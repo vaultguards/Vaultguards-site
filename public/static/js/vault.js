@@ -183,18 +183,24 @@
   var alignStage = document.getElementById('align-stage');
 
   function guideRectForBrand() {
-    // Slab guide sized by real brand ratio, centered, occupying ~64% of stage height.
-    var ratio = Cat.SLAB_RATIO[state.brand]; // width/height
+    // IMPORTANT: this guide box must be the EXACT same rectangle (as a % of
+    // the frame) that drawGuardComposite() below cuts the customer's slab
+    // into on the real guard photo. Previously this used a separately
+    // measured SLAB_RATIO to size a centered box, which was close but not
+    // identical to the true GUARD_WINDOW used at composite time — that tiny
+    // mismatch is why the guard sometimes didn't fit the uploaded slab photo
+    // perfectly. Deriving the guide directly from GUARD_WINDOW (the same
+    // source of truth used when compositing) guarantees whatever the
+    // customer lines up against the dashed guide here maps 1:1 onto the
+    // guard window later, for every colorway of that brand.
+    var win = Cat.GUARD_WINDOW[state.brand];
     var stageW = alignCanvas.width;
     var stageH = alignCanvas.height;
-    var guideH = stageH * 0.62;
-    var guideW = guideH * ratio;
-    return {
-      x: (stageW - guideW) / 2,
-      y: (stageH - guideH) / 2,
-      w: guideW,
-      h: guideH,
-    };
+    var x = (win.left / 100) * stageW;
+    var y = (win.top / 100) * stageH;
+    var w = stageW - x - (win.right / 100) * stageW;
+    var h = stageH - y - (win.bottom / 100) * stageH;
+    return { x: x, y: y, w: w, h: h };
   }
 
   function positionGuideOverlay() {
@@ -464,7 +470,7 @@
 
       renderSwatchThumb(canvas, g);
 
-      btn.addEventListener('click', function () { selectGuard(g, { scrollToPreview: true }); });
+      btn.addEventListener('click', function () { selectGuard(g); });
       grid.appendChild(btn);
     });
   }
@@ -476,25 +482,15 @@
     });
   }
 
-  function selectGuard(guard, opts) {
+  function selectGuard(guard) {
     state.activeGuard = guard;
     updateSwatchActiveState();
 
-    // If invoked from a swatch tap while scrolled down, bring the big preview
-    // image into view instead of making the user scroll back up manually.
-    if (opts && opts.scrollToPreview) {
-      var imageCard = document.getElementById('preview-image-card');
-      if (imageCard) {
-        var navEl = document.querySelector('.vg-nav');
-        var navH = navEl ? navEl.getBoundingClientRect().height : 0;
-        var rect = imageCard.getBoundingClientRect();
-        var fullyVisible = rect.top >= navH && rect.bottom <= window.innerHeight;
-        if (!fullyVisible) {
-          var targetY = window.scrollY + rect.top - navH - 16;
-          window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
-        }
-      }
-    }
+    // NOTE: the preview image card is CSS `position: sticky` (see
+    // #preview-image-card in theme.css), so it stays in view on its own
+    // while the customer scrolls the swatch list — no JS-triggered
+    // window.scrollTo() here anymore. A previous version smooth-scrolled
+    // the page on every tap, which felt like the screen was refreshing.
 
     document.getElementById('preview-color-title').textContent = guard.title;
     document.getElementById('preview-color-price').textContent = '$' + guard.price.toFixed(2);

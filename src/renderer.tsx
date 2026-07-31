@@ -21,7 +21,13 @@ export const renderer = jsxRenderer(({ children, title }) => {
         <link href="/static/style.css" rel="stylesheet" />
         <link href="/static/css/theme.css" rel="stylesheet" />
       </head>
-      <body>{children}</body>
+      <body>
+        <div class="vg-announce">
+          <i class="fa-solid fa-truck-fast" aria-hidden="true"></i>
+          Free US Shipping On Orders Over $50.
+        </div>
+        {children}
+      </body>
     </html>
   )
 })

@@ -269,6 +269,21 @@ h1, h2, h3, h4 {
 }
 
 /* ==========================================================================
+   Announcement bar
+   ========================================================================== */
+
+.vg-announce {
+  background: var(--vg-navy-900);
+  color: var(--vg-ivory-100);
+  text-align: center;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 9px var(--vg-space-4);
+}
+.vg-announce i { color: var(--vg-gold-400); margin-right: 7px; }
+
+/* ==========================================================================
    Nav
    ========================================================================== */
 
@@ -391,6 +406,41 @@ h1, h2, h3, h4 {
   background: var(--vg-ivory-300);
   border-radius: 10px;
   border: 2px solid var(--vg-ivory-100);
+}
+
+/* ==========================================================================
+   Front / Back photo toggle (PDP) — shows the acrylic backing shot
+   ========================================================================== */
+
+.vg-front-back-toggle {
+  display: flex;
+  gap: 8px;
+}
+.vg-fb-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: none;
+  background: var(--vg-ivory-100);
+  color: var(--vg-navy-500);
+  font-family: var(--vg-font-body);
+  font-weight: 600;
+  font-size: 13px;
+  padding: 11px 14px;
+  border-radius: var(--vg-radius-pill);
+  cursor: pointer;
+  transition: background var(--vg-dur-fast) var(--vg-ease-soft),
+              color var(--vg-dur-fast) var(--vg-ease-soft),
+              box-shadow var(--vg-dur-fast) var(--vg-ease-soft);
+  -webkit-tap-highlight-color: transparent;
+}
+.vg-fb-btn:hover { background: var(--vg-ivory-200); }
+.vg-fb-btn.vg-fb-active {
+  background: var(--vg-navy-900);
+  color: #fff;
+  box-shadow: var(--vg-shadow-sm);
 }
 
 /* ==========================================================================
@@ -593,7 +643,17 @@ h1, h2, h3, h4 {
 }
 
 .vault-card-pad { padding: 40px; }
-.vault-preview-grid { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 30px; }
+.vault-preview-grid { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 30px; align-items: start; }
+/* The preview image card stays pinned in view (below the sticky nav) while
+   the customer scrolls the swatch list and picks colors, instead of the
+   page auto-scrolling/jumping every time a color is tapped — that jump felt
+   like the screen was "refreshing". Kept on mobile too (stacked layout):
+   the card scrolls normally until it reaches the top, then sticks there
+   while the customer keeps browsing swatches below it. */
+#preview-image-card {
+  position: sticky;
+  top: 88px;
+}
 /* Swatch cards sized ~25% smaller than the original 4-column layout so more
    colorways are visible on screen at once. The thumb keeps a fixed 4:5
    aspect-ratio matching the real guard photos exactly (1920x2400 / 928x1152),

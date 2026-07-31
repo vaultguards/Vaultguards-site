@@ -2,8 +2,9 @@ import { Hono } from 'hono'
 import { renderer } from './renderer'
 import { Nav } from './components/Nav'
 import { Footer } from './components/Footer'
-import { TAG_GUARDS, PSA_GUARDS } from './data/products'
+import { TAG_GUARDS, PSA_GUARDS, ALL_GUARDS, type Guard } from './data/products'
 import { ProductCard } from './components/ProductCard'
+import { CatalogScript } from './components/CatalogScript'
 
 const app = new Hono()
 
@@ -17,6 +18,7 @@ const HOW_TO_OPEN_YOUTUBE_ID = 'dQw4w9WgXcQ'
 app.get('/', (c) => {
   const featuredTag = TAG_GUARDS.filter((g) => !g.mystery).slice(0, 4)
   const featuredPsa = PSA_GUARDS.filter((g) => !g.mystery).slice(0, 4)
+  const aura: Guard | undefined = ALL_GUARDS.find((g) => g.handle === 'aura')
 
   return c.render(
     <>
@@ -86,6 +88,45 @@ app.get('/', (c) => {
         </div>
       </section>
 
+      {/* ================= AURA SPOTLIGHT ================= */}
+      {aura && (
+        <section class="vg-section" style="background:var(--vg-navy-900); overflow:hidden;">
+          <div class="vg-container vg-grid-2">
+            <div class="vg-reveal vg-in">
+              <div class="vg-card" style="padding:26px; background:var(--vg-navy-800); box-shadow:none;">
+                <div style={`aspect-ratio:4/5; border-radius:var(--vg-radius-md); overflow:hidden; background:var(--vg-navy-700);`}>
+                  <img src={aura.image} alt={aura.title} style="width:100%; height:100%; object-fit:cover;" loading="lazy" />
+                </div>
+              </div>
+            </div>
+            <div class="vg-reveal" data-delay="1">
+              <div class="vg-eyebrow" style="color:var(--vg-gold-400);">Spotlight colorway</div>
+              <h2 style="font-size:36px; margin:16px 0 16px; color:#fff;">Meet <em style="color:var(--vg-gold-400); font-style:normal;">Aura</em>.</h2>
+              <p style="color:var(--vg-navy-300); font-size:16px; line-height:1.7; max-width:440px; margin-bottom:16px;">
+                Completely clear. No tint, no finish, nothing between you and the slab. Aura is built for the
+                purist collector who doesn&rsquo;t want to take anything away from the clean look of a TAG slab —
+                full edge and corner protection, plus the same solid acrylic backing as every other colorway,
+                without changing how the card looks in your hand.
+              </p>
+              <div style="display:flex; align-items:center; gap:12px; margin-bottom:28px;">
+                <span style="font-size:19px; color:#fff; font-weight:600;">${aura.price.toFixed(2)}</span>
+                <span class={aura.stock > 0 ? 'vg-pill vg-pill-in' : 'vg-pill vg-pill-out'}>
+                  {aura.stock > 0 ? 'In stock' : 'Out of stock'}
+                </span>
+              </div>
+              <div style="display:flex; gap:14px; flex-wrap:wrap;">
+                <a href={`/product/${aura.handle}`} class="vg-btn vg-btn-gold" data-vg-haptic="tap">
+                  Shop Aura <i class="fa-solid fa-arrow-right"></i>
+                </a>
+                <a href="/vault" class="vg-btn vg-btn-ghost" data-vg-haptic="tap">
+                  <i class="fa-solid fa-vault"></i> Try It On
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ================= SCROLL-REVEAL FEATURES ================= */}
       <section class="vg-section">
         <div class="vg-container">
@@ -94,18 +135,19 @@ app.get('/', (c) => {
             <h2 style="font-size:38px; margin-top:14px;">Protection that respects the grade.</h2>
           </div>
 
-          <div class="vg-grid-3">
+          <div class="vg-grid-4">
             {[
               { icon: 'fa-solid fa-shield-halved', title: 'Edge-first armor', body: 'Guards wrap the slab\u2019s edges and corners only — the label, cert number, and card stay fully visible.' },
+              { icon: 'fa-solid fa-layer-group', title: 'Solid acrylic backing', body: 'Every guard ships with a clear acrylic back panel, not a soft bumper — full rear protection for your slab.' },
               { icon: 'fa-solid fa-palette', title: '29 real colorways', body: 'From Aura white to Curse purple-black — every finish is photographed on real slabs, not renders.' },
               { icon: 'fa-solid fa-vault', title: 'Try before you buy', body: 'Upload your own slab in The Vault and preview it inside any guard color before it ships.' },
             ].map((f, i) => (
-              <div class="vg-reveal vg-card" data-delay={String(Math.min(i, 3))} style="padding:36px;">
-                <div style="width:52px; height:52px; border-radius:16px; background:var(--vg-gold-050); display:flex; align-items:center; justify-content:center; color:var(--vg-gold-500); font-size:20px; margin-bottom:18px;">
+              <div class="vg-reveal vg-card" data-delay={String(Math.min(i, 3))} style="padding:30px;">
+                <div style="width:48px; height:48px; border-radius:14px; background:var(--vg-gold-050); display:flex; align-items:center; justify-content:center; color:var(--vg-gold-500); font-size:18px; margin-bottom:16px;">
                   <i class={f.icon}></i>
                 </div>
-                <h3 style="font-size:19px; margin-bottom:10px;">{f.title}</h3>
-                <p style="color:var(--vg-navy-400); font-size:14.5px; margin:0;">{f.body}</p>
+                <h3 style="font-size:17px; margin-bottom:9px;">{f.title}</h3>
+                <p style="color:var(--vg-navy-400); font-size:14px; margin:0;">{f.body}</p>
               </div>
             ))}
           </div>
@@ -164,7 +206,7 @@ app.get('/', (c) => {
 
       <Footer />
 
-      <script src="/static/js/products-data.js"></script>
+      <CatalogScript />
       <script src="/static/js/haptic-scroll.js"></script>
       <script src="/static/js/bundle-widget.js"></script>
       <script>{`VG.initHapticScroll();`}</script>

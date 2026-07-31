@@ -1,4 +1,5 @@
 import type { Guard } from '../data/products'
+import { PRODUCT_PHOTO_ASPECT } from '../data/products'
 
 /** Shared product-card markup used on the homepage featured grid AND the full collection pages. */
 export function ProductCard({ g, delay }: { g: Guard; delay?: number }) {
@@ -9,7 +10,11 @@ export function ProductCard({ g, delay }: { g: Guard; delay?: number }) {
       data-delay={String(delay ?? 0)}
       style="overflow:hidden; padding:0; display:block; text-decoration:none; color:inherit;"
     >
-      <div style="aspect-ratio:1/1; background:var(--vg-ivory-50);">
+      {/* aspect-ratio matches the REAL product photo ratio (4:5) so the top
+          and bottom of the guard photo are never cropped — a 1:1 square
+          crop here was cutting off the top/bottom of every portrait-shot
+          product photo, most noticeably on PSA guards. */}
+      <div style={`aspect-ratio:${PRODUCT_PHOTO_ASPECT}; background:var(--vg-ivory-50);`}>
         <img src={g.image} alt={g.title} style="width:100%; height:100%; object-fit:cover;" loading="lazy" />
       </div>
       <div style="padding:18px 20px 22px;">

@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { renderer } from '../renderer'
 import { Nav } from '../components/Nav'
 import { Footer } from '../components/Footer'
+import { CatalogScript } from '../components/CatalogScript'
 
 const vault = new Hono()
 
@@ -165,7 +166,7 @@ vault.get('/', (c) => {
 
       <Footer />
 
-      <script src="/static/js/products-data.js"></script>
+      <CatalogScript />
       <script src="/static/js/haptic-scroll.js"></script>
       <script type="module" src="/static/js/vault.js"></script>
       <script>{`VG.initHapticScroll();`}</script>
