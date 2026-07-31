@@ -3,6 +3,7 @@ import { renderer } from './renderer'
 import { Nav } from './components/Nav'
 import { Footer } from './components/Footer'
 import { TAG_GUARDS, PSA_GUARDS } from './data/products'
+import { ProductCard } from './components/ProductCard'
 
 const app = new Hono()
 
@@ -61,53 +62,21 @@ app.get('/', (c) => {
 
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
             <h3 style="font-size:20px;">TAG Guards</h3>
-            <a href="/#shop-tag" class="vg-pill vg-pill-gold" style="text-decoration:none;">Shop TAG Collection</a>
+            <a href="/collection/tag" class="vg-pill vg-pill-gold" style="text-decoration:none;">Shop TAG Collection <i class="fa-solid fa-arrow-right" style="font-size:10px; margin-left:2px;"></i></a>
           </div>
           <div class="vg-grid-4" style="margin-bottom:56px;" id="shop-tag">
             {featuredTag.map((g, i) => (
-              <a href={`/product/${g.handle}`} class="vg-reveal vg-card vg-product-card" data-delay={String(i % 4)} style="overflow:hidden; padding:0; display:block; text-decoration:none; color:inherit;">
-                <div style="aspect-ratio:1/1; background:var(--vg-ivory-50);">
-                  <img src={g.image} alt={g.title} style="width:100%; height:100%; object-fit:cover;" />
-                </div>
-                <div style="padding:18px 20px 22px;">
-                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-                    <span style={`width:14px;height:14px;border-radius:50%;background:${g.hex};box-shadow:var(--vg-shadow-xs)`}></span>
-                    <span style="font-weight:600; font-size:15px;">{g.title}</span>
-                  </div>
-                  <div style="display:flex; align-items:center; justify-content:space-between;">
-                    <span style="color:var(--vg-navy-400); font-size:14px;">${g.price.toFixed(2)}</span>
-                    <span class={g.stock > 0 ? 'vg-pill vg-pill-in' : 'vg-pill vg-pill-out'} style="font-size:10px; padding:3px 10px;">
-                      {g.stock > 0 ? 'In stock' : 'Out of stock'}
-                    </span>
-                  </div>
-                </div>
-              </a>
+              <ProductCard g={g} delay={i % 4} />
             ))}
           </div>
 
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
             <h3 style="font-size:20px;">PSA Guards</h3>
-            <a href="/#shop-psa" class="vg-pill vg-pill-gold" style="text-decoration:none;">Shop PSA Collection</a>
+            <a href="/collection/psa" class="vg-pill vg-pill-gold" style="text-decoration:none;">Shop PSA Collection <i class="fa-solid fa-arrow-right" style="font-size:10px; margin-left:2px;"></i></a>
           </div>
           <div class="vg-grid-4" id="shop-psa">
             {featuredPsa.map((g, i) => (
-              <a href={`/product/${g.handle}`} class="vg-reveal vg-card vg-product-card" data-delay={String(i % 4)} style="overflow:hidden; padding:0; display:block; text-decoration:none; color:inherit;">
-                <div style="aspect-ratio:1/1; background:var(--vg-ivory-50);">
-                  <img src={g.image} alt={g.title} style="width:100%; height:100%; object-fit:cover;" />
-                </div>
-                <div style="padding:18px 20px 22px;">
-                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-                    <span style={`width:14px;height:14px;border-radius:50%;background:${g.hex};box-shadow:var(--vg-shadow-xs)`}></span>
-                    <span style="font-weight:600; font-size:15px;">{g.title}</span>
-                  </div>
-                  <div style="display:flex; align-items:center; justify-content:space-between;">
-                    <span style="color:var(--vg-navy-400); font-size:14px;">${g.price.toFixed(2)}</span>
-                    <span class={g.stock > 0 ? 'vg-pill vg-pill-in' : 'vg-pill vg-pill-out'} style="font-size:10px; padding:3px 10px;">
-                      {g.stock > 0 ? 'In stock' : 'Out of stock'}
-                    </span>
-                  </div>
-                </div>
-              </a>
+              <ProductCard g={g} delay={i % 4} />
             ))}
           </div>
 
@@ -205,7 +174,9 @@ app.get('/', (c) => {
 
 import vault from './routes/vault'
 import product from './routes/product'
+import collection from './routes/collection'
 app.route('/vault', vault)
 app.route('/product', product)
+app.route('/collection', collection)
 
 export default app
