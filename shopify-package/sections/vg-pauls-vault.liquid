@@ -15,14 +15,17 @@
   ONE-TIME SETUP (only needed once, already handled if this file was pushed
   by the assistant and a Page + template are set up per the assistant's
   instructions):
-  - A Shopify Page titled "Paul's Vault" must exist (Online Store > Pages),
+  - A separate Shopify Page must exist (Online Store > Pages) with URL
+    handle "founder-collection" (live at vaultguards.co/pages/founder-collection),
     with its Theme template set to "page.founder-collection" in the page
     editor's "Theme template" dropdown (labeled "Founder collection" in the
-    dropdown list).
+    dropdown list). This must be a DIFFERENT Page resource from "The Vault"
+    page - two separate pages in the Pages list, each with its own
+    permanent Theme template, never toggled back and forth on one page.
   - IMPORTANT: this is a DIFFERENT page from "The Vault" (the virtual try-on
-    tool, template "page.vault" / labeled "Vault"). Do not set either page's
-    Theme template to the other one's option - double-check the dropdown
-    label on each page before saving:
+    tool, handle "the-vault", template "page.vault" / labeled "Vault"). Do
+    not set either page's Theme template to the other one's option -
+    double-check the dropdown label on each page before saving:
       "The Vault" page        -> Theme template: "Vault"
       "Paul's Vault" page     -> Theme template: "Founder collection"
 {% endcomment %}
