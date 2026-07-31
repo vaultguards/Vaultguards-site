@@ -94,6 +94,18 @@
 .vg-nav-links { display: flex; gap: var(--vg-space-5); font-size: 14px; font-weight: 500; color: var(--vg-navy-600); }
 .vg-nav-links a:hover { color: var(--vg-navy-900); }
 @media (max-width: 720px) { .vg-nav-links { display: none; } }
+.vg-nav-actions { display: flex; align-items: center; gap: 10px; }
+.vg-nav-toggle { display: none; align-items: center; justify-content: center; width: 40px; height: 40px; background: none; border: none; color: var(--vg-navy-900); font-size: 19px; cursor: pointer; -webkit-tap-highlight-color: transparent; flex-shrink: 0; }
+@media (max-width: 720px) { .vg-nav-toggle { display: flex; } }
+@media (max-width: 400px) { .vg-nav-actions .vg-btn span { display: none; } .vg-nav-actions .vg-btn { padding: 10px 13px; } }
+.vg-mobile-menu { display: none; flex-direction: column; background: var(--vg-surface); border-top: 1px solid var(--vg-ivory-200); box-shadow: var(--vg-shadow-md); }
+.vg-mobile-menu.vg-mobile-menu-open { display: flex; }
+.vg-mobile-menu a { padding: 16px var(--vg-space-4); font-size: 15px; font-weight: 500; color: var(--vg-navy-700); border-bottom: 1px solid var(--vg-ivory-100); }
+.vg-mobile-menu a:last-child { border-bottom: none; }
+@media (min-width: 721px) { .vg-mobile-menu { display: none !important; } }
+.vg-vault-swatches { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; }
+@media (max-width: 520px) { .vg-vault-swatches { grid-template-columns: repeat(4,1fr); } }
+@media (max-width: 380px) { .vg-vault-swatches { grid-template-columns: repeat(3,1fr); } }
 .vg-reveal { opacity: 0; transform: translateY(36px); transition: opacity 900ms var(--vg-ease-out), transform 900ms var(--vg-ease-out); }
 .vg-reveal.vg-in { opacity: 1; transform: translateY(0); }
 .vg-reveal[data-delay="1"] { transition-delay: 90ms; }
@@ -138,10 +150,20 @@
         <a href="{{ pages['the-vault'].url | default: '/pages/the-vault' }}">The Vault</a>
         <a href="{{ pages.contact.url | default: '/pages/contact' }}">Contact</a>
       </nav>
-      <a href="{{ pages['the-vault'].url | default: '/pages/the-vault' }}" class="vg-btn vg-btn-gold" style="padding:10px 20px;font-size:13px" data-vg-haptic="tap">
-        <i class="fa-solid fa-vault"></i> Try It On
-      </a>
+      <div class="vg-nav-actions">
+        <a href="{{ pages['the-vault'].url | default: '/pages/the-vault' }}" class="vg-btn vg-btn-gold" style="padding:10px 20px;font-size:13px" data-vg-haptic="tap">
+          <i class="fa-solid fa-vault"></i> <span>Try It On</span>
+        </a>
+        <button type="button" class="vg-nav-toggle" id="vg-nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="vg-mobile-menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
     </div>
+    <nav class="vg-mobile-menu" id="vg-mobile-menu">
+      <a href="{{ routes.root_url }}#shop">Shop</a>
+      <a href="{{ pages['the-vault'].url | default: '/pages/the-vault' }}">The Vault</a>
+      <a href="{{ pages.contact.url | default: '/pages/contact' }}">Contact</a>
+    </nav>
   </header>
 
   <main role="main">
@@ -235,9 +257,31 @@
         else VG.haptic.tap();
       });
     }
+    function vgInitMobileMenu() {
+      var toggle = document.getElementById('vg-nav-toggle');
+      var menu = document.getElementById('vg-mobile-menu');
+      if (!toggle || !menu) return;
+      function closeMenu() {
+        menu.classList.remove('vg-mobile-menu-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.innerHTML = '<i class="fa-solid fa-bars"></i>';
+      }
+      toggle.addEventListener('click', function () {
+        var isOpen = menu.classList.toggle('vg-mobile-menu-open');
+        toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        toggle.innerHTML = isOpen ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
+      });
+      menu.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', closeMenu);
+      });
+      window.addEventListener('resize', function () {
+        if (window.innerWidth > 720) closeMenu();
+      });
+    }
     VG.initHapticScroll = function () {
       vgInitRevealObserver();
       vgInitTapHaptics();
+      vgInitMobileMenu();
     };
     document.addEventListener('DOMContentLoaded', function () { VG.initHapticScroll(); });
   </script>
