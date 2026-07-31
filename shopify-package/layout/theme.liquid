@@ -130,7 +130,7 @@
   <header class="vg-nav">
     <div class="vg-nav-inner">
       <a href="{{ routes.root_url }}" class="vg-logo">
-        <img src="{{ 'vaultguards-logo.png' | asset_url }}" alt="{{ shop.name }}" class="vg-logo-mark">
+        <img src="{{ 'vaultguards-logo.png' | asset_url }}" alt="{{ shop.name }}" class="vg-logo-mark" width="32" height="32">
         {{ shop.name }}
       </a>
       <nav class="vg-nav-links">
@@ -153,7 +153,7 @@
       <div class="vg-footer-grid" style="display:grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap:40px;">
         <div>
           <div class="vg-logo" style="color:#fff;">
-            <img src="{{ 'vaultguards-logo.png' | asset_url }}" alt="{{ shop.name }}" class="vg-logo-mark"> {{ shop.name }}
+            <img src="{{ 'vaultguards-logo.png' | asset_url }}" alt="{{ shop.name }}" class="vg-logo-mark" width="32" height="32"> {{ shop.name }}
           </div>
           <p style="color:var(--vg-navy-300); font-size:14px; max-width:280px; margin-top:14px;">
             Precision-fit colorway guards for TAG and PSA graded slabs. Built for collectors who treat their cards like the assets they are.
@@ -163,12 +163,16 @@
           <div style="font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--vg-gold-400); margin-bottom:14px;">Shop</div>
           <div style="display:flex; flex-direction:column; gap:10px; font-size:14px; color:var(--vg-navy-300);">
             {% for collection in collections %}
-              {% if collection.handle contains 'tag' %}<a href="{{ collection.url }}">TAG Guards</a>{% endif %}
+              {% assign vg_is_tag = false %}
+              {% if collection.handle contains 'tag' %}{% assign vg_is_tag = true %}{% endif %}
+              {% if vg_is_tag %}<a href="{{ collection.url }}">TAG Guards</a>{% endif %}
             {% endfor %}
             {% for collection in collections %}
-              {% unless collection.handle contains 'tag' %}
-                {% if collection.handle contains 'shimmer' %}<a href="{{ collection.url }}">PSA Guards</a>{% endif %}
-              {% endunless %}
+              {% assign vg_is_tag = false %}
+              {% assign vg_is_shimmer = false %}
+              {% if collection.handle contains 'tag' %}{% assign vg_is_tag = true %}{% endif %}
+              {% if collection.handle contains 'shimmer' %}{% assign vg_is_shimmer = true %}{% endif %}
+              {% if vg_is_shimmer and vg_is_tag == false %}<a href="{{ collection.url }}">PSA Guards</a>{% endif %}
             {% endfor %}
             <a href="{{ routes.root_url }}#shop">Accessories</a>
           </div>
