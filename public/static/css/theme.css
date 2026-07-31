@@ -496,6 +496,8 @@ h1, h2, h3, h4 {
 .vault-preview-stage {
   position: relative;
   width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
   aspect-ratio: 4/5;
   background: var(--vg-ivory-50);
   border-radius: var(--vg-radius-md);
@@ -591,8 +593,13 @@ h1, h2, h3, h4 {
 }
 
 .vault-card-pad { padding: 40px; }
-.vault-preview-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 30px; }
-.vault-swatch-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 26px; }
+.vault-preview-grid { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 30px; }
+/* Swatch cards sized ~25% smaller than the original 4-column layout so more
+   colorways are visible on screen at once. The thumb keeps a fixed 4:5
+   aspect-ratio matching the real guard photos exactly (1920x2400 / 928x1152),
+   so shrinking the grid cell never crops any part of the slab/guard image —
+   it only scales the whole photo down uniformly. */
+.vault-swatch-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 26px; }
 
 @media (max-width: 780px) {
   .vault-preview-grid { grid-template-columns: 1fr; }
@@ -617,7 +624,10 @@ h1, h2, h3, h4 {
 
   .vault-align-stage { max-width: 100%; }
 
-  .vault-swatch-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .vault-preview-stage { max-width: 190px; }
+
+  .vault-swatch-grid { grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .vault-swatch-label { font-size: 9.5px; padding-top: 4px; }
 
   #panel-upload .vg-btn-ghost,
   #panel-align .vg-btn-ghost,
@@ -631,7 +641,8 @@ h1, h2, h3, h4 {
 }
 
 @media (max-width: 380px) {
-  .vault-swatch-grid { grid-template-columns: repeat(2, 1fr); }
+  .vault-swatch-grid { grid-template-columns: repeat(4, 1fr); }
+  .vault-preview-stage { max-width: 160px; }
 }
 
 /* Ensure canvases used for compositing always scale to their container on

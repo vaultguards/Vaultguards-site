@@ -464,7 +464,7 @@
 
       renderSwatchThumb(canvas, g);
 
-      btn.addEventListener('click', function () { selectGuard(g); });
+      btn.addEventListener('click', function () { selectGuard(g, { scrollToPreview: true }); });
       grid.appendChild(btn);
     });
   }
@@ -476,9 +476,25 @@
     });
   }
 
-  function selectGuard(guard) {
+  function selectGuard(guard, opts) {
     state.activeGuard = guard;
     updateSwatchActiveState();
+
+    // If invoked from a swatch tap while scrolled down, bring the big preview
+    // image into view instead of making the user scroll back up manually.
+    if (opts && opts.scrollToPreview) {
+      var imageCard = document.getElementById('preview-image-card');
+      if (imageCard) {
+        var navEl = document.querySelector('.vg-nav');
+        var navH = navEl ? navEl.getBoundingClientRect().height : 0;
+        var rect = imageCard.getBoundingClientRect();
+        var fullyVisible = rect.top >= navH && rect.bottom <= window.innerHeight;
+        if (!fullyVisible) {
+          var targetY = window.scrollY + rect.top - navH - 16;
+          window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+        }
+      }
+    }
 
     document.getElementById('preview-color-title').textContent = guard.title;
     document.getElementById('preview-color-price').textContent = '$' + guard.price.toFixed(2);

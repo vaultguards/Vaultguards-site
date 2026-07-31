@@ -130,7 +130,7 @@ vault.get('/', (c) => {
           {/* ===== STEP 4: PREVIEW & BUY ===== */}
           <div class="vault-panel" id="panel-preview" style="display:none;">
             <div class="vault-preview-grid">
-              <div class="vg-card" style="padding:24px;">
+              <div class="vg-card" style="padding:24px;" id="preview-image-card">
                 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
                   <span class="vg-pill vg-pill-gold" id="preview-brand-pill">TAG</span>
                   <button class="vg-btn vg-btn-ghost" style="padding:7px 14px; font-size:12px;" data-vault-back="3">
