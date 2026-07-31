@@ -89,15 +89,15 @@
 .vg-announce i { color: var(--vg-gold-400); margin-right: 7px; }
 .vg-nav { position: sticky; top: 0; z-index: 100; background: rgba(230,231,233,.9); backdrop-filter: blur(18px) saturate(1.2); -webkit-backdrop-filter: blur(18px) saturate(1.2); box-shadow: 0 1px 0 rgba(18,22,27,.06); }
 .vg-nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 18px var(--vg-space-4); max-width: 1180px; margin: 0 auto; }
-.vg-logo { font-family: var(--vg-font-display); font-size: 21px; font-weight: 600; letter-spacing: .02em; display: flex; align-items: center; gap: 8px; }
+.vg-logo { font-family: var(--vg-font-display); font-size: 21px; font-weight: 600; letter-spacing: .02em; display: flex; align-items: center; gap: 6px; }
 .vg-logo-mark { width: 32px; height: 32px; object-fit: contain; flex-shrink: 0; }
 .vg-nav-links { display: flex; gap: var(--vg-space-5); font-size: 14px; font-weight: 500; color: var(--vg-navy-600); }
 .vg-nav-links a:hover { color: var(--vg-navy-900); }
 @media (max-width: 720px) { .vg-nav-links { display: none; } }
-.vg-nav-actions { display: flex; align-items: center; gap: 10px; }
+.vg-nav-actions { display: flex; align-items: center; gap: 8px; }
 .vg-nav-toggle { display: none; align-items: center; justify-content: center; width: 40px; height: 40px; background: none; border: none; color: var(--vg-navy-900); font-size: 19px; cursor: pointer; -webkit-tap-highlight-color: transparent; flex-shrink: 0; }
 @media (max-width: 720px) { .vg-nav-toggle { display: flex; } }
-@media (max-width: 400px) { .vg-nav-actions .vg-btn span { display: none; } .vg-nav-actions .vg-btn { padding: 10px 13px; } }
+@media (max-width: 480px) { .vg-nav-actions .vg-btn span { display: none; } .vg-nav-actions .vg-btn { padding: 10px 13px; } }
 .vg-mobile-menu { display: none; flex-direction: column; background: var(--vg-surface); border-top: 1px solid var(--vg-ivory-200); box-shadow: var(--vg-shadow-md); }
 .vg-mobile-menu.vg-mobile-menu-open { display: flex; }
 .vg-mobile-menu a { padding: 16px var(--vg-space-4); font-size: 15px; font-weight: 500; color: var(--vg-navy-700); border-bottom: 1px solid var(--vg-ivory-100); }
@@ -146,8 +146,8 @@
   <header class="vg-nav">
     <div class="vg-nav-inner">
       <a href="{{ routes.root_url }}" class="vg-logo">
-        <img src="{{ 'vaultguards-logo.png' | asset_url }}" alt="" class="vg-logo-mark" style="width:19px; height:19px;" width="19" height="19">
-        <img src="{{ 'vaultguards-wordmark-dark.png' | asset_url }}" alt="{{ shop.name }}" style="height:11px; width:auto; display:block;" width="144" height="11">
+        <img src="{{ 'vaultguards-logo.png' | asset_url }}" alt="" class="vg-logo-mark" style="width:15px; height:15px;" width="15" height="15">
+        <img src="{{ 'vaultguards-wordmark-dark.png' | asset_url }}" alt="{{ shop.name }}" style="height:9px; width:auto; display:block;" width="115" height="9">
       </a>
       <nav class="vg-nav-links">
         <a href="{{ routes.root_url }}#shop">Shop</a>
@@ -155,7 +155,7 @@
         <a href="{{ pages.contact.url | default: '/pages/contact' }}">Contact</a>
       </nav>
       <div class="vg-nav-actions">
-        <a href="{{ pages['the-vault'].url | default: '/pages/the-vault' }}" class="vg-btn vg-btn-gold" style="padding:10px 20px;font-size:13px" data-vg-haptic="tap">
+        <a href="{{ pages['the-vault'].url | default: '/pages/the-vault' }}" class="vg-btn vg-btn-gold" style="padding:9px 14px;font-size:12px;white-space:nowrap;" data-vg-haptic="tap">
           <i class="fa-solid fa-vault"></i> <span>Try It On</span>
         </a>
         <a href="{{ routes.cart_url }}" class="vg-nav-cart" aria-label="Cart, {{ cart.item_count }} items" data-vg-haptic="tick">
