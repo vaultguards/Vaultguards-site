@@ -196,10 +196,28 @@
 </section>
 {% endif %}
 
+{% comment %} ---- Watch Once You Buy: real unboxing video, placed before "Protection that respects the grade" ---- {% endcomment %}
+{% assign youtube_id = 'JPYy9seWNDY' %}
+<section id="watch" class="vg-section" style="background:var(--vg-navy-900);">
+  <div class="vg-container">
+    <div class="vg-reveal" style="text-align:center; max-width:600px; margin:0 auto 40px;">
+      <div class="vg-eyebrow" style="color:var(--vg-gold-400);">How it opens</div>
+      <h2 style="font-size:36px; margin-top:14px; color:#fff;">Watch once you buy.</h2>
+      <p style="color:var(--vg-navy-300); margin-top:12px; font-size:15.5px;">
+        A quick look at Vaultguards&rsquo; unique pull-tab unboxing: two pulls, press the perforated edge, and your guard is ready.
+      </p>
+    </div>
+    <div class="vg-reveal" style="max-width:900px; margin:0 auto;">
+      <div class="vg-video-frame">
+        <iframe src="https://www.youtube-nocookie.com/embed/{{ youtube_id }}" title="How to open your Vaultguards guard" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="vg-section">
   <div class="vg-container">
     <div class="vg-reveal" style="text-align:center; max-width:640px; margin:0 auto 64px;">
-      <div class="vg-eyebrow">Why collectors switch</div>
       <h2 style="font-size:38px; margin-top:14px;">Protection that respects the grade.</h2>
     </div>
     <div class="vg-features-grid">
@@ -259,25 +277,6 @@
           </div>
         </a>
       {% endfor %}
-    </div>
-  </div>
-</section>
-
-{% comment %} ---- Watch Once You Buy: swap YOUTUBE_ID for your real unboxing video ---- {% endcomment %}
-{% assign youtube_id = 'dQw4w9WgXcQ' %}
-<section id="watch" class="vg-section" style="background:var(--vg-navy-900);">
-  <div class="vg-container">
-    <div class="vg-reveal" style="text-align:center; max-width:600px; margin:0 auto 40px;">
-      <div class="vg-eyebrow" style="color:var(--vg-gold-400);">How it opens</div>
-      <h2 style="font-size:36px; margin-top:14px; color:#fff;">Watch once you buy.</h2>
-      <p style="color:var(--vg-navy-300); margin-top:12px; font-size:15.5px;">
-        A quick look at Vaultguards&rsquo; unique pull-tab unboxing: two pulls, press the perforated edge, and your guard is ready.
-      </p>
-    </div>
-    <div class="vg-reveal" style="max-width:900px; margin:0 auto;">
-      <div class="vg-video-frame">
-        <iframe src="https://www.youtube-nocookie.com/embed/{{ youtube_id }}" title="How to open your Vaultguards guard" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-      </div>
     </div>
   </div>
 </section>
