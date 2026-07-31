@@ -1,12 +1,12 @@
 {% comment %}
   VAULTGUARDS - The Vault Section (virtual try-on), connected to real
-  products. Fully client-side: no server, no data storage. A visitor uploads
-  a photo of their slab (it stays only in their own browser tab - nothing is
-  sent anywhere or saved), picks a real product from your TAG or PSA
-  collection, and previews a guard-color frame around their photo - the tint
-  is sampled live from that real product photo, so it is not a
-  fake/placeholder color. From there they can jump to that product page or
-  add it straight to cart.
+  products. Fully client-side: no server, no data storage. A visitor picks
+  their slab brand, uploads a photo (stays only in their own browser tab -
+  nothing is sent anywhere or saved), aligns it with a pinch/drag guide, then
+  previews it composited with the REAL guard product photo for every real
+  colorway - the frame around their card is the actual plastic guard photo
+  (true color, texture, sheen), not a flat tint. From there they can jump to
+  that product page or add it straight to cart.
 
   CONFIG: edit the two handles below if your collection handles ever change.
 
@@ -34,8 +34,8 @@
      Vaultguards Vault shows.
   8. Click Save in the top right.
   9. Open your storefront > click "Try It On" in the nav, or visit
-     /pages/the-vault directly > upload a photo, pick a product, try
-     Add to Cart.
+     /pages/the-vault directly > pick a brand, upload a photo, align it,
+     preview every colorway, try Add to Cart.
 {% endcomment %}
 
 {% assign tag_collection_handle = 'tag-guards-shimmer-series' %}
@@ -43,73 +43,146 @@
 {% assign tag_collection = collections[tag_collection_handle] %}
 {% assign psa_collection = collections[psa_collection_handle] %}
 
-<section class="vg-section" style="padding-top:56px;">
-  <div class="vg-container" style="max-width:900px;">
-    <div class="vg-reveal vg-in" style="text-align:center; margin-bottom:40px;">
-      <div class="vg-eyebrow">Virtual Try-On</div>
-      <h1 style="font-size:40px; margin-top:14px;">Welcome to The Vault.</h1>
-      <p style="color:var(--vg-navy-400); margin-top:12px; font-size:16px;">
-        Upload a photo of your slab, pick a real colorway from the shop, and preview it
-        before you buy. Your photo stays in your browser only - nothing is uploaded or
-        saved anywhere.
-      </p>
+<section class="vg-section vg-vault-root" style="padding-top:56px;">
+  <div class="vg-container" style="max-width:680px; text-align:center; margin-bottom:20px;">
+    <div class="vg-eyebrow">Virtual Try-On</div>
+    <h1 style="font-size:40px; margin-top:14px;">Welcome to The Vault.</h1>
+    <p style="color:var(--vg-navy-400); margin-top:12px; font-size:16px;">
+      Upload a photo of your slab, align it, and preview every real colorway before you
+      buy. Your photo stays in your browser only - nothing is uploaded or saved anywhere.
+    </p>
+  </div>
+
+  <div class="vg-container" style="max-width:920px;">
+    <div id="vg-vault-steps" style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; margin-bottom:24px;">
+      <div class="vgv-step" data-step="1"><span class="vgv-step-num">1</span> Brand</div>
+      <div class="vgv-step-line"></div>
+      <div class="vgv-step" data-step="2"><span class="vgv-step-num">2</span> Upload</div>
+      <div class="vgv-step-line"></div>
+      <div class="vgv-step" data-step="3"><span class="vgv-step-num">3</span> Align</div>
+      <div class="vgv-step-line"></div>
+      <div class="vgv-step" data-step="4"><span class="vgv-step-num">4</span> Preview &amp; Buy</div>
     </div>
 
-    <div class="vg-card vg-reveal" style="padding:28px;">
-      <div style="display:flex; gap:10px; justify-content:center; margin-bottom:26px;">
-        <button type="button" class="vg-fb-btn vg-fb-active" id="vg-vault-tag-btn">TAG Slab</button>
-        <button type="button" class="vg-fb-btn" id="vg-vault-psa-btn">PSA Slab</button>
+    {% comment %} ===== STEP 1: BRAND ===== {% endcomment %}
+    <div class="vgv-panel" id="vgv-panel-brand">
+      <div class="vg-card" style="padding:28px;">
+        <h2 style="font-size:22px; margin-bottom:6px; text-align:center;">Which brand is your slab?</h2>
+        <p style="text-align:center; color:var(--vg-navy-400); font-size:14px; margin-bottom:30px;">
+          This sets the slab shape used for alignment and which colorways you can preview.
+        </p>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <button type="button" class="vgv-brand-btn" data-brand="tag" data-vg-haptic="tap">
+            <div class="vgv-brand-swatch" style="background:linear-gradient(135deg,#eee,#ccc);"></div>
+            <div style="font-weight:700; font-size:18px; margin-top:14px;">TAG Slab</div>
+          </button>
+          <button type="button" class="vgv-brand-btn" data-brand="psa" data-vg-haptic="tap">
+            <div class="vgv-brand-swatch" style="background:linear-gradient(135deg,#dbe7f7,#9fc0e8);"></div>
+            <div style="font-weight:700; font-size:18px; margin-top:14px;">PSA Slab</div>
+          </button>
+        </div>
       </div>
+    </div>
 
-      <div class="vg-grid-2" style="gap:36px; align-items:start;">
-        <div>
-          <div id="vg-vault-frame" style="position:relative; max-width:340px; margin:0 auto 18px; aspect-ratio:0.72; border-radius:18px; padding:16px; background:#D8DEE3; transition:background 260ms var(--vg-ease-soft), aspect-ratio 220ms var(--vg-ease-soft);">
-            <div style="width:100%; height:100%; border-radius:8px; background:#fff; overflow:hidden; display:flex; align-items:center; justify-content:center;">
-              <img id="vg-vault-photo" src="" alt="Your uploaded slab" style="display:none; width:100%; height:100%; object-fit:contain;" width="340" height="472">
-              <div id="vg-vault-placeholder" style="text-align:center; color:var(--vg-navy-400); font-size:13px; padding:20px;">
-                <i class="fa-solid fa-image" style="font-size:26px; display:block; margin-bottom:10px;"></i>
-                Upload a photo to preview
-              </div>
-            </div>
-          </div>
+    {% comment %} ===== STEP 2: UPLOAD ===== {% endcomment %}
+    <div class="vgv-panel" id="vgv-panel-upload" style="display:none;">
+      <div class="vg-card" style="padding:28px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; flex-wrap:wrap; gap:10px;">
+          <h2 style="font-size:22px;">Upload your slab photo</h2>
+          <button type="button" class="vg-btn vg-btn-ghost" style="padding:8px 16px; font-size:12.5px;" data-vgv-back="1">
+            <i class="fa-solid fa-arrow-left"></i> Change brand
+          </button>
+        </div>
 
-          <div style="text-align:center; margin-bottom:8px;">
-            <label for="vg-vault-upload" class="vg-btn vg-btn-primary" data-vg-haptic="tap" style="cursor:pointer;">
-              <i class="fa-solid fa-upload"></i> Upload Your Slab Photo
-            </label>
-            <input type="file" id="vg-vault-upload" accept="image/*" style="display:none;">
+        <div class="vg-card-flat" style="padding:16px 20px; display:flex; gap:14px; align-items:flex-start; margin-bottom:24px;">
+          <i class="fa-solid fa-camera" style="color:var(--vg-gold-500); font-size:18px; margin-top:2px;"></i>
+          <div style="font-size:13.5px; color:var(--vg-navy-600); line-height:1.6;">
+            For the cleanest result: place your slab on a flat, well-lit surface and fill
+            most of the camera frame with it - shoot straight-on, not at an angle.
           </div>
-          <p style="text-align:center; font-size:12px; color:var(--vg-navy-400);">
-            Tint above is sampled live from the selected product photo on the right.
-          </p>
+        </div>
+
+        <div id="vgv-dropzone" class="vgv-dropzone">
+          <input type="file" id="vgv-upload-input" accept="image/*" capture="environment" style="display:none;">
+          <i class="fa-solid fa-cloud-arrow-up" style="font-size:30px; color:var(--vg-gold-500);"></i>
+          <div style="font-weight:600; margin-top:12px;">Tap to take or choose a photo</div>
+          <div style="color:var(--vg-navy-400); font-size:12.5px; margin-top:4px;">JPG or PNG - background removed automatically</div>
+        </div>
+
+        <div id="vgv-upload-progress" style="display:none; text-align:center; padding:30px 0;">
+          <div class="vgv-spinner"></div>
+          <div id="vgv-upload-progress-label" style="margin-top:14px; font-size:14px; color:var(--vg-navy-500);">Removing background...</div>
+          <div style="font-size:12px; color:var(--vg-navy-400); margin-top:6px;">First run downloads a small on-device model - this can take a moment.</div>
+        </div>
+      </div>
+    </div>
+
+    {% comment %} ===== STEP 3: ALIGN ===== {% endcomment %}
+    <div class="vgv-panel" id="vgv-panel-align" style="display:none;">
+      <div class="vg-card" style="padding:28px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; flex-wrap:wrap; gap:10px;">
+          <h2 style="font-size:22px;">Align your slab</h2>
+          <button type="button" class="vg-btn vg-btn-ghost" style="padding:8px 16px; font-size:12.5px;" data-vgv-back="2">
+            <i class="fa-solid fa-arrow-left"></i> Retake photo
+          </button>
+        </div>
+        <p style="color:var(--vg-navy-400); font-size:13.5px; margin-bottom:22px;">
+          Drag to position, pinch or scroll to zoom until your slab fills the guide.
+        </p>
+
+        <div id="vgv-align-stage" class="vgv-align-stage">
+          <canvas id="vgv-align-canvas" width="700" height="875"></canvas>
+          <div id="vgv-align-guide" class="vgv-align-guide"></div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:14px; margin-top:22px; max-width:420px; margin-left:auto; margin-right:auto;">
+          <i class="fa-solid fa-magnifying-glass-minus" style="color:var(--vg-navy-400);"></i>
+          <input type="range" id="vgv-align-zoom" min="50" max="300" value="100" style="flex:1;">
+          <i class="fa-solid fa-magnifying-glass-plus" style="color:var(--vg-navy-400);"></i>
+        </div>
+
+        <div style="text-align:center; margin-top:26px;">
+          <button type="button" class="vg-btn vg-btn-primary" id="vgv-align-confirm-btn" data-vg-haptic="success">
+            Looks good <i class="fa-solid fa-check"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {% comment %} ===== STEP 4: PREVIEW & BUY ===== {% endcomment %}
+    <div class="vgv-panel" id="vgv-panel-preview" style="display:none;">
+      <div class="vgv-preview-grid">
+        <div class="vg-card" style="padding:24px;" id="vgv-preview-image-card">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+            <span class="vg-pill vg-pill-gold" id="vgv-preview-brand-pill">TAG</span>
+            <button type="button" class="vg-btn vg-btn-ghost" style="padding:7px 14px; font-size:12px;" data-vgv-back="3">
+              <i class="fa-solid fa-arrow-left"></i> Re-align
+            </button>
+          </div>
+          <div id="vgv-preview-stage" class="vgv-preview-stage">
+            <canvas id="vgv-preview-canvas" width="800" height="1000"></canvas>
+          </div>
+          <div id="vgv-oos-note" style="display:none; text-align:center; font-size:12.5px; color:var(--vg-navy-400); margin-top:14px;"></div>
         </div>
 
         <div>
-          <div id="vg-vault-selected" style="display:none; margin-bottom:16px;">
-            <div class="vg-card-flat" style="padding:14px 16px; display:flex; align-items:center; gap:12px;">
-              <img id="vg-vault-selected-img" src="" alt="" style="width:44px; height:55px; border-radius:8px; object-fit:cover; flex-shrink:0;" width="44" height="55">
-              <div style="flex:1; min-width:0;">
-                <div id="vg-vault-selected-title" style="font-weight:600; font-size:14px;"></div>
-                <div id="vg-vault-selected-price" style="font-size:13px; color:var(--vg-navy-400);"></div>
-              </div>
-            </div>
-            <div style="display:flex; gap:10px; margin-top:12px;">
-              <a id="vg-vault-shop-link" href="#" class="vg-btn vg-btn-ghost" data-vg-haptic="tap" style="flex:1; font-size:13px; padding:12px;">
-                <i class="fa-solid fa-eye"></i> View Product
-              </a>
-              <button type="button" id="vg-vault-add-cart" class="vg-btn vg-btn-gold" data-vg-haptic="tap" style="flex:1; font-size:13px; padding:12px;">
-                <i class="fa-solid fa-bag-shopping"></i> Add to Cart
-              </button>
-            </div>
-            <div id="vg-vault-cart-msg" style="text-align:center; font-size:12px; color:var(--vg-success); margin-top:8px; display:none;">
-              Added to cart.
+          <div id="vgv-selected" style="margin-bottom:16px;">
+            <h2 style="font-size:20px; margin-bottom:4px;" id="vgv-selected-title">&nbsp;</h2>
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+              <span id="vgv-selected-price" style="color:var(--vg-navy-400); font-size:14.5px;"></span>
+              <span id="vgv-selected-stock" class="vg-pill" style="font-size:10.5px; padding:3px 10px;"></span>
             </div>
           </div>
 
           <div style="margin-bottom:8px; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--vg-navy-400);">
-            Pick a colorway
+            Pick a colorway - previewed with YOUR photo
           </div>
-          <div id="vg-vault-swatches" class="vg-vault-swatches"></div>
+          <div id="vgv-swatch-grid" class="vgv-swatch-grid"></div>
+
+          <button type="button" class="vg-btn vg-btn-primary" id="vgv-add-cart" style="width:100%; padding:16px;" data-vg-haptic="tap" disabled>
+            <i class="fa-solid fa-bag-shopping"></i> Add to Cart
+          </button>
+          <div id="vgv-cart-note" style="font-size:12px; color:var(--vg-navy-400); text-align:center; margin-top:10px;"></div>
         </div>
       </div>
     </div>
@@ -125,7 +198,7 @@
       "url": {{ product.url | json }},
       "priceCents": {{ product.price }},
       "available": {{ product.available }},
-      "image": {% if product.featured_image %}{{ product.featured_image | image_url: width: 200 | json }}{% else %}""{% endif %}
+      "image": {% if product.featured_image %}{{ product.featured_image | image_url: width: 800 | json }}{% else %}""{% endif %}
     }{% unless forloop.last %},{% endunless %}
   {% endfor %}
 ]{% endcapture %}
@@ -138,10 +211,71 @@
       "url": {{ product.url | json }},
       "priceCents": {{ product.price }},
       "available": {{ product.available }},
-      "image": {% if product.featured_image %}{{ product.featured_image | image_url: width: 200 | json }}{% else %}""{% endif %}
+      "image": {% if product.featured_image %}{{ product.featured_image | image_url: width: 800 | json }}{% else %}""{% endif %}
     }{% unless forloop.last %},{% endunless %}
   {% endfor %}
 ]{% endcapture %}
+
+<style>
+  .vgv-step { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--vg-navy-300); padding: 6px 4px; }
+  .vgv-step.vgv-step-active { color: var(--vg-navy-900); }
+  .vgv-step.vgv-step-done { color: var(--vg-gold-500); }
+  .vgv-step-num { width: 24px; height: 24px; border-radius: 50%; background: var(--vg-ivory-200); display: flex; align-items: center; justify-content: center; font-size: 12px; transition: background var(--vg-dur-fast) var(--vg-ease-soft), color var(--vg-dur-fast) var(--vg-ease-soft); }
+  .vgv-step-active .vgv-step-num { background: var(--vg-navy-900); color: #fff; }
+  .vgv-step-done .vgv-step-num { background: var(--vg-gold-400); color: #2a1f08; }
+  .vgv-step-line { width: 32px; height: 1px; background: var(--vg-ivory-300); }
+
+  .vgv-brand-btn { border: none; background: var(--vg-ivory-50); border-radius: var(--vg-radius-md); padding: 30px 20px; cursor: pointer; box-shadow: var(--vg-shadow-sm); transition: box-shadow var(--vg-dur-fast) var(--vg-ease-soft), transform var(--vg-dur-fast) var(--vg-ease-soft); text-align: center; -webkit-tap-highlight-color: transparent; }
+  .vgv-brand-btn:hover { box-shadow: var(--vg-shadow-md); transform: translateY(-3px); }
+  .vgv-brand-btn.vgv-brand-selected { box-shadow: 0 0 0 3px var(--vg-gold-400), var(--vg-shadow-md); }
+  .vgv-brand-swatch { width: 64px; height: 96px; margin: 0 auto; border-radius: 10px; box-shadow: var(--vg-shadow-xs), inset 0 0 0 1px rgba(0,0,0,0.04); }
+
+  .vgv-dropzone { border: none; border-radius: var(--vg-radius-md); background: var(--vg-ivory-50); box-shadow: var(--vg-shadow-inset), var(--vg-shadow-xs); padding: 52px 20px; text-align: center; cursor: pointer; transition: box-shadow var(--vg-dur-fast) var(--vg-ease-soft); -webkit-tap-highlight-color: transparent; }
+  .vgv-dropzone:hover { box-shadow: var(--vg-shadow-inset), var(--vg-shadow-sm); }
+  .vgv-dropzone.vgv-drag-over { box-shadow: 0 0 0 3px var(--vg-gold-400); }
+
+  .vgv-spinner { width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--vg-ivory-300); border-top-color: var(--vg-gold-500); margin: 0 auto; animation: vgvSpin 900ms linear infinite; }
+  @keyframes vgvSpin { to { transform: rotate(360deg); } }
+
+  .vgv-align-stage { position: relative; width: 100%; max-width: 420px; margin: 0 auto; aspect-ratio: 4/5; background: var(--vg-ivory-200); border-radius: var(--vg-radius-md); overflow: hidden; touch-action: none; cursor: grab; }
+  .vgv-align-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; max-width: 100%; max-height: 100%; }
+  .vgv-align-guide { position: absolute; border: 2px dashed rgba(111, 160, 190, 0.9); border-radius: 14px; pointer-events: none; box-shadow: 0 0 0 2000px rgba(20, 24, 31, 0.38); }
+
+  .vgv-preview-stage { position: relative; width: 100%; max-width: 300px; margin: 0 auto; aspect-ratio: 4/5; background: var(--vg-ivory-50); border-radius: var(--vg-radius-md); overflow: hidden; }
+  .vgv-preview-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; max-width: 100%; max-height: 100%; }
+
+  .vgv-preview-grid { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 30px; align-items: start; }
+  #vgv-preview-image-card { position: sticky; top: 90px; }
+
+  .vgv-swatch-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 26px; }
+  .vgv-swatch { width: 100%; border-radius: 12px; border: none; cursor: pointer; position: relative; background: var(--vg-surface); padding: 0 0 8px; box-shadow: var(--vg-shadow-xs); -webkit-tap-highlight-color: transparent; transition: transform var(--vg-dur-fast) var(--vg-ease-soft), box-shadow var(--vg-dur-fast) var(--vg-ease-soft); }
+  .vgv-swatch:hover { transform: translateY(-2px); box-shadow: var(--vg-shadow-sm); }
+  .vgv-swatch.vgv-swatch-active { box-shadow: 0 0 0 3px var(--vg-navy-900); }
+  .vgv-swatch-thumb { position: relative; width: 100%; aspect-ratio: 4/5; background: var(--vg-ivory-50); }
+  .vgv-swatch-thumb canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .vgv-swatch-label { font-size: 11px; font-weight: 600; line-height: 1.2; color: var(--vg-navy-700); padding: 6px 6px 0; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .vgv-swatch .vgv-swatch-oos-dot { position: absolute; top: 6px; right: 6px; width: 16px; height: 16px; border-radius: 50%; background: var(--vg-danger); box-shadow: 0 0 0 2px #fff; font-size: 8px; color: #fff; display: flex; align-items: center; justify-content: center; }
+
+  .vgv-panel { animation: vgvFadeUp 480ms var(--vg-ease-out); }
+  @keyframes vgvFadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 780px) { .vgv-preview-grid { grid-template-columns: 1fr; } #vgv-preview-image-card { position: static; } }
+  @media (max-width: 640px) {
+    .vgv-step { font-size: 0; gap: 0; padding: 4px; }
+    .vgv-step-num { font-size: 12px; width: 26px; height: 26px; }
+    .vgv-step-line { width: 14px; }
+    .vgv-brand-btn { padding: 22px 12px; }
+    .vgv-brand-swatch { width: 52px; height: 78px; }
+    .vgv-dropzone { padding: 36px 16px; }
+    .vgv-preview-stage { max-width: 220px; }
+    .vgv-swatch-grid { gap: 6px; }
+    .vgv-swatch-label { font-size: 9.5px; padding-top: 4px; }
+  }
+  @media (max-width: 420px) {
+    .vgv-swatch-grid { grid-template-columns: repeat(4, 1fr); }
+    .vgv-preview-stage { max-width: 180px; }
+  }
+</style>
 
 <script>
 (function () {
@@ -149,163 +283,480 @@
     tag: {{ tag_products_json }},
     psa: {{ psa_products_json }}
   };
+  var GUARD_WINDOW = {
+    tag: { top: 13.7, left: 22.5, right: 22.1, bottom: 13.8 },
+    psa: { top: 13.2, left: 21.9, right: 21.8, bottom: 13.0 }
+  };
 
-  var frame = document.getElementById('vg-vault-frame');
-  var swatchRow = document.getElementById('vg-vault-swatches');
-  var photo = document.getElementById('vg-vault-photo');
-  var placeholder = document.getElementById('vg-vault-placeholder');
-  var upload = document.getElementById('vg-vault-upload');
-  var tagBtn = document.getElementById('vg-vault-tag-btn');
-  var psaBtn = document.getElementById('vg-vault-psa-btn');
-  var selectedBox = document.getElementById('vg-vault-selected');
-  var selectedImg = document.getElementById('vg-vault-selected-img');
-  var selectedTitle = document.getElementById('vg-vault-selected-title');
-  var selectedPrice = document.getElementById('vg-vault-selected-price');
-  var shopLink = document.getElementById('vg-vault-shop-link');
-  var addCartBtn = document.getElementById('vg-vault-add-cart');
-  var cartMsg = document.getElementById('vg-vault-cart-msg');
+  var haptic = (window.VG && window.VG.haptic) || { tap: function () {}, success: function () {}, warn: function () {}, snap: function () {} };
 
-  var currentBrand = 'tag';
-  var currentProduct = null;
+  var STEP_ORDER = ['brand', 'upload', 'align', 'preview'];
+  var state = {
+    brand: null,
+    slabImage: null,
+    slabNaturalAspect: 1,
+    align: { x: 0, y: 0, scale: 1 },
+    products: [],
+    activeProduct: null
+  };
+
+  function goToStep(name) {
+    STEP_ORDER.forEach(function (s) {
+      var panel = document.getElementById('vgv-panel-' + s);
+      if (panel) panel.style.display = s === name ? '' : 'none';
+    });
+    document.querySelectorAll('.vgv-step').forEach(function (el) {
+      var idx = parseInt(el.getAttribute('data-step'), 10) - 1;
+      var curIdx = STEP_ORDER.indexOf(name);
+      el.classList.remove('vgv-step-active', 'vgv-step-done');
+      if (idx < curIdx) el.classList.add('vgv-step-done');
+      else if (idx === curIdx) el.classList.add('vgv-step-active');
+    });
+    haptic.snap();
+  }
+
+  document.querySelectorAll('[data-vgv-back]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var target = parseInt(btn.getAttribute('data-vgv-back'), 10);
+      goToStep(STEP_ORDER[target - 1]);
+    });
+  });
 
   function formatPrice(cents) {
     return '$' + (cents / 100).toFixed(2);
   }
 
-  function setFrameColor(hex) {
-    if (frame) frame.style.background = hex;
+  function roundRectPath(ctx, x, y, w, h, r) {
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
   }
 
-  function sampleColorFromImage(url, callback) {
+  // -------------------------------------------------------------------
+  // Step 1: brand
+  // -------------------------------------------------------------------
+  document.querySelectorAll('.vgv-brand-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.vgv-brand-btn').forEach(function (b) { b.classList.remove('vgv-brand-selected'); });
+      btn.classList.add('vgv-brand-selected');
+      state.brand = btn.getAttribute('data-brand');
+      state.products = VG_VAULT_PRODUCTS[state.brand] || [];
+      haptic.success();
+      setTimeout(function () { goToStep('upload'); }, 220);
+    });
+  });
+
+  // -------------------------------------------------------------------
+  // Step 2: upload + client-side background removal
+  // -------------------------------------------------------------------
+  var dropzone = document.getElementById('vgv-dropzone');
+  var fileInput = document.getElementById('vgv-upload-input');
+  var progressEl = document.getElementById('vgv-upload-progress');
+  var progressLabel = document.getElementById('vgv-upload-progress-label');
+  var _bgRemovalModulePromise = null;
+
+  function loadBgRemoval() {
+    if (!_bgRemovalModulePromise) {
+      _bgRemovalModulePromise = import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/dist/index.mjs');
+    }
+    return _bgRemovalModulePromise;
+  }
+
+  if (dropzone) dropzone.addEventListener('click', function () { fileInput.click(); });
+  ['dragover', 'dragleave', 'drop'].forEach(function (evt) {
+    if (!dropzone) return;
+    dropzone.addEventListener(evt, function (e) {
+      e.preventDefault();
+      dropzone.classList.toggle('vgv-drag-over', evt === 'dragover');
+    });
+  });
+  if (dropzone) dropzone.addEventListener('drop', function (e) {
+    var f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) handleFile(f);
+  });
+  if (fileInput) fileInput.addEventListener('change', function () {
+    if (fileInput.files && fileInput.files[0]) handleFile(fileInput.files[0]);
+  });
+
+  function useImageAsIs(objectUrl, note) {
     var img = new Image();
-    img.crossOrigin = 'anonymous';
     img.onload = function () {
-      try {
-        var canvas = document.createElement('canvas');
-        canvas.width = 12;
-        canvas.height = 12;
-        var ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, 12, 12);
-        var data = ctx.getImageData(0, 0, 12, 12).data;
-        var r = 0, g = 0, b = 0, count = 0;
-        for (var i = 0; i < data.length; i += 4) {
-          r += data[i];
-          g += data[i + 1];
-          b += data[i + 2];
-          count++;
-        }
-        r = Math.round(r / count);
-        g = Math.round(g / count);
-        b = Math.round(b / count);
-        callback('rgb(' + r + ',' + g + ',' + b + ')');
-      } catch (err) {
-        callback('#D8DEE3');
-      }
+      state.slabImage = img;
+      state.slabNaturalAspect = img.naturalWidth / img.naturalHeight;
+      state.align = { x: 0, y: 0, scale: 1 };
+      progressEl.style.display = 'none';
+      dropzone.style.display = '';
+      if (note) progressLabel.textContent = note;
+      goToStep('align');
+      initAlignStage();
     };
     img.onerror = function () {
-      callback('#D8DEE3');
+      progressLabel.textContent = 'Could not load that photo - please try another.';
+      progressEl.style.display = 'none';
+      dropzone.style.display = '';
     };
-    img.src = url;
+    img.src = objectUrl;
   }
 
-  function selectProduct(p) {
-    currentProduct = p;
-    sampleColorFromImage(p.image, setFrameColor);
-    if (selectedBox) selectedBox.style.display = 'block';
-    if (selectedImg) selectedImg.src = p.image;
-    if (selectedTitle) selectedTitle.textContent = p.title;
-    if (selectedPrice) selectedPrice.textContent = formatPrice(p.priceCents) + (p.available ? '' : ' - Out of stock');
-    if (shopLink) shopLink.href = p.url;
-    if (addCartBtn) addCartBtn.disabled = !p.available;
-    if (cartMsg) cartMsg.style.display = 'none';
-    Array.prototype.forEach.call(swatchRow.children, function (el) {
-      el.style.boxShadow = 'var(--vg-shadow-xs)';
-      el.style.outline = 'none';
-    });
-  }
+  function handleFile(file) {
+    dropzone.style.display = 'none';
+    progressEl.style.display = '';
+    progressLabel.textContent = 'Removing background...';
+    var objectUrl = URL.createObjectURL(file);
 
-  function renderSwatches(brand) {
-    currentBrand = brand;
-    swatchRow.innerHTML = '';
-    var list = VG_VAULT_PRODUCTS[brand] || [];
-    list.forEach(function (p, i) {
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.title = p.title;
-      btn.setAttribute('aria-label', p.title);
-      btn.style.padding = '0';
-      btn.style.border = 'none';
-      btn.style.borderRadius = '10px';
-      btn.style.overflow = 'hidden';
-      btn.style.cursor = 'pointer';
-      btn.style.aspectRatio = '4/5';
-      btn.style.boxShadow = 'var(--vg-shadow-xs)';
-      var img = document.createElement('img');
-      img.src = p.image;
-      img.alt = p.title;
-      img.style.width = '100%';
-      img.style.height = '100%';
-      img.style.objectFit = 'cover';
-      img.style.display = 'block';
-      btn.appendChild(img);
-      btn.addEventListener('click', function () {
-        selectProduct(p);
-        btn.style.outline = '3px solid var(--vg-navy-900)';
+    loadBgRemoval()
+      .then(function (mod) {
+        var removeBackground = mod.removeBackground || mod.default;
+        if (typeof removeBackground !== 'function') {
+          throw new Error('removeBackground export not found on module');
+        }
+        return removeBackground(objectUrl, {
+          progress: function (key, current, total) {
+            if (total > 0) {
+              var pct = Math.round((current / total) * 100);
+              progressLabel.textContent = 'Preparing on-device model... ' + pct + '%';
+            }
+          }
+        });
+      })
+      .then(function (blob) {
+        var url = URL.createObjectURL(blob);
+        haptic.success();
+        useImageAsIs(url);
+      })
+      .catch(function (err) {
+        useImageAsIs(objectUrl, 'Background removal unavailable - using original photo.');
       });
-      swatchRow.appendChild(btn);
-      if (i === 0) selectProduct(p);
-    });
-    if (!list.length && selectedBox) {
-      selectedBox.style.display = 'none';
-      setFrameColor('#D8DEE3');
+  }
+
+  // -------------------------------------------------------------------
+  // Step 3: pinch-to-zoom / drag alignment
+  // -------------------------------------------------------------------
+  var alignCanvas = document.getElementById('vgv-align-canvas');
+  var alignCtx = alignCanvas.getContext('2d');
+  var alignGuideEl = document.getElementById('vgv-align-guide');
+  var alignZoomSlider = document.getElementById('vgv-align-zoom');
+  var alignStage = document.getElementById('vgv-align-stage');
+
+  function guideRectForBrand() {
+    var win = GUARD_WINDOW[state.brand] || GUARD_WINDOW.tag;
+    var stageW = alignCanvas.width;
+    var stageH = alignCanvas.height;
+    var x = (win.left / 100) * stageW;
+    var y = (win.top / 100) * stageH;
+    var w = stageW - x - (win.right / 100) * stageW;
+    var h = stageH - y - (win.bottom / 100) * stageH;
+    return { x: x, y: y, w: w, h: h };
+  }
+
+  function positionGuideOverlay() {
+    var rect = guideRectForBrand();
+    var stageRect = alignStage.getBoundingClientRect();
+    var scaleX = stageRect.width / alignCanvas.width;
+    var scaleY = stageRect.height / alignCanvas.height;
+    alignGuideEl.style.left = (rect.x * scaleX) + 'px';
+    alignGuideEl.style.top = (rect.y * scaleY) + 'px';
+    alignGuideEl.style.width = (rect.w * scaleX) + 'px';
+    alignGuideEl.style.height = (rect.h * scaleY) + 'px';
+  }
+
+  function drawAlignStage() {
+    alignCtx.clearRect(0, 0, alignCanvas.width, alignCanvas.height);
+    alignCtx.fillStyle = '#EFEAE0';
+    alignCtx.fillRect(0, 0, alignCanvas.width, alignCanvas.height);
+    if (state.slabImage) {
+      var cx = alignCanvas.width / 2 + state.align.x;
+      var cy = alignCanvas.height / 2 + state.align.y;
+      var baseH = alignCanvas.height * 0.5 * state.align.scale;
+      var baseW = baseH * state.slabNaturalAspect;
+      alignCtx.drawImage(state.slabImage, cx - baseW / 2, cy - baseH / 2, baseW, baseH);
     }
   }
 
-  function setBrand(brand) {
-    if (frame) frame.style.aspectRatio = brand === 'psa' ? '0.78' : '0.72';
-    if (tagBtn) tagBtn.classList.toggle('vg-fb-active', brand === 'tag');
-    if (psaBtn) psaBtn.classList.toggle('vg-fb-active', brand === 'psa');
-    renderSwatches(brand);
+  var dragging = false;
+  var lastPointer = null;
+  var pinchStartDist = null;
+  var pinchStartScale = 1;
+  var activePointers = new Map();
+
+  function distBetween(p1, p2) {
+    return Math.hypot(p1.x - p2.x, p1.y - p2.y);
   }
 
-  if (tagBtn) tagBtn.addEventListener('click', function () { setBrand('tag'); });
-  if (psaBtn) psaBtn.addEventListener('click', function () { setBrand('psa'); });
+  function initAlignStage() {
+    positionGuideOverlay();
+    drawAlignStage();
+  }
 
-  if (upload) {
-    upload.addEventListener('change', function (e) {
-      var file = e.target.files && e.target.files[0];
-      if (!file) return;
-      var reader = new FileReader();
-      reader.onload = function (evt) {
-        photo.src = evt.target.result;
-        photo.style.display = 'block';
-        if (placeholder) placeholder.style.display = 'none';
+  alignStage.addEventListener('pointerdown', function (e) {
+    alignStage.setPointerCapture(e.pointerId);
+    activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (activePointers.size === 1) {
+      dragging = true;
+      lastPointer = { x: e.clientX, y: e.clientY };
+    } else if (activePointers.size === 2) {
+      dragging = false;
+      var pts = Array.from(activePointers.values());
+      pinchStartDist = distBetween(pts[0], pts[1]);
+      pinchStartScale = state.align.scale;
+    }
+  });
+
+  alignStage.addEventListener('pointermove', function (e) {
+    if (!activePointers.has(e.pointerId)) return;
+    activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (activePointers.size === 2) {
+      var pts = Array.from(activePointers.values());
+      var d = distBetween(pts[0], pts[1]);
+      if (pinchStartDist) {
+        var next = pinchStartScale * (d / pinchStartDist);
+        state.align.scale = Math.max(0.5, Math.min(3, next));
+        alignZoomSlider.value = Math.round(state.align.scale * 100);
+        drawAlignStage();
+      }
+      return;
+    }
+
+    if (dragging && lastPointer) {
+      var stageRect = alignStage.getBoundingClientRect();
+      var scaleX = alignCanvas.width / stageRect.width;
+      var scaleY = alignCanvas.height / stageRect.height;
+      var dx = (e.clientX - lastPointer.x) * scaleX;
+      var dy = (e.clientY - lastPointer.y) * scaleY;
+      state.align.x += dx;
+      state.align.y += dy;
+      lastPointer = { x: e.clientX, y: e.clientY };
+      drawAlignStage();
+    }
+  });
+
+  function endPointer(e) {
+    activePointers.delete(e.pointerId);
+    if (activePointers.size < 2) pinchStartDist = null;
+    if (activePointers.size === 0) dragging = false;
+  }
+  alignStage.addEventListener('pointerup', endPointer);
+  alignStage.addEventListener('pointercancel', endPointer);
+  alignStage.addEventListener('pointerleave', function () {
+    if (activePointers.size <= 1) dragging = false;
+  });
+
+  alignStage.addEventListener('wheel', function (e) {
+    e.preventDefault();
+    var delta = e.deltaY > 0 ? -0.05 : 0.05;
+    state.align.scale = Math.max(0.5, Math.min(3, state.align.scale + delta));
+    alignZoomSlider.value = Math.round(state.align.scale * 100);
+    drawAlignStage();
+  }, { passive: false });
+
+  alignZoomSlider.addEventListener('input', function () {
+    state.align.scale = parseInt(alignZoomSlider.value, 10) / 100;
+    drawAlignStage();
+  });
+
+  window.addEventListener('resize', function () {
+    var alignPanel = document.getElementById('vgv-panel-align');
+    if (alignPanel && alignPanel.style.display !== 'none') positionGuideOverlay();
+  });
+
+  document.getElementById('vgv-align-confirm-btn').addEventListener('click', function () {
+    goToStep('preview');
+    initPreviewPanel();
+  });
+
+  // -------------------------------------------------------------------
+  // Step 4: real-photo compositing + preview + add to cart
+  // -------------------------------------------------------------------
+  var previewCanvas = document.getElementById('vgv-preview-canvas');
+  var previewCtx = previewCanvas.getContext('2d');
+  var guardImageCache = {};
+
+  function loadGuardImage(product) {
+    if (guardImageCache[product.id]) return Promise.resolve(guardImageCache[product.id]);
+    return new Promise(function (resolve, reject) {
+      var img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function () {
+        guardImageCache[product.id] = img;
+        resolve(img);
       };
-      reader.readAsDataURL(file);
+      img.onerror = reject;
+      img.src = product.image;
     });
   }
 
-  if (addCartBtn) {
-    addCartBtn.addEventListener('click', function () {
-      if (!currentProduct || !currentProduct.id) return;
-      addCartBtn.disabled = true;
-      fetch('/cart/add.js', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: currentProduct.id, quantity: 1 })
+  function drawGuardComposite(ctx, W, H, guardImg) {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, W, H);
+
+    var win = GUARD_WINDOW[state.brand] || GUARD_WINDOW.tag;
+    var winX = (win.left / 100) * W;
+    var winY = (win.top / 100) * H;
+    var winW = W - winX - (win.right / 100) * W;
+    var winH = H - winY - (win.bottom / 100) * H;
+    var r = Math.max(2, Math.round(W * 0.0125));
+
+    if (state.slabImage) {
+      ctx.save();
+      ctx.beginPath();
+      roundRectPath(ctx, winX, winY, winW, winH, r);
+      ctx.clip();
+
+      var guide = guideRectForBrand();
+      var relX = (alignCanvas.width / 2 + state.align.x - guide.x) / guide.w;
+      var relY = (alignCanvas.height / 2 + state.align.y - guide.y) / guide.h;
+      var baseHRatio = (alignCanvas.height * 0.5 * state.align.scale) / guide.h;
+      var slabH = winH * baseHRatio;
+      var slabW = slabH * state.slabNaturalAspect;
+      var slabCx = winX + relX * winW;
+      var slabCy = winY + relY * winH;
+
+      ctx.drawImage(state.slabImage, slabCx - slabW / 2, slabCy - slabH / 2, slabW, slabH);
+      ctx.restore();
+    }
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, W, H);
+    roundRectPath(ctx, winX, winY, winW, winH, r);
+    ctx.clip('evenodd');
+    ctx.drawImage(guardImg, 0, 0, W, H);
+    ctx.restore();
+  }
+
+  function compositePreview(product) {
+    var W = previewCanvas.width, H = previewCanvas.height;
+    loadGuardImage(product).then(function (guardImg) {
+      drawGuardComposite(previewCtx, W, H, guardImg);
+    }).catch(function () {
+      previewCtx.clearRect(0, 0, W, H);
+      previewCtx.fillStyle = '#D8DEE3';
+      previewCtx.fillRect(0, 0, W, H);
+    });
+  }
+
+  var SWATCH_THUMB_W = 160, SWATCH_THUMB_H = 200;
+
+  function renderSwatchThumb(canvas, product) {
+    var ctx = canvas.getContext('2d');
+    loadGuardImage(product).then(function (guardImg) {
+      drawGuardComposite(ctx, SWATCH_THUMB_W, SWATCH_THUMB_H, guardImg);
+    }).catch(function () {
+      ctx.fillStyle = '#D8DEE3';
+      ctx.fillRect(0, 0, SWATCH_THUMB_W, SWATCH_THUMB_H);
+    });
+  }
+
+  function renderSwatchGrid() {
+    var grid = document.getElementById('vgv-swatch-grid');
+    grid.innerHTML = '';
+    state.products.forEach(function (p) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'vgv-swatch';
+      btn.title = p.title + (p.available ? '' : ' (out of stock - preview only)');
+      btn.setAttribute('data-vg-haptic', 'tap');
+
+      var thumbWrap = document.createElement('div');
+      thumbWrap.className = 'vgv-swatch-thumb';
+      var canvas = document.createElement('canvas');
+      canvas.width = SWATCH_THUMB_W;
+      canvas.height = SWATCH_THUMB_H;
+      thumbWrap.appendChild(canvas);
+      if (!p.available) {
+        var dot = document.createElement('span');
+        dot.className = 'vgv-swatch-oos-dot';
+        dot.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+        thumbWrap.appendChild(dot);
+      }
+      btn.appendChild(thumbWrap);
+
+      var label = document.createElement('div');
+      label.className = 'vgv-swatch-label';
+      label.textContent = p.title;
+      btn.appendChild(label);
+
+      renderSwatchThumb(canvas, p);
+
+      btn.addEventListener('click', function () { selectProduct(p); });
+      grid.appendChild(btn);
+    });
+  }
+
+  function updateSwatchActiveState() {
+    var grid = document.getElementById('vgv-swatch-grid');
+    Array.prototype.forEach.call(grid.children, function (btn, i) {
+      btn.classList.toggle('vgv-swatch-active', state.products[i] === state.activeProduct);
+    });
+  }
+
+  function selectProduct(p) {
+    state.activeProduct = p;
+    updateSwatchActiveState();
+
+    document.getElementById('vgv-selected-title').textContent = p.title;
+    document.getElementById('vgv-selected-price').textContent = formatPrice(p.priceCents);
+
+    var stockPill = document.getElementById('vgv-selected-stock');
+    if (p.available) {
+      stockPill.textContent = 'In stock';
+      stockPill.className = 'vg-pill vg-pill-in';
+    } else {
+      stockPill.textContent = 'Out of stock';
+      stockPill.className = 'vg-pill vg-pill-out';
+    }
+
+    var addBtn = document.getElementById('vgv-add-cart');
+    var note = document.getElementById('vgv-cart-note');
+    addBtn.disabled = !p.available || !p.id;
+    note.textContent = p.available
+      ? ''
+      : 'Preview available for out-of-stock colors - add to cart unlocks once restocked.';
+
+    var oosNote = document.getElementById('vgv-oos-note');
+    if (!p.available) {
+      oosNote.style.display = 'block';
+      oosNote.textContent = 'This colorway is currently out of stock - you can still preview it here.';
+    } else {
+      oosNote.style.display = 'none';
+    }
+
+    compositePreview(p);
+    haptic.tap();
+  }
+
+  function initPreviewPanel() {
+    document.getElementById('vgv-preview-brand-pill').textContent = state.brand.toUpperCase();
+    renderSwatchGrid();
+    var initial = state.products.filter(function (p) { return p.available; })[0] || state.products[0];
+    if (initial) selectProduct(initial);
+  }
+
+  var addCartBtn = document.getElementById('vgv-add-cart');
+  addCartBtn.addEventListener('click', function () {
+    if (!state.activeProduct || !state.activeProduct.id) return;
+    addCartBtn.disabled = true;
+    fetch('/cart/add.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: state.activeProduct.id, quantity: 1 })
+    })
+      .then(function (res) { return res.json(); })
+      .then(function () {
+        haptic.success();
+        var note = document.getElementById('vgv-cart-note');
+        note.textContent = 'Added to cart.';
+        addCartBtn.disabled = false;
       })
-        .then(function (res) { return res.json(); })
-        .then(function () {
-          if (cartMsg) cartMsg.style.display = 'block';
-          addCartBtn.disabled = false;
-        })
-        .catch(function () {
-          addCartBtn.disabled = false;
-        });
-    });
-  }
-
-  setBrand('tag');
+      .catch(function () {
+        addCartBtn.disabled = false;
+      });
+  });
 })();
 </script>
 
