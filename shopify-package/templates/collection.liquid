@@ -1,0 +1,54 @@
+{% comment %}
+  VAULTGUARDS — Collection Page (works for BOTH your TAG and PSA collections
+  automatically — no separate file needed per brand)
+  INSTALL: Edit code > Templates > find "collection.liquid" (older themes)
+  OR "collection.json" (Online Store 2.0).
+  - If collection.liquid exists: open it, select all, delete, paste this
+    in, Save. This becomes the default look for ALL collections.
+  - If you only have collection.json: Add a new template > type
+    "collection" > name it e.g. "collection.vaultguards" > paste this in
+    > Save. Then on each collection (Admin > Products > Collections > pick
+    one > Theme template dropdown) select "collection.vaultguards".
+{% endcomment %}
+
+<section class="vg-section" style="padding-top:56px;">
+  <div class="vg-container">
+    <a href="{{ routes.root_url }}#shop" style="color:var(--vg-navy-400); font-size:13px; text-decoration:none;">
+      <i class="fa-solid fa-arrow-left"></i> Back to shop
+    </a>
+    <div class="vg-reveal vg-in" style="margin-top:18px; margin-bottom:40px;">
+      <div class="vg-eyebrow">{{ collection.title }}</div>
+      <h1 style="font-size:38px; margin-top:14px;">All {{ collection.title }} colorways.</h1>
+      <p style="color:var(--vg-navy-400); margin-top:10px; font-size:15px;">
+        {{ collection.products_count }} colorways
+        {% assign in_stock_count = 0 %}
+        {% for product in collection.products %}{% if product.available %}{% assign in_stock_count = in_stock_count | plus: 1 %}{% endif %}{% endfor %}
+        &middot;
+        {% if in_stock_count > 0 %}{{ in_stock_count }} in stock{% else %}currently sold out &mdash; preview any of them live in The Vault{% endif %}
+      </p>
+    </div>
+
+    <div class="vg-grid-4">
+      {% for product in collection.products %}
+        <a href="{{ product.url }}" class="vg-card vg-product-card vg-reveal" data-delay="{{ forloop.index0 | modulo: 4 }}">
+          <div class="vg-product-card-img">
+            <img src="{{ product.featured_image | image_url: width: 700 }}" alt="{{ product.title }}" loading="lazy">
+          </div>
+          <div class="vg-product-card-body">
+            <div style="font-weight:600; font-size:15px; margin-bottom:6px;">{{ product.title }}</div>
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <span style="color:var(--vg-navy-600);">{{ product.price | money }}</span>
+              <span class="{% if product.available %}vg-pill vg-pill-in{% else %}vg-pill vg-pill-out{% endif %}">
+                {% if product.available %}In stock{% else %}Out of stock{% endif %}
+              </span>
+            </div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+
+    <div style="text-align:center; margin-top:48px;">
+      <a href="{{ pages['the-vault'].url | default: '/pages/the-vault' }}" class="vg-btn vg-btn-gold" data-vg-haptic="tap"><i class="fa-solid fa-vault"></i> Preview Your Slab in The Vault</a>
+    </div>
+  </div>
+</section>

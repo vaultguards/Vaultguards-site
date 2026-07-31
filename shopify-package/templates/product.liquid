@@ -1,0 +1,128 @@
+{% comment %}
+  VAULTGUARDS — Product Page (front/back toggle + acrylic backing card +
+  "goes well with" suggestions + Add to Cart)
+  INSTALL: Edit code > Templates > find "product.liquid" (older themes) OR
+  "product.json" (Online Store 2.0 themes).
+  - If product.liquid exists: open it, select all, delete, paste this in, Save.
+  - If you only have product.json: Add a new template > type "product" >
+    name it e.g. "product.vaultguards" > it creates product.vaultguards.liquid
+    > paste this in > Save. Then on each product (Admin > Products > pick
+    one > Theme template dropdown, bottom right) select "product.vaultguards".
+    Repeat for all products (or set it as your theme's default product
+    template in Customize if you want every product to use it).
+
+  FRONT/BACK PHOTOS: uses product.images[0] and product.images[1] —
+  confirmed on your live store that image position 1 = front, position 2 =
+  back (acrylic backing) for every real guard product.
+{% endcomment %}
+
+{% assign front_image = product.images[0] %}
+{% assign back_image = product.images[1] %}
+
+<section class="vg-section">
+  <div class="vg-container vg-grid-2">
+    <div class="vg-reveal vg-in">
+      <div class="vg-card" style="padding:24px; overflow:hidden;">
+        <div style="aspect-ratio:4/5; border-radius:var(--vg-radius-md); overflow:hidden; background:var(--vg-ivory-50);">
+          <img
+            src="{{ front_image | image_url: width: 900 }}"
+            alt="{{ product.title }}"
+            style="width:100%; height:100%; object-fit:cover;"
+            id="vg-pdp-image">
+        </div>
+        {% if back_image %}
+          <div class="vg-front-back-toggle" style="margin-top:14px;">
+            <button type="button" class="vg-fb-btn vg-fb-active" data-vg-fb="front" data-vg-front="{{ front_image | image_url: width: 900 }}" data-vg-back="{{ back_image | image_url: width: 900 }}">
+              <i class="fa-solid fa-image"></i> Front
+            </button>
+            <button type="button" class="vg-fb-btn" data-vg-fb="back" data-vg-front="{{ front_image | image_url: width: 900 }}" data-vg-back="{{ back_image | image_url: width: 900 }}">
+              <i class="fa-solid fa-image"></i> Back
+            </button>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="vg-reveal vg-in" data-delay="1">
+      <a href="{{ routes.root_url }}#shop" style="color:var(--vg-navy-400); font-size:13px; text-decoration:none;">
+        <i class="fa-solid fa-arrow-left"></i> Back to shop
+      </a>
+      <span class="vg-pill vg-pill-gold" style="margin-top:16px; display:inline-block;">{{ product.type }}</span>
+      <h1 style="font-size:32px; margin:12px 0 10px;">{{ product.title }}</h1>
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:22px;">
+        <span style="font-size:20px; color:var(--vg-navy-600);">{{ product.price | money }}</span>
+        <span class="{% if product.available %}vg-pill vg-pill-in{% else %}vg-pill vg-pill-out{% endif %}">
+          {% if product.available %}In stock{% else %}Out of stock{% endif %}
+        </span>
+      </div>
+
+      <div style="color:var(--vg-navy-400); font-size:15px; line-height:1.7; max-width:440px; margin-bottom:18px;">
+        {{ product.description }}
+      </div>
+
+      <div class="vg-card-flat" style="padding:14px 18px; display:flex; gap:12px; align-items:flex-start; margin-bottom:26px;">
+        <i class="fa-solid fa-layer-group" style="color:var(--vg-gold-500); margin-top:2px;"></i>
+        <div style="font-size:13px; color:var(--vg-navy-600); line-height:1.6;">
+          <strong>Clear acrylic backing included</strong> &mdash; the back of every guard is a solid acrylic
+          shell that fully protects your slab, not just a soft bumper. Tap &ldquo;Back&rdquo; above to see it.
+        </div>
+      </div>
+
+      {% comment %} Goes well with — up to 2 other products from the same collection {% endcomment %}
+      {% assign suggestion_count = 0 %}
+      <div style="margin-bottom:26px;">
+        <div style="font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--vg-navy-400); margin-bottom:10px;">
+          Goes well with
+        </div>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          {% for collection in product.collections %}
+            {% for other in collection.products %}
+              {% if other.id != product.id and suggestion_count < 2 %}
+                {% assign suggestion_count = suggestion_count | plus: 1 %}
+                <a href="{{ other.url }}" style="display:flex; align-items:center; gap:10px; background:var(--vg-ivory-50); border-radius:14px; padding:8px 14px 8px 8px; text-decoration:none; color:inherit; box-shadow:var(--vg-shadow-xs);">
+                  <span style="width:40px; height:50px; border-radius:8px; overflow:hidden; flex-shrink:0; background:var(--vg-ivory-100); display:block;">
+                    <img src="{{ other.featured_image | image_url: width: 120 }}" alt="{{ other.title }}" style="width:100%; height:100%; object-fit:cover;" loading="lazy">
+                  </span>
+                  <span>
+                    <span style="display:block; font-weight:600; font-size:13.5px;">{{ other.title }}</span>
+                    <span style="display:block; font-size:12px; color:var(--vg-navy-400);">{{ other.price | money }}</span>
+                  </span>
+                </a>
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+        </div>
+      </div>
+
+      {% form 'product', product %}
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+        <button type="submit" class="vg-btn vg-btn-primary" data-vg-haptic="tap" style="width:100%; padding:16px;" {% unless product.available %}disabled{% endunless %}>
+          <i class="fa-solid fa-bag-shopping"></i> Add to Cart
+        </button>
+      {% endform %}
+      {% unless product.available %}
+        <div style="font-size:12px; color:var(--vg-navy-400); text-align:center; margin-top:10px;">
+          Currently out of stock &mdash; try previewing it in The Vault while you wait.
+        </div>
+      {% endunless %}
+
+      <a href="{{ pages['the-vault'].url | default: '/pages/the-vault' }}" class="vg-btn vg-btn-ghost" data-vg-haptic="tap" style="width:100%; margin-top:12px; justify-content:center;">
+        <i class="fa-solid fa-vault"></i> Preview This in The Vault
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+document.addEventListener('click', function (e) {
+  var btn = e.target.closest('[data-vg-fb]');
+  if (!btn) return;
+  var img = document.getElementById('vg-pdp-image');
+  if (!img) return;
+  var which = btn.getAttribute('data-vg-fb');
+  img.src = which === 'back' ? btn.getAttribute('data-vg-back') : btn.getAttribute('data-vg-front');
+  var row = btn.closest('.vg-front-back-toggle');
+  row.querySelectorAll('.vg-fb-btn').forEach(function (b) { b.classList.remove('vg-fb-active'); });
+  btn.classList.add('vg-fb-active');
+});
+</script>

@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>{{ page_title }}{% unless page_title contains shop.name %} &mdash; {{ shop.name }}{% endunless %}</title>
+  {% if page_description %}<meta name="description" content="{{ page_description | escape }}">{% endif %}
+  <link rel="canonical" href="{{ canonical_url }}">
+  {{ content_for_header }}
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+/* ==========================================================================
+   Vaultguards — Design System ("The Vault" steel/gunmetal theme)
+   ========================================================================== */
+:root {
+  --vg-ivory-50: #F5F7F9;
+  --vg-ivory-100: #ECF0F3;
+  --vg-ivory-200: #DEE4E9;
+  --vg-ivory-300: #C9D2DA;
+  --vg-navy-900: #12161B;
+  --vg-navy-800: #1B2128;
+  --vg-navy-700: #262E37;
+  --vg-navy-600: #3A4650;
+  --vg-navy-500: #57646E;
+  --vg-navy-400: #71808B;
+  --vg-navy-300: #9AA7B1;
+  --vg-gold-500: #4E7C99;
+  --vg-gold-400: #6FA0BE;
+  --vg-gold-300: #9FC2D8;
+  --vg-gold-050: #E7F0F5;
+  --vg-success: #2E8B6F;
+  --vg-danger: #B5453B;
+  --vg-bg: var(--vg-ivory-100);
+  --vg-bg-alt: var(--vg-ivory-50);
+  --vg-surface: #FFFFFF;
+  --vg-text: var(--vg-navy-900);
+  --vg-text-muted: var(--vg-navy-400);
+  --vg-shadow-xs: 0 1px 2px rgba(18,22,27,.05), 0 1px 1px rgba(18,22,27,.04);
+  --vg-shadow-sm: 0 2px 8px rgba(18,22,27,.08), 0 1px 3px rgba(18,22,27,.05);
+  --vg-shadow-md: 0 8px 24px rgba(18,22,27,.10), 0 2px 6px rgba(18,22,27,.06);
+  --vg-shadow-lg: 0 20px 48px rgba(18,22,27,.16), 0 6px 16px rgba(18,22,27,.08);
+  --vg-shadow-gold-glow: 0 8px 30px rgba(78,124,153,.30);
+  --vg-shadow-inset: inset 0 1px 2px rgba(18,22,27,.08);
+  --vg-radius-sm: 12px; --vg-radius-md: 18px; --vg-radius-lg: 26px; --vg-radius-xl: 34px; --vg-radius-pill: 999px;
+  --vg-space-1: 4px; --vg-space-2: 8px; --vg-space-3: 12px; --vg-space-4: 20px; --vg-space-5: 32px; --vg-space-6: 48px; --vg-space-7: 72px; --vg-space-8: 112px;
+  --vg-font-display: 'Space Grotesk','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --vg-font-body: 'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --vg-ease-out: cubic-bezier(.16,1,.3,1);
+  --vg-ease-soft: cubic-bezier(.22,.61,.36,1);
+  --vg-dur-fast: 180ms; --vg-dur-base: 420ms; --vg-dur-slow: 900ms;
+}
+.vg-root, .vg-root * { box-sizing: border-box; }
+.vg-root { background: var(--vg-bg); color: var(--vg-text); font-family: var(--vg-font-body); font-size: 16px; line-height: 1.6; }
+.vg-root img { max-width: 100%; display: block; }
+.vg-root a { color: inherit; text-decoration: none; }
+.vg-root h1, .vg-root h2, .vg-root h3, .vg-root h4 { font-family: var(--vg-font-display); font-weight: 600; letter-spacing: -0.015em; color: var(--vg-navy-900); margin: 0; }
+.vg-eyebrow { font-family: var(--vg-font-body); font-size: 12px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--vg-gold-500); }
+.vg-container { width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 var(--vg-space-4); }
+.vg-section { padding: var(--vg-space-8) 0; }
+@media (max-width: 720px) { .vg-section { padding: var(--vg-space-6) 0; } .vg-container { padding: 0 var(--vg-space-3); } }
+.vg-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+.vg-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; }
+.vg-grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 22px; }
+@media (max-width: 900px) { .vg-grid-4 { grid-template-columns: repeat(2,1fr); gap: 16px; } }
+@media (max-width: 860px) { .vg-grid-2 { grid-template-columns: 1fr; gap: 36px; } .vg-grid-3 { grid-template-columns: 1fr; gap: 18px; } }
+@media (max-width: 480px) { .vg-grid-4 { grid-template-columns: repeat(2,1fr); gap: 12px; } }
+@media (max-width: 640px) { .vg-root h1 { font-size: clamp(32px,9vw,44px) !important; } .vg-root h2 { font-size: clamp(26px,7vw,32px) !important; } }
+@media (max-width: 640px) { .vg-btn { width: 100%; } .vg-nav .vg-btn { width: auto; } }
+@media (max-width: 720px) { .vg-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 28px 20px !important; } }
+@media (max-width: 480px) { .vg-footer-grid { grid-template-columns: 1fr !important; } }
+.vg-card { background: var(--vg-surface); border-radius: var(--vg-radius-lg); box-shadow: var(--vg-shadow-md); border: none; transition: transform var(--vg-dur-base) var(--vg-ease-out), box-shadow var(--vg-dur-base) var(--vg-ease-out); }
+.vg-card:hover { transform: translateY(-4px); box-shadow: var(--vg-shadow-lg); }
+.vg-card-flat { background: var(--vg-ivory-50); border-radius: var(--vg-radius-md); box-shadow: var(--vg-shadow-sm); }
+.vg-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: var(--vg-font-body); font-weight: 600; font-size: 15px; padding: 15px 30px; border-radius: var(--vg-radius-pill); border: none; cursor: pointer; transition: transform var(--vg-dur-fast) var(--vg-ease-soft), box-shadow var(--vg-dur-fast) var(--vg-ease-soft), background var(--vg-dur-fast) var(--vg-ease-soft), opacity var(--vg-dur-fast) var(--vg-ease-soft); -webkit-tap-highlight-color: transparent; }
+.vg-btn:active { transform: scale(.97); }
+.vg-btn-primary { background: linear-gradient(180deg, var(--vg-navy-800), var(--vg-navy-900)); color: var(--vg-ivory-100); box-shadow: var(--vg-shadow-md); }
+.vg-btn-primary:hover { box-shadow: var(--vg-shadow-lg); transform: translateY(-2px); }
+.vg-btn-gold { background: linear-gradient(180deg, var(--vg-gold-400), var(--vg-gold-500)); color: #0B1620; box-shadow: var(--vg-shadow-gold-glow); }
+.vg-btn-gold:hover { box-shadow: 0 12px 36px rgba(78,124,153,.4); transform: translateY(-2px); }
+.vg-btn-ghost { background: var(--vg-ivory-50); color: var(--vg-navy-900); box-shadow: var(--vg-shadow-sm); }
+.vg-btn-ghost:hover { box-shadow: var(--vg-shadow-md); }
+.vg-btn:disabled { opacity: .42; cursor: not-allowed; box-shadow: none; transform: none !important; }
+.vg-announce { background: var(--vg-navy-900); color: var(--vg-ivory-100); text-align: center; font-size: 12.5px; font-weight: 600; letter-spacing: .03em; padding: 9px var(--vg-space-4); }
+.vg-announce i { color: var(--vg-gold-400); margin-right: 7px; }
+.vg-nav { position: sticky; top: 0; z-index: 100; background: rgba(236,240,243,.9); backdrop-filter: blur(18px) saturate(1.2); -webkit-backdrop-filter: blur(18px) saturate(1.2); box-shadow: 0 1px 0 rgba(18,22,27,.06); }
+.vg-nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 18px var(--vg-space-4); max-width: 1180px; margin: 0 auto; }
+.vg-logo { font-family: var(--vg-font-display); font-size: 21px; font-weight: 600; letter-spacing: .02em; display: flex; align-items: center; gap: 8px; }
+.vg-logo-mark { width: 32px; height: 32px; object-fit: contain; flex-shrink: 0; }
+.vg-nav-links { display: flex; gap: var(--vg-space-5); font-size: 14px; font-weight: 500; color: var(--vg-navy-600); }
+.vg-nav-links a:hover { color: var(--vg-navy-900); }
+@media (max-width: 720px) { .vg-nav-links { display: none; } }
+.vg-reveal { opacity: 0; transform: translateY(36px); transition: opacity 900ms var(--vg-ease-out), transform 900ms var(--vg-ease-out); }
+.vg-reveal.vg-in { opacity: 1; transform: translateY(0); }
+.vg-reveal[data-delay="1"] { transition-delay: 90ms; }
+.vg-reveal[data-delay="2"] { transition-delay: 180ms; }
+.vg-reveal[data-delay="3"] { transition-delay: 270ms; }
+.vg-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: var(--vg-radius-pill); background: var(--vg-ivory-200); color: var(--vg-navy-600); font-size: 12px; font-weight: 600; letter-spacing: .04em; }
+.vg-pill-out { background: #F3E4DC; color: var(--vg-danger); }
+.vg-pill-in { background: #E3F0E9; color: var(--vg-success); }
+.vg-pill-gold { background: var(--vg-gold-050); color: var(--vg-gold-500); }
+.vg-front-back-toggle { display: flex; gap: 8px; }
+.vg-fb-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: none; background: var(--vg-ivory-100); color: var(--vg-navy-500); font-family: var(--vg-font-body); font-weight: 600; font-size: 13px; padding: 11px 14px; border-radius: var(--vg-radius-pill); cursor: pointer; transition: background var(--vg-dur-fast) var(--vg-ease-soft), color var(--vg-dur-fast) var(--vg-ease-soft), box-shadow var(--vg-dur-fast) var(--vg-ease-soft); -webkit-tap-highlight-color: transparent; }
+.vg-fb-btn:hover { background: var(--vg-ivory-200); }
+.vg-fb-btn.vg-fb-active { background: var(--vg-navy-900); color: #fff; box-shadow: var(--vg-shadow-sm); }
+.vg-video-frame { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: var(--vg-radius-lg); overflow: hidden; box-shadow: var(--vg-shadow-lg); background: var(--vg-navy-800); }
+.vg-video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+@media (max-width: 640px) { .vg-video-frame { border-radius: var(--vg-radius-md); } }
+.vg-product-card { overflow: hidden; padding: 0; display: block; text-decoration: none; color: inherit; }
+.vg-product-card-img { aspect-ratio: 4/5; background: var(--vg-ivory-50); border-radius: var(--vg-radius-lg) var(--vg-radius-lg) 0 0; overflow: hidden; }
+.vg-product-card-img img { width: 100%; height: 100%; object-fit: cover; }
+.vg-product-card-body { padding: 18px 20px 22px; }
+.vg-form-field { margin-bottom: 18px; }
+.vg-form-field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 7px; color: var(--vg-navy-700); }
+.vg-form-field input, .vg-form-field textarea { width: 100%; padding: 13px 16px; border-radius: 12px; border: none; background: var(--vg-ivory-100); font-family: inherit; font-size: 15px; color: var(--vg-text); }
+.vg-form-field textarea { resize: vertical; }
+  </style>
+</head>
+<body class="vg-root">
+
+  <div class="vg-announce">
+    <i class="fa-solid fa-truck-fast" aria-hidden="true"></i>
+    {{ settings.vg_announcement | default: 'Free US Shipping On Orders Over $50.' }}
+  </div>
+
+  <header class="vg-nav">
+    <div class="vg-nav-inner">
+      <a href="{{ routes.root_url }}" class="vg-logo">
+        <img src="{{ 'vaultguards-logo.png' | asset_url }}" alt="{{ shop.name }}" class="vg-logo-mark">
+        {{ shop.name }}
+      </a>
+      <nav class="vg-nav-links">
+        <a href="{{ routes.root_url }}#shop">Shop</a>
+        <a href="{{ pages['the-vault'].url | default: '/pages/the-vault' }}">The Vault</a>
+        <a href="{{ pages.contact.url | default: '/pages/contact' }}">Contact</a>
+      </nav>
+      <a href="{{ pages['the-vault'].url | default: '/pages/the-vault' }}" class="vg-btn vg-btn-gold" style="padding:10px 20px;font-size:13px" data-vg-haptic="tap">
+        <i class="fa-solid fa-vault"></i> Try It On
+      </a>
+    </div>
+  </header>
+
+  <main role="main">
+    {{ content_for_layout }}
+  </main>
+
+  <footer style="background:var(--vg-navy-900); color:var(--vg-ivory-200); padding:64px 0 32px;">
+    <div class="vg-container">
+      <div class="vg-footer-grid" style="display:grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap:40px;">
+        <div>
+          <div class="vg-logo" style="color:#fff;">
+            <img src="{{ 'vaultguards-logo.png' | asset_url }}" alt="{{ shop.name }}" class="vg-logo-mark"> {{ shop.name }}
+          </div>
+          <p style="color:var(--vg-navy-300); font-size:14px; max-width:280px; margin-top:14px;">
+            Precision-fit colorway guards for TAG and PSA graded slabs. Built for collectors who treat their cards like the assets they are.
+          </p>
+        </div>
+        <div>
+          <div style="font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--vg-gold-400); margin-bottom:14px;">Shop</div>
+          <div style="display:flex; flex-direction:column; gap:10px; font-size:14px; color:var(--vg-navy-300);">
+            {% for collection in collections %}
+              {% if collection.handle contains 'tag' %}<a href="{{ collection.url }}">TAG Guards</a>{% endif %}
+            {% endfor %}
+            {% for collection in collections %}
+              {% if collection.handle contains 'shimmer' and collection.handle contains 'tag' == false %}<a href="{{ collection.url }}">PSA Guards</a>{% endif %}
+            {% endfor %}
+            <a href="{{ routes.root_url }}#shop">Accessories</a>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--vg-gold-400); margin-bottom:14px;">Explore</div>
+          <div style="display:flex; flex-direction:column; gap:10px; font-size:14px; color:var(--vg-navy-300);">
+            <a href="{{ pages['the-vault'].url | default: '/pages/the-vault' }}">The Vault &mdash; Try It On</a>
+            <a href="{{ routes.root_url }}#watch">Watch Once You Buy</a>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--vg-gold-400); margin-bottom:14px;">Support</div>
+          <div style="display:flex; flex-direction:column; gap:10px; font-size:14px; color:var(--vg-navy-300);">
+            <a href="{{ pages.contact.url | default: '/pages/contact' }}">Contact</a>
+            <a href="{{ pages.shipping.url | default: '#' }}">Shipping</a>
+            <a href="{{ pages.faq.url | default: '#' }}">FAQ</a>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:48px; padding-top:24px; border-top:1px solid rgba(255,255,255,.08); display:flex; flex-wrap:wrap; gap:8px 20px; justify-content:space-between; color:var(--vg-navy-400); font-size:13px;">
+        <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</span>
+        <span>Not affiliated with TAG Grading or PSA.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.VG = window.VG || {};
+    VG.haptic = {
+      _v: function (p) { if (navigator.vibrate) { try { navigator.vibrate(p); } catch (e) {} } },
+      tick: function () { this._v(8); },
+      tap: function () { this._v(12); },
+      success: function () { this._v([10, 40, 10]); },
+      warn: function () { this._v([16, 30, 16]); },
+      snap: function () { this._v(6); }
+    };
+    function vgInitRevealObserver() {
+      var els = document.querySelectorAll('.vg-reveal');
+      if (!('IntersectionObserver' in window) || !els.length) {
+        els.forEach(function (el) { el.classList.add('vg-in'); });
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('vg-in');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+      els.forEach(function (el) { io.observe(el); });
+    }
+    function vgInitTapHaptics() {
+      document.addEventListener('click', function (e) {
+        var t = e.target.closest('[data-vg-haptic]');
+        if (!t) return;
+        var kind = t.getAttribute('data-vg-haptic');
+        if (VG.haptic[kind]) VG.haptic[kind]();
+        else VG.haptic.tap();
+      });
+    }
+    VG.initHapticScroll = function () {
+      vgInitRevealObserver();
+      vgInitTapHaptics();
+    };
+    document.addEventListener('DOMContentLoaded', function () { VG.initHapticScroll(); });
+  </script>
+
+  {% if section.settings %}{% endif %}
+</body>
+</html>
