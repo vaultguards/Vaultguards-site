@@ -175,8 +175,9 @@
     <div class="vg-container">
       <div class="vg-footer-grid" style="display:grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap:40px;">
         <div>
-          <div class="vg-logo" style="color:#fff;">
-            <img src="{{ 'vaultguards-logo.png' | asset_url }}" alt="{{ shop.name }}" class="vg-logo-mark" width="32" height="32"> {{ shop.name }}
+          <div class="vg-logo" style="color:#fff; display:flex; align-items:center; gap:10px;">
+            <img src="{{ 'vaultguards-logo.png' | asset_url }}" alt="" class="vg-logo-mark" width="32" height="32">
+            <img src="{{ 'vaultguards-wordmark.png' | asset_url }}" alt="{{ shop.name }}" style="height:20px; width:auto; display:block;" width="207" height="20">
           </div>
           <p style="color:var(--vg-navy-300); font-size:14px; max-width:280px; margin-top:14px;">
             Precision-fit colorway guards for TAG and PSA graded slabs. Built for collectors who treat their cards like the assets they are.
