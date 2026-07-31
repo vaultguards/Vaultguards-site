@@ -166,7 +166,9 @@
               {% if collection.handle contains 'tag' %}<a href="{{ collection.url }}">TAG Guards</a>{% endif %}
             {% endfor %}
             {% for collection in collections %}
-              {% if collection.handle contains 'shimmer' and collection.handle contains 'tag' == false %}<a href="{{ collection.url }}">PSA Guards</a>{% endif %}
+              {% unless collection.handle contains 'tag' %}
+                {% if collection.handle contains 'shimmer' %}<a href="{{ collection.url }}">PSA Guards</a>{% endif %}
+              {% endunless %}
             {% endfor %}
             <a href="{{ routes.root_url }}#shop">Accessories</a>
           </div>
