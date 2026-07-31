@@ -1,0 +1,491 @@
+/* ==========================================================================
+   Vaultguards — Design System
+   Palette: warm ivory backgrounds, deep charcoal-navy text, muted gold accent.
+   Principles: no hard borders, soft layered shadows, rounded surfaces,
+   Apple-Store-like restrained polish.
+   ========================================================================== */
+
+:root {
+  /* --- Core palette --- */
+  --vg-ivory-50: #FDFBF7;
+  --vg-ivory-100: #FAF6EE;
+  --vg-ivory-200: #F3ECDD;
+  --vg-ivory-300: #EBE1CB;
+
+  --vg-navy-900: #14181F;
+  --vg-navy-800: #1C222C;
+  --vg-navy-700: #262E3B;
+  --vg-navy-600: #3A4456;
+  --vg-navy-400: #6B7688;
+  --vg-navy-300: #9AA3B2;
+
+  --vg-gold-500: #B08D4F;
+  --vg-gold-400: #C7A76A;
+  --vg-gold-300: #DDC796;
+  --vg-gold-050: #F7EFDD;
+
+  --vg-steel-400: #8C97A3;
+  --vg-steel-300: #AEB8C2;
+
+  --vg-success: #3F8F6B;
+  --vg-danger: #B5573F;
+
+  /* --- Semantic tokens --- */
+  --vg-bg: var(--vg-ivory-100);
+  --vg-bg-alt: var(--vg-ivory-50);
+  --vg-surface: #FFFFFF;
+  --vg-surface-sunken: var(--vg-ivory-200);
+  --vg-text: var(--vg-navy-900);
+  --vg-text-muted: var(--vg-navy-400);
+  --vg-accent: var(--vg-gold-500);
+  --vg-accent-strong: var(--vg-navy-900);
+
+  /* --- Shadows (soft, layered, never hard-edged) --- */
+  --vg-shadow-xs: 0 1px 2px rgba(20, 24, 31, 0.04), 0 1px 1px rgba(20, 24, 31, 0.03);
+  --vg-shadow-sm: 0 2px 8px rgba(20, 24, 31, 0.06), 0 1px 3px rgba(20, 24, 31, 0.04);
+  --vg-shadow-md: 0 8px 24px rgba(20, 24, 31, 0.08), 0 2px 6px rgba(20, 24, 31, 0.05);
+  --vg-shadow-lg: 0 20px 48px rgba(20, 24, 31, 0.12), 0 6px 16px rgba(20, 24, 31, 0.06);
+  --vg-shadow-gold-glow: 0 8px 30px rgba(176, 141, 79, 0.25);
+  --vg-shadow-inset: inset 0 1px 2px rgba(20, 24, 31, 0.06);
+
+  /* --- Radii --- */
+  --vg-radius-sm: 14px;
+  --vg-radius-md: 22px;
+  --vg-radius-lg: 32px;
+  --vg-radius-xl: 44px;
+  --vg-radius-pill: 999px;
+
+  /* --- Spacing scale --- */
+  --vg-space-1: 4px;
+  --vg-space-2: 8px;
+  --vg-space-3: 12px;
+  --vg-space-4: 20px;
+  --vg-space-5: 32px;
+  --vg-space-6: 48px;
+  --vg-space-7: 72px;
+  --vg-space-8: 112px;
+
+  /* --- Typography --- */
+  --vg-font-display: 'Fraunces', 'Georgia', serif;
+  --vg-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* --- Motion --- */
+  --vg-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --vg-ease-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --vg-dur-fast: 180ms;
+  --vg-dur-base: 420ms;
+  --vg-dur-slow: 900ms;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  background: var(--vg-bg);
+  color: var(--vg-text);
+  font-family: var(--vg-font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--vg-font-display);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--vg-navy-900);
+  margin: 0;
+}
+
+.vg-eyebrow {
+  font-family: var(--vg-font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--vg-gold-500);
+}
+
+/* ==========================================================================
+   Layout helpers
+   ========================================================================== */
+
+.vg-container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--vg-space-4);
+}
+
+.vg-section {
+  padding: var(--vg-space-8) 0;
+}
+
+@media (max-width: 720px) {
+  .vg-section { padding: var(--vg-space-6) 0; }
+  .vg-container { padding: 0 var(--vg-space-3); }
+}
+
+/* ==========================================================================
+   Surfaces — soft rounded cards, no hard lines
+   ========================================================================== */
+
+.vg-card {
+  background: var(--vg-surface);
+  border-radius: var(--vg-radius-lg);
+  box-shadow: var(--vg-shadow-md);
+  border: none;
+  transition: transform var(--vg-dur-base) var(--vg-ease-out), box-shadow var(--vg-dur-base) var(--vg-ease-out);
+}
+
+.vg-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--vg-shadow-lg);
+}
+
+.vg-card-flat {
+  background: var(--vg-ivory-50);
+  border-radius: var(--vg-radius-md);
+  box-shadow: var(--vg-shadow-sm);
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+.vg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--vg-font-body);
+  font-weight: 600;
+  font-size: 15px;
+  padding: 15px 30px;
+  border-radius: var(--vg-radius-pill);
+  border: none;
+  cursor: pointer;
+  transition: transform var(--vg-dur-fast) var(--vg-ease-soft),
+              box-shadow var(--vg-dur-fast) var(--vg-ease-soft),
+              background var(--vg-dur-fast) var(--vg-ease-soft),
+              opacity var(--vg-dur-fast) var(--vg-ease-soft);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.vg-btn:active { transform: scale(0.97); }
+
+.vg-btn-primary {
+  background: linear-gradient(180deg, var(--vg-navy-800), var(--vg-navy-900));
+  color: var(--vg-ivory-100);
+  box-shadow: var(--vg-shadow-md);
+}
+.vg-btn-primary:hover { box-shadow: var(--vg-shadow-lg); transform: translateY(-2px); }
+
+.vg-btn-gold {
+  background: linear-gradient(180deg, var(--vg-gold-400), var(--vg-gold-500));
+  color: #211705;
+  box-shadow: var(--vg-shadow-gold-glow);
+}
+.vg-btn-gold:hover { box-shadow: 0 12px 36px rgba(176, 141, 79, 0.35); transform: translateY(-2px); }
+
+.vg-btn-ghost {
+  background: var(--vg-ivory-50);
+  color: var(--vg-navy-900);
+  box-shadow: var(--vg-shadow-sm);
+}
+.vg-btn-ghost:hover { box-shadow: var(--vg-shadow-md); }
+
+.vg-btn:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none !important;
+}
+
+/* ==========================================================================
+   Nav
+   ========================================================================== */
+
+.vg-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(250, 246, 238, 0.78);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  box-shadow: 0 1px 0 rgba(20,24,31,0.05);
+}
+
+.vg-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px var(--vg-space-4);
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.vg-logo {
+  font-family: var(--vg-font-display);
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vg-logo .vg-logo-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--vg-gold-500);
+  box-shadow: 0 0 0 4px rgba(176,141,79,0.18);
+}
+
+.vg-nav-links {
+  display: flex;
+  gap: var(--vg-space-5);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--vg-navy-600);
+}
+
+.vg-nav-links a {
+  transition: color var(--vg-dur-fast) var(--vg-ease-soft);
+}
+.vg-nav-links a:hover { color: var(--vg-navy-900); }
+
+@media (max-width: 720px) {
+  .vg-nav-links { display: none; }
+}
+
+/* ==========================================================================
+   Scroll reveal
+   ========================================================================== */
+
+.vg-reveal {
+  opacity: 0;
+  transform: translateY(36px);
+  transition: opacity 900ms var(--vg-ease-out), transform 900ms var(--vg-ease-out);
+  will-change: opacity, transform;
+}
+.vg-reveal.vg-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+.vg-reveal[data-delay="1"] { transition-delay: 90ms; }
+.vg-reveal[data-delay="2"] { transition-delay: 180ms; }
+.vg-reveal[data-delay="3"] { transition-delay: 270ms; }
+
+/* ==========================================================================
+   Scroll snap sections (desktop momentum-style feel)
+   ========================================================================== */
+
+.vg-snap-track {
+  scroll-snap-type: y proximity;
+}
+.vg-snap-section {
+  scroll-snap-align: start;
+}
+
+/* ==========================================================================
+   Badges / pills
+   ========================================================================== */
+
+.vg-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--vg-radius-pill);
+  background: var(--vg-ivory-200);
+  color: var(--vg-navy-600);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.vg-pill-out { background: #F3E4DC; color: var(--vg-danger); }
+.vg-pill-in { background: #E3F0E9; color: var(--vg-success); }
+.vg-pill-gold { background: var(--vg-gold-050); color: var(--vg-gold-500); }
+
+/* ==========================================================================
+   Scrollbar (subtle)
+   ========================================================================== */
+
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--vg-ivory-300);
+  border-radius: 10px;
+  border: 2px solid var(--vg-ivory-100);
+}
+
+/* ==========================================================================
+   THE VAULT — Virtual Try-On
+   ========================================================================== */
+
+.vault-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--vg-navy-300);
+  padding: 6px 4px;
+}
+.vault-step.vault-step-active { color: var(--vg-navy-900); }
+.vault-step.vault-step-done { color: var(--vg-gold-500); }
+.vault-step-num {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--vg-ivory-200);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  transition: background var(--vg-dur-fast) var(--vg-ease-soft), color var(--vg-dur-fast) var(--vg-ease-soft);
+}
+.vault-step-active .vault-step-num { background: var(--vg-navy-900); color: #fff; }
+.vault-step-done .vault-step-num { background: var(--vg-gold-400); color: #2a1f08; }
+.vault-step-line { width: 32px; height: 1px; background: var(--vg-ivory-300); }
+
+.vault-panel { animation: vgFadeUp 480ms var(--vg-ease-out); }
+@keyframes vgFadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.vault-brand-btn {
+  border: none;
+  background: var(--vg-ivory-50);
+  border-radius: var(--vg-radius-md);
+  padding: 30px 20px;
+  cursor: pointer;
+  box-shadow: var(--vg-shadow-sm);
+  transition: box-shadow var(--vg-dur-fast) var(--vg-ease-soft), transform var(--vg-dur-fast) var(--vg-ease-soft);
+  text-align: center;
+  font-family: var(--vg-font-body);
+}
+.vault-brand-btn:hover { box-shadow: var(--vg-shadow-md); transform: translateY(-3px); }
+.vault-brand-btn.vault-brand-selected {
+  box-shadow: 0 0 0 3px var(--vg-gold-400), var(--vg-shadow-md);
+}
+.vault-brand-swatch {
+  width: 64px; height: 96px;
+  margin: 0 auto;
+  border-radius: 10px;
+  box-shadow: var(--vg-shadow-xs), inset 0 0 0 1px rgba(0,0,0,0.04);
+}
+
+.vault-dropzone {
+  border: none;
+  border-radius: var(--vg-radius-md);
+  background: var(--vg-ivory-50);
+  box-shadow: var(--vg-shadow-inset), var(--vg-shadow-xs);
+  padding: 52px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: box-shadow var(--vg-dur-fast) var(--vg-ease-soft);
+}
+.vault-dropzone:hover { box-shadow: var(--vg-shadow-inset), var(--vg-shadow-sm); }
+.vault-dropzone.vault-drag-over { box-shadow: 0 0 0 3px var(--vg-gold-400); }
+
+.vault-spinner {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  border: 3px solid var(--vg-ivory-300);
+  border-top-color: var(--vg-gold-500);
+  margin: 0 auto;
+  animation: vgSpin 900ms linear infinite;
+}
+@keyframes vgSpin { to { transform: rotate(360deg); } }
+
+.vault-align-stage {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  aspect-ratio: 4/5;
+  background: var(--vg-ivory-200);
+  border-radius: var(--vg-radius-md);
+  overflow: hidden;
+  touch-action: none;
+}
+.vault-align-stage canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+}
+.vault-align-guide {
+  position: absolute;
+  border: 2px dashed rgba(176, 141, 79, 0.85);
+  border-radius: 14px;
+  pointer-events: none;
+  box-shadow: 0 0 0 2000px rgba(20, 24, 31, 0.38);
+}
+
+.vault-preview-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/5;
+  background: var(--vg-ivory-50);
+  border-radius: var(--vg-radius-md);
+  overflow: hidden;
+}
+.vault-preview-stage canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+}
+
+.vault-swatch {
+  width: 100%;
+  aspect-ratio: 1/1;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  box-shadow: var(--vg-shadow-xs);
+  transition: transform var(--vg-dur-fast) var(--vg-ease-soft), box-shadow var(--vg-dur-fast) var(--vg-ease-soft);
+}
+.vault-swatch:hover { transform: translateY(-2px); box-shadow: var(--vg-shadow-sm); }
+.vault-swatch.vault-swatch-active { box-shadow: 0 0 0 3px var(--vg-navy-900); }
+.vault-swatch .vault-swatch-oos-dot {
+  position: absolute; top: -4px; right: -4px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--vg-danger);
+  box-shadow: 0 0 0 2px #fff;
+  font-size: 8px; color: #fff; display: flex; align-items: center; justify-content: center;
+}
+
+#suggestion-banner {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--vg-gold-050);
+  font-size: 13px;
+  color: var(--vg-navy-700);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#suggestion-banner button {
+  border: none; background: var(--vg-navy-900); color: #fff;
+  padding: 6px 12px; border-radius: 999px; font-size: 12px; cursor: pointer;
+}
+
+@media (max-width: 780px) {
+  #panel-preview > div { grid-template-columns: 1fr !important; }
+}
