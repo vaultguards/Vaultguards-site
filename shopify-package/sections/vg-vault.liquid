@@ -103,10 +103,14 @@
         </div>
 
         <div id="vgv-dropzone" class="vgv-dropzone">
-          <input type="file" id="vgv-upload-input" accept="image/*" capture="environment" style="display:none;">
+          <input type="file" id="vgv-upload-input" accept="image/*" style="display:none;">
+          <input type="file" id="vgv-camera-input" accept="image/*" capture="environment" style="display:none;">
           <i class="fa-solid fa-cloud-arrow-up" style="font-size:30px; color:var(--vg-gold-500);"></i>
-          <div style="font-weight:600; margin-top:12px;">Tap to take or choose a photo</div>
+          <div style="font-weight:600; margin-top:12px;">Tap to upload a photo</div>
           <div style="color:var(--vg-navy-400); font-size:12.5px; margin-top:4px;">JPG or PNG - background removed automatically</div>
+          <button type="button" id="vgv-camera-btn" class="vg-btn vg-btn-ghost" style="margin-top:18px; padding:9px 18px; font-size:12.5px;">
+            <i class="fa-solid fa-camera"></i> Take a Photo Instead
+          </button>
         </div>
 
         <div id="vgv-upload-progress" style="display:none; text-align:center; padding:30px 0;">
@@ -354,6 +358,8 @@
   // -------------------------------------------------------------------
   var dropzone = document.getElementById('vgv-dropzone');
   var fileInput = document.getElementById('vgv-upload-input');
+  var cameraInput = document.getElementById('vgv-camera-input');
+  var cameraBtn = document.getElementById('vgv-camera-btn');
   var progressEl = document.getElementById('vgv-upload-progress');
   var progressLabel = document.getElementById('vgv-upload-progress-label');
   var _bgRemovalModulePromise = null;
@@ -365,7 +371,14 @@
     return _bgRemovalModulePromise;
   }
 
-  if (dropzone) dropzone.addEventListener('click', function () { fileInput.click(); });
+  if (dropzone) dropzone.addEventListener('click', function (e) {
+    if (cameraBtn && (e.target === cameraBtn || cameraBtn.contains(e.target))) return;
+    fileInput.click();
+  });
+  if (cameraBtn) cameraBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (cameraInput) cameraInput.click();
+  });
   ['dragover', 'dragleave', 'drop'].forEach(function (evt) {
     if (!dropzone) return;
     dropzone.addEventListener(evt, function (e) {
@@ -379,6 +392,9 @@
   });
   if (fileInput) fileInput.addEventListener('change', function () {
     if (fileInput.files && fileInput.files[0]) handleFile(fileInput.files[0]);
+  });
+  if (cameraInput) cameraInput.addEventListener('change', function () {
+    if (cameraInput.files && cameraInput.files[0]) handleFile(cameraInput.files[0]);
   });
 
   function useImageAsIs(objectUrl, note) {
@@ -752,6 +768,7 @@
         var note = document.getElementById('vgv-cart-note');
         note.textContent = 'Added to cart.';
         addCartBtn.disabled = false;
+        if (window.VG && VG.refreshCartCount) VG.refreshCartCount();
       })
       .catch(function () {
         addCartBtn.disabled = false;

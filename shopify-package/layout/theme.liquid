@@ -131,6 +131,9 @@
 .vg-form-field input, .vg-form-field textarea { width: 100%; padding: 13px 16px; border-radius: 12px; border: 1px solid var(--vg-ivory-300); background: var(--vg-surface); font-family: inherit; font-size: 15px; color: var(--vg-text); box-shadow: var(--vg-shadow-xs); transition: border-color var(--vg-dur-fast) var(--vg-ease-soft), box-shadow var(--vg-dur-fast) var(--vg-ease-soft); }
 .vg-form-field input:focus, .vg-form-field textarea:focus { outline: none; border-color: var(--vg-gold-400); box-shadow: 0 0 0 3px var(--vg-gold-050); }
 .vg-form-field textarea { resize: vertical; }
+.vg-nav-cart { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: var(--vg-ivory-50); color: var(--vg-navy-900); font-size: 16px; flex-shrink: 0; -webkit-tap-highlight-color: transparent; transition: background var(--vg-dur-fast) var(--vg-ease-soft); }
+.vg-nav-cart:hover { background: var(--vg-ivory-200); }
+.vg-nav-cart-badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 999px; background: var(--vg-gold-500); color: #fff; font-size: 10.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; line-height: 1; }
   </style>
 </head>
 <body class="vg-root">
@@ -143,8 +146,8 @@
   <header class="vg-nav">
     <div class="vg-nav-inner">
       <a href="{{ routes.root_url }}" class="vg-logo">
-        <img src="{{ 'vaultguards-logo.png' | asset_url }}" alt="{{ shop.name }}" class="vg-logo-mark" width="32" height="32">
-        {{ shop.name }}
+        <img src="{{ 'vaultguards-logo.png' | asset_url }}" alt="" class="vg-logo-mark" width="32" height="32">
+        <img src="{{ 'vaultguards-wordmark-dark.png' | asset_url }}" alt="{{ shop.name }}" style="height:18px; width:auto; display:block;" width="209" height="16">
       </a>
       <nav class="vg-nav-links">
         <a href="{{ routes.root_url }}#shop">Shop</a>
@@ -154,6 +157,10 @@
       <div class="vg-nav-actions">
         <a href="{{ pages['the-vault'].url | default: '/pages/the-vault' }}" class="vg-btn vg-btn-gold" style="padding:10px 20px;font-size:13px" data-vg-haptic="tap">
           <i class="fa-solid fa-vault"></i> <span>Try It On</span>
+        </a>
+        <a href="{{ routes.cart_url }}" class="vg-nav-cart" aria-label="Cart, {{ cart.item_count }} items" data-vg-haptic="tick">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span class="vg-nav-cart-badge" id="vg-nav-cart-count" style="{% if cart.item_count == 0 %}display:none;{% endif %}">{{ cart.item_count }}</span>
         </a>
         <button type="button" class="vg-nav-toggle" id="vg-nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="vg-mobile-menu">
           <i class="fa-solid fa-bars"></i>
@@ -280,12 +287,26 @@
         if (window.innerWidth > 720) closeMenu();
       });
     }
+    VG.refreshCartCount = function () {
+      fetch('/cart.js', { headers: { 'Accept': 'application/json' } })
+        .then(function (res) { return res.json(); })
+        .then(function (cart) {
+          var badge = document.getElementById('vg-nav-cart-count');
+          if (!badge) return;
+          badge.textContent = cart.item_count;
+          badge.style.display = cart.item_count > 0 ? 'flex' : 'none';
+        })
+        .catch(function () {});
+    };
     VG.initHapticScroll = function () {
       vgInitRevealObserver();
       vgInitTapHaptics();
       vgInitMobileMenu();
     };
-    document.addEventListener('DOMContentLoaded', function () { VG.initHapticScroll(); });
+    document.addEventListener('DOMContentLoaded', function () {
+      VG.initHapticScroll();
+      VG.refreshCartCount();
+    });
   </script>
 
 </body>

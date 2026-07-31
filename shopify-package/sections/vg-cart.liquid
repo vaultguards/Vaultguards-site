@@ -123,17 +123,17 @@
 
               <div class="vg-form-field" style="margin-bottom:16px;">
                 <label for="vg-cart-discount">Discount code or gift card</label>
-                <div style="display:flex; gap:8px;">
-                  <input type="text" id="vg-cart-discount" placeholder="Enter code" autocomplete="off" style="flex:1;">
-                  <button type="button" id="vg-cart-discount-apply" class="vg-btn vg-btn-ghost" style="padding:13px 18px; font-size:13px; white-space:nowrap;">Apply</button>
-                </div>
+                <input type="text" id="vg-cart-discount" placeholder="Enter discount code or gift card number" autocomplete="off" style="width:100%; margin-bottom:10px;">
+                <button type="button" id="vg-cart-discount-apply" class="vg-btn vg-btn-ghost" style="width:100%; padding:13px 18px; font-size:13.5px;">
+                  <i class="fa-solid fa-tag"></i> Apply Code
+                </button>
                 <div style="font-size:11.5px; color:var(--vg-navy-400); margin-top:8px; line-height:1.5;">
-                  Discount codes apply right away. Gift cards are redeemed in this same field on the next step.
+                  Discount codes apply right away and carry through to checkout. Gift cards are redeemed in this same field on the next step.
                 </div>
               </div>
 
               <button type="submit" name="checkout" id="vg-cart-checkout" class="vg-btn vg-btn-primary" style="width:100%; padding:16px;" data-vg-haptic="tap">
-                <i class="fa-solid fa-lock"></i> Checkout
+                <i class="fa-solid fa-lock"></i> Continue to Checkout
               </button>
 
               <a href="{{ pages['the-vault'].url | default: '/pages/the-vault' }}" class="vg-btn vg-btn-ghost" style="width:100%; margin-top:10px; justify-content:center;" data-vg-haptic="tap">
@@ -180,6 +180,12 @@
     if (isNaN(v) || v < 0) v = 0;
     return v;
   }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && e.target && e.target.matches && e.target.matches('[data-vg-cart-qty-input]')) {
+      e.preventDefault();
+    }
+  });
 
   document.addEventListener('click', function (e) {
     var stepBtn = e.target.closest('[data-vg-cart-step]');
