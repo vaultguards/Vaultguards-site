@@ -387,49 +387,71 @@ Key mechanics worth remembering when touching these:
   `youtube.com/watch?v=<ID>` URL.
 - **Announcement bar (top strip) is a native Horizon file, not a custom
   `vg-` section**: `sections/header-group.json` — previously untouched/
-  untracked locally until we needed to edit it. Its `header_announcements_*`
-  section natively supports EITHER multiple rotating `_announcement` blocks
-  (fades between them every `settings.speed` seconds, only activates when
-  `section.blocks.size > 1` — confirmed by pulling
-  `sections/header-announcements.liquid`) OR a single static block.
-  **We first tried rotation (2 blocks: VG15 code + free shipping, speed 3),
-  and pushed/verified it correctly at the source level twice — but the user
-  twice reported only ever seeing one message, no visible rotation.** Rather
-  than keep debugging a live-rendering issue we couldn't directly observe
-  from this sandbox (see rate-limit note below), we switched to the
-  guaranteed-deterministic fix the user then explicitly asked for: **one
-  single block, both messages shown at once, always, no JS/rotation
-  dependency at all.**
-  - **Current live state**: ONE block (`announcement_BxgCk9`) with
-    `settings.text` = `"Free US Shipping over $50\nUse code VG15 for 15%
-    off"` (a literal `\n` inside the JSON string — two lines, single block).
-    `block_order` has just that one id.
-  - **Key gotcha discovered**: the `_announcement` block's `text` setting is
-    type `inline_richtext`, and Shopify's server-side push validation
-    **rejects `<br>`** in that field with `Setting 'text' is invalid. Tag
-    '<br>' is not permitted` (push fails cleanly, old content stays live —
-    no corruption, but the new content does NOT go live, so always check
-    the push output for an `error` block, not just "pushed successfully").
-    The fix: use a **literal `\n` character** in the string instead (passes
-    validation, since it isn't an HTML tag) plus a small CSS override in
-    `layout/theme.liquid` — `.announcement-bar__text { white-space:
-    pre-line; line-height: 1.5 !important; }` — to make the browser actually
-    render that `\n` as a visual line break (browsers collapse raw newlines
-    to a space by default without `pre-line`/`pre-wrap`).
-  - If multi-message rotation is ever wanted again later, it's still fully
-    supported natively — just add a second block back with its own
-    `_announcement` settings and set `block_order` to both ids; but given the
-    trouble getting the user to actually see it rotate, treat that as
-    something to test carefully with the user watching live for a full cycle
-    before considering it done, not just source-verified.
-  - **Rate-limit note**: Cloudflare's rate limiter on repeated storefront
-    fetches from this sandbox kicks in fast (HTTP 429 `local_rate_limited`,
-    `retry-after: 60`) — a `curl`/crawler check right after a push will often
-    just get rate-limited, not a real signal either way. `theme pull` +
+  untracked locally until we needed to edit it for the VG15 promo attempts
+  below. Its `header_announcements_*` section natively supports EITHER
+  multiple rotating `_announcement` blocks (fades between them every
+  `settings.speed` seconds, only activates when `section.blocks.size > 1` —
+  confirmed by pulling `sections/header-announcements.liquid`) OR a single
+  static block.
+  - **VG15 promo history in this file (all abandoned, now fully reverted)**:
+    1. Tried rotation (2 blocks: VG15 code + free shipping, various
+       speeds/orders) — pushed/verified correct at the source level three
+       times, but the user repeatedly reported never seeing it rotate
+       visually.
+    2. Pivoted to one static block with both lines via a literal `\n` in the
+       `text` setting + a `white-space: pre-line` CSS override in
+       `layout/theme.liquid` (note: `<br>` is explicitly rejected by
+       Shopify's push validation for `inline_richtext` fields — error
+       `Setting 'text' is invalid. Tag '<br>' is not permitted` — `\n` is the
+       working substitute since it isn't an HTML tag).
+    3. User said this "didn't work at all" and asked to move the VG15 promo
+       off the top bar entirely, onto the cart page instead (see below).
+  - **Current live state: fully reverted to the pre-existing original**,
+    single block (`announcement_BxgCk9`), `settings.text` =
+    `"Free Shipping On US Orders over $50"` (no VG15 mention, no `\n`),
+    `speed: 5`, `padding-block-start/end: 15` — byte-for-byte the same as
+    before any of this work started. The `white-space: pre-line` CSS rule
+    added to `layout/theme.liquid` for step 2 above was also removed (it's
+    dead weight once there's no `\n` left to render).
+  - If a top-bar promo is ever wanted again, the native rotation mechanism
+    above is proven to work correctly at the source/push/pull level every
+    time it was tried — the open question is only whether it visually
+    renders/rotates for real users, which was never confirmed either way in
+    this sandbox. Test it live with the user watching a full cycle before
+    calling it done, not just via source verification.
+  - **Rate-limit note (applies broadly, not just to this feature)**:
+    Cloudflare's rate limiter on repeated storefront fetches from this
+    sandbox kicks in fast (HTTP 429 `local_rate_limited`, `retry-after: 60`)
+    — a `curl`/crawler check right after a push will often just get
+    rate-limited, not a real signal either way. `theme pull` +
     diff/structural-compare (our normal method) is the reliable verification
     step; treat any live-rendering claim beyond that as needing the user's
     own eyes on the actual page, not something this sandbox can reliably
     confirm by fetching the page itself.
+- **VG15 discount promo now lives on the Cart page instead**
+  (`sections/vg-cart.liquid`), per the user's explicit request after the
+  top-bar approach failed to satisfy them. A gold pill banner reading
+  "Did you add a discount? Use code VG15 for 15% off — tap to apply." sits
+  directly above the existing "Discount code or gift card" field, wrapped in
+  `{% if cart.total_discount == 0 %}` so it disappears automatically once a
+  discount is already applied (avoids nagging). Clicking it fills the
+  discount input with `VG15` and reuses the file's existing
+  `applyDiscount('/cart')` JS helper, which redirects through Shopify's
+  native `/discount/CODE?redirect=/cart` route — the same mechanism the
+  existing manual "Apply Code" button already used, so no new backend
+  logic was needed.
+  - **IMPORTANT — unresolved, needs the user to confirm**: the Theme Access
+    token this project uses only has theme read/write scope (confirmed by a
+    direct test: a `price_rules.json` Admin API call with this token returns
+    `401 Invalid API key or access token`), so there is no way for this
+    agent to check or create discount codes in Shopify Admin. **This banner
+    is purely a UI prompt — it does nothing to guarantee a "VG15" discount
+    code actually exists and is active in Shopify Admin > Discounts.** If
+    that code isn't set up (or is expired/inactive), clicking the banner
+    will redirect through Shopify's discount-apply route and land back on
+    the cart with no discount applied and no clear error shown to the
+    shopper. The user needs to verify/create the VG15 discount code
+    themselves in Admin — this agent cannot do it with the current token.
 
 ---
 
