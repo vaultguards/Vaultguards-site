@@ -296,6 +296,21 @@ export SHOPIFY_CLI_THEME_TOKEN=shptka_d8f98845fd2d7cf7569c5ed16b4f9d42
 | Cart | `sections/vg-cart.liquid` | `templates/cart.json` |
 | Paul's Vault (founder collection) | `sections/vg-pauls-vault.liquid` | `templates/page.founder-collection.json` |
 
+**Confirmed live Page handles (Shopify Page resource URLs, separate from the
+template filename above)** — these are the actual values, confirmed directly
+by the user visiting the live site, and are what any `pages['<handle>']`
+Liquid lookup or nav link must match exactly:
+- The Vault → `vaultguards.co/pages/the-vault` (Page resource handle: `the-vault`)
+- Paul's Vault → `vaultguards.co/pages/founder-collection` (Page resource
+  handle: `founder-collection` — **not** `pauls-vault`; an earlier guess used
+  `pauls-vault` before the user had actually created the page, which caused
+  a live 404 on the header nav link once the real page turned out to use a
+  different handle. If a nav link or `pages['...']` reference for this page
+  is ever missing/wrong again, this is the first thing to check — Page
+  handles are a property of the Shopify Page resource itself, not something
+  this Theme Access token can read or write, so they must be confirmed with
+  the user rather than assumed.)
+
 Key mechanics worth remembering when touching these:
 - **Cart**: single `{% form 'cart', cart, id: '...' %}` wraps the WHOLE
   layout; `name="update"` submit button updates quantities & stays on
