@@ -33,8 +33,9 @@
 <section style="position:relative; padding:110px 0 90px; overflow:hidden;">
   <div class="vg-container vg-grid-2">
     <div class="vg-reveal vg-in">
-      <h1 style="font-size:56px; line-height:1.05; margin:0 0 22px;">
-        Welcome to <em style="color:var(--vg-gold-500); font-style:normal;">Vaultguards.</em>
+      <h1 style="font-size:56px; line-height:1.05; margin:0 0 22px; display:flex; align-items:center; flex-wrap:wrap; gap:16px;">
+        <span>Welcome to</span>
+        <img src="{{ 'vaultguards-wordmark-dark.png' | asset_url }}" alt="Vaultguards" class="vg-hero-wordmark" width="628" height="48">
       </h1>
       <p style="font-size:18px; color:var(--vg-navy-400); max-width:440px; margin-bottom:34px;">
         Precision fit guards with acrylic backing, made specifically for TAG and PSA slabs.
@@ -298,6 +299,8 @@
   @media (max-width: 1024px) { .vg-features-grid { grid-template-columns: repeat(3, 1fr); } }
   @media (max-width: 720px) { .vg-features-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; } }
   @media (max-width: 480px) { .vg-features-grid { grid-template-columns: 1fr; } }
+  .vg-hero-wordmark { height: 48px; width: auto; display: block; }
+  @media (max-width: 640px) { .vg-hero-wordmark { height: 34px; } }
 </style>
 
 <script>

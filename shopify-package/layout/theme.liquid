@@ -18,21 +18,21 @@
    Vaultguards - Design System ("The Vault" steel/gunmetal theme)
    ========================================================================== */
 :root {
-  --vg-ivory-50: #F5F7F9;
-  --vg-ivory-100: #ECF0F3;
-  --vg-ivory-200: #DEE4E9;
-  --vg-ivory-300: #C9D2DA;
-  --vg-navy-900: #12161B;
-  --vg-navy-800: #1B2128;
-  --vg-navy-700: #262E37;
-  --vg-navy-600: #3A4650;
-  --vg-navy-500: #57646E;
-  --vg-navy-400: #71808B;
-  --vg-navy-300: #9AA7B1;
-  --vg-gold-500: #4E7C99;
-  --vg-gold-400: #6FA0BE;
-  --vg-gold-300: #9FC2D8;
-  --vg-gold-050: #E7F0F5;
+  --vg-ivory-50: #F4F4F5;
+  --vg-ivory-100: #E6E7E9;
+  --vg-ivory-200: #D2D4D7;
+  --vg-ivory-300: #B7BABE;
+  --vg-navy-900: #15171A;
+  --vg-navy-800: #1E2023;
+  --vg-navy-700: #2A2D30;
+  --vg-navy-600: #3E4145;
+  --vg-navy-500: #595D61;
+  --vg-navy-400: #75797D;
+  --vg-navy-300: #9CA0A3;
+  --vg-gold-500: #63737B;
+  --vg-gold-400: #8A99A1;
+  --vg-gold-300: #B4BFC5;
+  --vg-gold-050: #EBEDEE;
   --vg-success: #2E8B6F;
   --vg-danger: #B5453B;
   --vg-bg: var(--vg-ivory-100);
@@ -44,7 +44,7 @@
   --vg-shadow-sm: 0 2px 8px rgba(18,22,27,.08), 0 1px 3px rgba(18,22,27,.05);
   --vg-shadow-md: 0 8px 24px rgba(18,22,27,.10), 0 2px 6px rgba(18,22,27,.06);
   --vg-shadow-lg: 0 20px 48px rgba(18,22,27,.16), 0 6px 16px rgba(18,22,27,.08);
-  --vg-shadow-gold-glow: 0 8px 30px rgba(78,124,153,.30);
+  --vg-shadow-gold-glow: 0 8px 30px rgba(99,115,123,.30);
   --vg-shadow-inset: inset 0 1px 2px rgba(18,22,27,.08);
   --vg-radius-sm: 12px; --vg-radius-md: 18px; --vg-radius-lg: 26px; --vg-radius-xl: 34px; --vg-radius-pill: 999px;
   --vg-space-1: 4px; --vg-space-2: 8px; --vg-space-3: 12px; --vg-space-4: 20px; --vg-space-5: 32px; --vg-space-6: 48px; --vg-space-7: 72px; --vg-space-8: 112px;
@@ -81,13 +81,13 @@
 .vg-btn-primary { background: linear-gradient(180deg, var(--vg-navy-800), var(--vg-navy-900)); color: #FFFFFF !important; box-shadow: var(--vg-shadow-md); }
 .vg-btn-primary:hover { box-shadow: var(--vg-shadow-lg); transform: translateY(-2px); }
 .vg-btn-gold { background: linear-gradient(180deg, var(--vg-gold-400), var(--vg-gold-500)); color: #0B1620 !important; box-shadow: var(--vg-shadow-gold-glow); }
-.vg-btn-gold:hover { box-shadow: 0 12px 36px rgba(78,124,153,.4); transform: translateY(-2px); }
+.vg-btn-gold:hover { box-shadow: 0 12px 36px rgba(99,115,123,.4); transform: translateY(-2px); }
 .vg-btn-ghost { background: var(--vg-ivory-50); color: var(--vg-navy-900) !important; box-shadow: var(--vg-shadow-sm); }
 .vg-btn-ghost:hover { box-shadow: var(--vg-shadow-md); }
 .vg-btn:disabled { opacity: .42; cursor: not-allowed; box-shadow: none; transform: none !important; }
 .vg-announce { background: var(--vg-navy-900); color: var(--vg-ivory-100); text-align: center; font-size: 12.5px; font-weight: 600; letter-spacing: .03em; padding: 9px var(--vg-space-4); }
 .vg-announce i { color: var(--vg-gold-400); margin-right: 7px; }
-.vg-nav { position: sticky; top: 0; z-index: 100; background: rgba(236,240,243,.9); backdrop-filter: blur(18px) saturate(1.2); -webkit-backdrop-filter: blur(18px) saturate(1.2); box-shadow: 0 1px 0 rgba(18,22,27,.06); }
+.vg-nav { position: sticky; top: 0; z-index: 100; background: rgba(230,231,233,.9); backdrop-filter: blur(18px) saturate(1.2); -webkit-backdrop-filter: blur(18px) saturate(1.2); box-shadow: 0 1px 0 rgba(18,22,27,.06); }
 .vg-nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 18px var(--vg-space-4); max-width: 1180px; margin: 0 auto; }
 .vg-logo { font-family: var(--vg-font-display); font-size: 21px; font-weight: 600; letter-spacing: .02em; display: flex; align-items: center; gap: 8px; }
 .vg-logo-mark { width: 32px; height: 32px; object-fit: contain; flex-shrink: 0; }
@@ -146,8 +146,8 @@
   <header class="vg-nav">
     <div class="vg-nav-inner">
       <a href="{{ routes.root_url }}" class="vg-logo">
-        <img src="{{ 'vaultguards-logo.png' | asset_url }}" alt="" class="vg-logo-mark" width="32" height="32">
-        <img src="{{ 'vaultguards-wordmark-dark.png' | asset_url }}" alt="{{ shop.name }}" style="height:18px; width:auto; display:block;" width="209" height="16">
+        <img src="{{ 'vaultguards-logo.png' | asset_url }}" alt="" class="vg-logo-mark" style="width:19px; height:19px;" width="19" height="19">
+        <img src="{{ 'vaultguards-wordmark-dark.png' | asset_url }}" alt="{{ shop.name }}" style="height:11px; width:auto; display:block;" width="144" height="11">
       </a>
       <nav class="vg-nav-links">
         <a href="{{ routes.root_url }}#shop">Shop</a>
