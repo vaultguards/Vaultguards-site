@@ -32,7 +32,7 @@
       {% for product in collection.products %}
         <a href="{{ product.url }}" class="vg-card vg-product-card vg-reveal" data-delay="{{ forloop.index0 | modulo: 4 }}">
           <div class="vg-product-card-img">
-            <img src="{{ product.featured_image | image_url: width: 700 }}" alt="{{ product.title }}" loading="lazy">
+            <img src="{{ product.featured_image | image_url: width: 700 }}" alt="{{ product.title }}" loading="lazy" width="700" height="875">
           </div>
           <div class="vg-product-card-body">
             <div style="font-weight:600; font-size:15px; margin-bottom:6px;">{{ product.title }}</div>

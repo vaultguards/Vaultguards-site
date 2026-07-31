@@ -1,8 +1,8 @@
 {% comment %}
-  VAULTGUARDS - Contact Page (Shopify's NATIVE contact form)
+  VAULTGUARDS - Contact Page (Shopify NATIVE contact form)
   No API key, no backend, no third-party service. Submits straight to
   whatever email is set in: Shopify Admin > Settings > Notifications >
-  "Contact form" recipient (defaults to your store's customer email).
+  "Contact form" recipient (defaults to the store customer email).
 
   INSTALL:
   1. Online Store > Themes > Edit code > Templates > Add a new template
@@ -19,14 +19,14 @@
 <section class="vg-section vg-container" style="max-width:640px;">
   <h1 style="margin-bottom:8px;">Contact Us</h1>
   <p style="color:var(--vg-text-muted); margin-bottom:32px;">
-    Questions about fit, colorways, or an order? Send us a message and we'll get back to you.
+    Questions about fit, colorways, or an order? Send us a message and we will get back to you.
   </p>
 
   {% form 'contact' %}
     {% if form.posted_successfully? %}
       <div class="vg-card" style="padding:20px; margin-bottom:24px; border-left:4px solid var(--vg-gold-400);">
         <strong>Thanks - your message was sent.</strong><br>
-        We'll reply to your email as soon as we can.
+        We will reply to your email as soon as we can.
       </div>
     {% endif %}
 

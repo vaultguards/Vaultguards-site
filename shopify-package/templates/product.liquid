@@ -8,7 +8,7 @@
     name it e.g. "product.vaultguards" > it creates product.vaultguards.liquid
     > paste this in > Save. Then on each product (Admin > Products > pick
     one > Theme template dropdown, bottom right) select "product.vaultguards".
-    Repeat for all products (or set it as your theme's default product
+    Repeat for all products (or set it as the theme default product
     template in Customize if you want every product to use it).
 
   FRONT/BACK PHOTOS: uses product.images[0] and product.images[1] -
@@ -28,6 +28,7 @@
             src="{{ front_image | image_url: width: 900 }}"
             alt="{{ product.title }}"
             style="width:100%; height:100%; object-fit:cover;"
+            width="900" height="1125"
             id="vg-pdp-image">
         </div>
         {% if back_image %}
@@ -81,7 +82,7 @@
                 {% assign suggestion_count = suggestion_count | plus: 1 %}
                 <a href="{{ other.url }}" style="display:flex; align-items:center; gap:10px; background:var(--vg-ivory-50); border-radius:14px; padding:8px 14px 8px 8px; text-decoration:none; color:inherit; box-shadow:var(--vg-shadow-xs);">
                   <span style="width:40px; height:50px; border-radius:8px; overflow:hidden; flex-shrink:0; background:var(--vg-ivory-100); display:block;">
-                    <img src="{{ other.featured_image | image_url: width: 120 }}" alt="{{ other.title }}" style="width:100%; height:100%; object-fit:cover;" loading="lazy">
+                    <img src="{{ other.featured_image | image_url: width: 120 }}" alt="{{ other.title }}" style="width:100%; height:100%; object-fit:cover;" loading="lazy" width="120" height="150">
                   </span>
                   <span>
                     <span style="display:block; font-weight:600; font-size:13.5px;">{{ other.title }}</span>
