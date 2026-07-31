@@ -1,34 +1,43 @@
 /* ==========================================================================
-   Vaultguards — Design System
-   Palette: warm ivory backgrounds, deep charcoal-navy text, muted gold accent.
-   Principles: no hard borders, soft layered shadows, rounded surfaces,
-   Apple-Store-like restrained polish.
+   Vaultguards — Design System ("The Vault" steel/gunmetal theme)
+   Palette: cool steel/platinum backgrounds, deep gunmetal-graphite text,
+   brushed-chrome/steel-blue accent. Principles: no hard borders, soft
+   layered shadows, rounded surfaces, precise/technical "bank vault" polish.
+
+   NOTE: variable NAMES below (--vg-ivory-*, --vg-navy-*, --vg-gold-*) are
+   kept as-is even though they now hold steel/gunmetal/chrome values — this
+   avoids a risky rename across every component file. Treat "ivory" as
+   "light steel", "navy" as "gunmetal/graphite", and "gold" as "chrome/
+   steel-blue accent" wherever you see them referenced elsewhere.
    ========================================================================== */
 
 :root {
-  /* --- Core palette --- */
-  --vg-ivory-50: #FDFBF7;
-  --vg-ivory-100: #FAF6EE;
-  --vg-ivory-200: #F3ECDD;
-  --vg-ivory-300: #EBE1CB;
+  /* --- Core palette (steel / platinum) --- */
+  --vg-ivory-50: #F5F7F9;
+  --vg-ivory-100: #ECF0F3;
+  --vg-ivory-200: #DEE4E9;
+  --vg-ivory-300: #C9D2DA;
 
-  --vg-navy-900: #14181F;
-  --vg-navy-800: #1C222C;
-  --vg-navy-700: #262E3B;
-  --vg-navy-600: #3A4456;
-  --vg-navy-400: #6B7688;
-  --vg-navy-300: #9AA3B2;
+  /* --- Gunmetal / graphite (deep, cool-toned near-black) --- */
+  --vg-navy-900: #12161B;
+  --vg-navy-800: #1B2128;
+  --vg-navy-700: #262E37;
+  --vg-navy-600: #3A4650;
+  --vg-navy-500: #57646E;
+  --vg-navy-400: #71808B;
+  --vg-navy-300: #9AA7B1;
 
-  --vg-gold-500: #B08D4F;
-  --vg-gold-400: #C7A76A;
-  --vg-gold-300: #DDC796;
-  --vg-gold-050: #F7EFDD;
+  /* --- Chrome / steel-blue accent (replaces gold) --- */
+  --vg-gold-500: #4E7C99;
+  --vg-gold-400: #6FA0BE;
+  --vg-gold-300: #9FC2D8;
+  --vg-gold-050: #E7F0F5;
 
   --vg-steel-400: #8C97A3;
   --vg-steel-300: #AEB8C2;
 
-  --vg-success: #3F8F6B;
-  --vg-danger: #B5573F;
+  --vg-success: #2E8B6F;
+  --vg-danger: #B5453B;
 
   /* --- Semantic tokens --- */
   --vg-bg: var(--vg-ivory-100);
@@ -41,18 +50,18 @@
   --vg-accent-strong: var(--vg-navy-900);
 
   /* --- Shadows (soft, layered, never hard-edged) --- */
-  --vg-shadow-xs: 0 1px 2px rgba(20, 24, 31, 0.04), 0 1px 1px rgba(20, 24, 31, 0.03);
-  --vg-shadow-sm: 0 2px 8px rgba(20, 24, 31, 0.06), 0 1px 3px rgba(20, 24, 31, 0.04);
-  --vg-shadow-md: 0 8px 24px rgba(20, 24, 31, 0.08), 0 2px 6px rgba(20, 24, 31, 0.05);
-  --vg-shadow-lg: 0 20px 48px rgba(20, 24, 31, 0.12), 0 6px 16px rgba(20, 24, 31, 0.06);
-  --vg-shadow-gold-glow: 0 8px 30px rgba(176, 141, 79, 0.25);
-  --vg-shadow-inset: inset 0 1px 2px rgba(20, 24, 31, 0.06);
+  --vg-shadow-xs: 0 1px 2px rgba(18, 22, 27, 0.05), 0 1px 1px rgba(18, 22, 27, 0.04);
+  --vg-shadow-sm: 0 2px 8px rgba(18, 22, 27, 0.08), 0 1px 3px rgba(18, 22, 27, 0.05);
+  --vg-shadow-md: 0 8px 24px rgba(18, 22, 27, 0.10), 0 2px 6px rgba(18, 22, 27, 0.06);
+  --vg-shadow-lg: 0 20px 48px rgba(18, 22, 27, 0.16), 0 6px 16px rgba(18, 22, 27, 0.08);
+  --vg-shadow-gold-glow: 0 8px 30px rgba(78, 124, 153, 0.30);
+  --vg-shadow-inset: inset 0 1px 2px rgba(18, 22, 27, 0.08);
 
   /* --- Radii --- */
-  --vg-radius-sm: 14px;
-  --vg-radius-md: 22px;
-  --vg-radius-lg: 32px;
-  --vg-radius-xl: 44px;
+  --vg-radius-sm: 12px;
+  --vg-radius-md: 18px;
+  --vg-radius-lg: 26px;
+  --vg-radius-xl: 34px;
   --vg-radius-pill: 999px;
 
   /* --- Spacing scale --- */
@@ -65,8 +74,8 @@
   --vg-space-7: 72px;
   --vg-space-8: 112px;
 
-  /* --- Typography --- */
-  --vg-font-display: 'Fraunces', 'Georgia', serif;
+  /* --- Typography: professional, technical, non-wavy geometric sans --- */
+  --vg-font-display: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --vg-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
   /* --- Motion --- */
@@ -108,8 +117,8 @@ a {
 
 h1, h2, h3, h4 {
   font-family: var(--vg-font-display);
-  font-weight: 500;
-  letter-spacing: -0.01em;
+  font-weight: 600;
+  letter-spacing: -0.015em;
   color: var(--vg-navy-900);
   margin: 0;
 }
@@ -117,8 +126,8 @@ h1, h2, h3, h4 {
 .vg-eyebrow {
   font-family: var(--vg-font-body);
   font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-weight: 700;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--vg-gold-500);
 }
@@ -141,6 +150,46 @@ h1, h2, h3, h4 {
 @media (max-width: 720px) {
   .vg-section { padding: var(--vg-space-6) 0; }
   .vg-container { padding: 0 var(--vg-space-3); }
+}
+
+/* ==========================================================================
+   Responsive grid helpers — every multi-column layout on the site MUST use
+   one of these instead of a raw inline grid-template-columns, so it
+   collapses correctly on phones (90% of traffic is mobile).
+   ========================================================================== */
+
+.vg-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+.vg-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.vg-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+
+@media (max-width: 900px) {
+  .vg-grid-4 { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+}
+@media (max-width: 860px) {
+  .vg-grid-2 { grid-template-columns: 1fr; gap: 36px; }
+  .vg-grid-3 { grid-template-columns: 1fr; gap: 18px; }
+}
+@media (max-width: 480px) {
+  .vg-grid-4 { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+}
+
+/* Fluid type scale so headings never overflow small screens */
+@media (max-width: 640px) {
+  h1 { font-size: clamp(32px, 9vw, 44px) !important; }
+  h2 { font-size: clamp(26px, 7vw, 32px) !important; }
+}
+
+/* Minimum comfortable touch target on all interactive controls (mobile a11y) */
+@media (max-width: 640px) {
+  .vg-btn { width: 100%; }
+  .vg-nav .vg-btn { width: auto; }
+}
+
+@media (max-width: 720px) {
+  .vg-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 28px 20px !important; }
+}
+@media (max-width: 480px) {
+  .vg-footer-grid { grid-template-columns: 1fr !important; }
 }
 
 /* ==========================================================================
@@ -200,10 +249,10 @@ h1, h2, h3, h4 {
 
 .vg-btn-gold {
   background: linear-gradient(180deg, var(--vg-gold-400), var(--vg-gold-500));
-  color: #211705;
+  color: #0B1620;
   box-shadow: var(--vg-shadow-gold-glow);
 }
-.vg-btn-gold:hover { box-shadow: 0 12px 36px rgba(176, 141, 79, 0.35); transform: translateY(-2px); }
+.vg-btn-gold:hover { box-shadow: 0 12px 36px rgba(78, 124, 153, 0.4); transform: translateY(-2px); }
 
 .vg-btn-ghost {
   background: var(--vg-ivory-50);
@@ -227,10 +276,10 @@ h1, h2, h3, h4 {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(250, 246, 238, 0.78);
-  backdrop-filter: blur(18px) saturate(1.4);
-  -webkit-backdrop-filter: blur(18px) saturate(1.4);
-  box-shadow: 0 1px 0 rgba(20,24,31,0.05);
+  background: rgba(236, 240, 243, 0.82);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  box-shadow: 0 1px 0 rgba(18,22,27,0.06);
 }
 
 .vg-nav-inner {
@@ -255,7 +304,7 @@ h1, h2, h3, h4 {
 .vg-logo .vg-logo-dot {
   width: 8px; height: 8px; border-radius: 50%;
   background: var(--vg-gold-500);
-  box-shadow: 0 0 0 4px rgba(176,141,79,0.18);
+  box-shadow: 0 0 0 4px rgba(78,124,153,0.22);
 }
 
 .vg-nav-links {
@@ -431,7 +480,7 @@ h1, h2, h3, h4 {
 }
 .vault-align-guide {
   position: absolute;
-  border: 2px dashed rgba(176, 141, 79, 0.85);
+  border: 2px dashed rgba(111, 160, 190, 0.9);
   border-radius: 14px;
   pointer-events: none;
   box-shadow: 0 0 0 2000px rgba(20, 24, 31, 0.38);
@@ -486,6 +535,54 @@ h1, h2, h3, h4 {
   padding: 6px 12px; border-radius: 999px; font-size: 12px; cursor: pointer;
 }
 
+.vault-card-pad { padding: 40px; }
+.vault-preview-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 30px; }
+.vault-swatch-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 26px; }
+
 @media (max-width: 780px) {
-  #panel-preview > div { grid-template-columns: 1fr !important; }
+  .vault-preview-grid { grid-template-columns: 1fr; }
+}
+
+/* ==========================================================================
+   THE VAULT — mobile-first refinements (90% of buyers are on phones)
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .vault-card-pad { padding: 22px 18px; border-radius: var(--vg-radius-md); }
+
+  #vault-steps { gap: 4px; justify-content: space-between; }
+  .vault-step { font-size: 0; gap: 0; padding: 4px; }
+  .vault-step-num { font-size: 12px; width: 26px; height: 26px; }
+  .vault-step-line { width: 14px; }
+
+  .vault-brand-btn { padding: 22px 12px; }
+  .vault-brand-swatch { width: 52px; height: 78px; }
+
+  .vault-dropzone { padding: 36px 16px; }
+
+  .vault-align-stage { max-width: 100%; }
+
+  .vault-swatch-grid { grid-template-columns: repeat(5, 1fr); gap: 8px; }
+
+  #panel-upload .vg-btn-ghost,
+  #panel-align .vg-btn-ghost,
+  #panel-preview .vg-btn-ghost { width: auto; }
+
+  #panel-upload > .vg-card > div:first-child,
+  #panel-align > .vg-card > div:first-child {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 380px) {
+  .vault-swatch-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* Ensure canvases used for compositing always scale to their container on
+   any viewport instead of overflowing (critical for phones). */
+.vault-align-stage canvas,
+.vault-preview-stage canvas {
+  max-width: 100%;
+  max-height: 100%;
 }

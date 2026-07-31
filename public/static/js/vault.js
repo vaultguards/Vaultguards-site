@@ -14,11 +14,29 @@
  * `/cart/add.js` using a hidden file input bound to the variant's line
  * item properties (Shopify's native file-type line item property), e.g.
  * `properties[Your Preview]` -> uploaded file. See vault-shopify-notes.md.
+ *
+ * IMPORTANT: all UI wiring (brand select, upload, align, preview) below is
+ * synchronous and runs immediately on script load. The background-removal
+ * library is loaded LAZILY via dynamic import() only when the user actually
+ * uploads a photo — this is intentional so a slow/blocked/failed CDN import
+ * of that library can NEVER break the rest of the page's interactivity
+ * (a previous version used a static top-level `import ... from` here; since
+ * that module has no default export, the static import threw at parse time
+ * and silently killed every click handler on the page, including brand
+ * selection — this file must never repeat that pattern).
  */
-import removeBackground from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/dist/index.mjs';
-
 (function () {
   'use strict';
+
+  var _bgRemovalModulePromise = null;
+  function loadBgRemoval() {
+    if (!_bgRemovalModulePromise) {
+      _bgRemovalModulePromise = import(
+        'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/dist/index.mjs'
+      );
+    }
+    return _bgRemovalModulePromise;
+  }
 
   var Cat = window.VaultguardsCatalog;
   var haptic = (window.VG && window.VG.haptic) || {};
@@ -101,6 +119,26 @@ import removeBackground from 'https://cdn.jsdelivr.net/npm/@imgly/background-rem
     if (fileInput.files && fileInput.files[0]) handleFile(fileInput.files[0]);
   });
 
+  function useImageAsIs(objectUrl, note) {
+    var img = new Image();
+    img.onload = function () {
+      state.slabImage = img;
+      state.slabNaturalAspect = img.naturalWidth / img.naturalHeight;
+      state.align = { x: 0, y: 0, scale: 1 };
+      progressEl.style.display = 'none';
+      dropzone.style.display = '';
+      if (note) progressLabel.textContent = note;
+      goToStep('align');
+      initAlignStage();
+    };
+    img.onerror = function () {
+      progressLabel.textContent = 'Could not load that photo — please try another.';
+      progressEl.style.display = 'none';
+      dropzone.style.display = '';
+    };
+    img.src = objectUrl;
+  }
+
   function handleFile(file) {
     dropzone.style.display = 'none';
     progressEl.style.display = '';
@@ -108,44 +146,30 @@ import removeBackground from 'https://cdn.jsdelivr.net/npm/@imgly/background-rem
 
     var objectUrl = URL.createObjectURL(file);
 
-    removeBackground(objectUrl, {
-      progress: function (key, current, total) {
-        if (total > 0) {
-          var pct = Math.round((current / total) * 100);
-          progressLabel.textContent = 'Preparing on-device model… ' + pct + '%';
+    loadBgRemoval()
+      .then(function (mod) {
+        var removeBackground = mod.removeBackground || mod.default;
+        if (typeof removeBackground !== 'function') {
+          throw new Error('removeBackground export not found on module');
         }
-      },
-    })
+        return removeBackground(objectUrl, {
+          progress: function (key, current, total) {
+            if (total > 0) {
+              var pct = Math.round((current / total) * 100);
+              progressLabel.textContent = 'Preparing on-device model… ' + pct + '%';
+            }
+          },
+        });
+      })
       .then(function (blob) {
         var url = URL.createObjectURL(blob);
-        var img = new Image();
-        img.onload = function () {
-          state.slabImage = img;
-          state.slabNaturalAspect = img.naturalWidth / img.naturalHeight;
-          state.align = { x: 0, y: 0, scale: 1 };
-          if (haptic.success) haptic.success();
-          progressEl.style.display = 'none';
-          dropzone.style.display = '';
-          goToStep('align');
-          initAlignStage();
-        };
-        img.src = url;
+        if (haptic.success) haptic.success();
+        useImageAsIs(url);
       })
       .catch(function (err) {
         console.error('Background removal failed, falling back to original image', err);
         // Graceful fallback: use the original photo un-removed rather than blocking the flow.
-        var img = new Image();
-        img.onload = function () {
-          state.slabImage = img;
-          state.slabNaturalAspect = img.naturalWidth / img.naturalHeight;
-          state.align = { x: 0, y: 0, scale: 1 };
-          progressEl.style.display = 'none';
-          dropzone.style.display = '';
-          progressLabel.textContent = 'Background removal unavailable — using original photo.';
-          goToStep('align');
-          initAlignStage();
-        };
-        img.src = objectUrl;
+        useImageAsIs(objectUrl, 'Background removal unavailable — using original photo.');
       });
   }
 

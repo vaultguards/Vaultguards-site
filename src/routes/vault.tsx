@@ -43,13 +43,13 @@ vault.get('/', (c) => {
 
           {/* ===== STEP 1: BRAND SELECT ===== */}
           <div class="vault-panel" id="panel-brand">
-            <div class="vg-card" style="padding:40px;">
+            <div class="vg-card vault-card-pad">
               <h2 style="font-size:22px; margin-bottom:6px; text-align:center;">Which brand is your slab?</h2>
               <p style="text-align:center; color:var(--vg-navy-400); font-size:14px; margin-bottom:30px;">
                 This determines the slab shape used for alignment and which colorways you can preview.
                 TAG and PSA slabs are never mixed.
               </p>
-              <div style="display:grid; grid-template-columns:1fr 1fr; gap:22px;">
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
                 <button class="vault-brand-btn" data-brand="TAG" data-vg-haptic="tap">
                   <div class="vault-brand-swatch" style="background:linear-gradient(135deg,#eee,#ccc);"></div>
                   <div style="font-weight:700; font-size:18px; margin-top:14px;">TAG Slab</div>
@@ -66,7 +66,7 @@ vault.get('/', (c) => {
 
           {/* ===== STEP 2: UPLOAD ===== */}
           <div class="vault-panel" id="panel-upload" style="display:none;">
-            <div class="vg-card" style="padding:40px;">
+            <div class="vg-card vault-card-pad">
               <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:22px;">
                 <h2 style="font-size:22px;">Upload your slab photo</h2>
                 <button class="vg-btn vg-btn-ghost" style="padding:8px 16px; font-size:12.5px;" data-vault-back="1">
@@ -99,7 +99,7 @@ vault.get('/', (c) => {
 
           {/* ===== STEP 3: ALIGN ===== */}
           <div class="vault-panel" id="panel-align" style="display:none;">
-            <div class="vg-card" style="padding:40px;">
+            <div class="vg-card vault-card-pad">
               <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
                 <h2 style="font-size:22px;">Align your slab</h2>
                 <button class="vg-btn vg-btn-ghost" style="padding:8px 16px; font-size:12.5px;" data-vault-back="2">
@@ -131,7 +131,7 @@ vault.get('/', (c) => {
 
           {/* ===== STEP 4: PREVIEW & BUY ===== */}
           <div class="vault-panel" id="panel-preview" style="display:none;">
-            <div style="display:grid; grid-template-columns:1.1fr 1fr; gap:30px;">
+            <div class="vault-preview-grid">
               <div class="vg-card" style="padding:24px;">
                 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
                   <span class="vg-pill vg-pill-gold" id="preview-brand-pill">TAG</span>
@@ -152,7 +152,7 @@ vault.get('/', (c) => {
                   <span id="preview-color-stock" class="vg-pill" style="font-size:10.5px; padding:3px 10px;"></span>
                 </div>
 
-                <div id="swatch-grid" style="display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:26px;"></div>
+                <div id="swatch-grid" class="vault-swatch-grid"></div>
 
                 <button class="vg-btn vg-btn-primary" id="add-to-cart-btn" style="width:100%; padding:16px;" data-vg-haptic="tap" disabled>
                   <i class="fa-solid fa-bag-shopping"></i> Add to Cart

@@ -2,7 +2,7 @@ export function Footer() {
   return (
     <footer style="background:var(--vg-navy-900); color:var(--vg-ivory-200); padding:64px 0 32px;">
       <div class="vg-container">
-        <div style="display:grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap:40px;">
+        <div class="vg-footer-grid" style="display:grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap:40px;">
           <div>
             <div class="vg-logo" style="color:#fff;">
               <span class="vg-logo-dot"></span> Vaultguards
@@ -37,7 +37,7 @@ export function Footer() {
             </div>
           </div>
         </div>
-        <div style="margin-top:48px; padding-top:24px; border-top:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; color:var(--vg-navy-400); font-size:13px;">
+        <div style="margin-top:48px; padding-top:24px; border-top:1px solid rgba(255,255,255,0.08); display:flex; flex-wrap:wrap; gap:8px 20px; justify-content:space-between; color:var(--vg-navy-400); font-size:13px;">
           <span>© {new Date().getFullYear()} Vaultguards. All rights reserved.</span>
           <span>Not affiliated with TAG Grading or PSA.</span>
         </div>

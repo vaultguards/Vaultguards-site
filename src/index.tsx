@@ -22,7 +22,7 @@ app.get('/', (c) => {
 
       {/* ================= HERO ================= */}
       <section style="position:relative; padding:110px 0 90px; overflow:hidden;">
-        <div class="vg-container" style="display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center;">
+        <div class="vg-container vg-grid-2">
           <div class="vg-reveal vg-in">
             <div class="vg-eyebrow">Built for graded slabs</div>
             <h1 style="font-size:56px; line-height:1.05; margin:18px 0 22px;">
@@ -36,7 +36,7 @@ app.get('/', (c) => {
               <a href="#shop" class="vg-btn vg-btn-primary" data-vg-haptic="tap">Shop Guards <i class="fa-solid fa-arrow-right"></i></a>
               <a href="/vault" class="vg-btn vg-btn-ghost" data-vg-haptic="tap"><i class="fa-solid fa-vault"></i> Try It On in The Vault</a>
             </div>
-            <div style="display:flex; gap:28px; margin-top:44px;">
+            <div style="display:flex; gap:28px; margin-top:44px; flex-wrap:wrap;">
               <div><div style="font-family:var(--vg-font-display); font-size:26px;">29+</div><div style="font-size:12px; color:var(--vg-navy-400);">Colorways</div></div>
               <div><div style="font-family:var(--vg-font-display); font-size:26px;">2</div><div style="font-size:12px; color:var(--vg-navy-400);">Brand fits — TAG &amp; PSA</div></div>
               <div><div style="font-family:var(--vg-font-display); font-size:26px;">100%</div><div style="font-size:12px; color:var(--vg-navy-400);">Label visibility</div></div>
@@ -58,7 +58,7 @@ app.get('/', (c) => {
             <h2 style="font-size:38px; margin-top:14px;">Protection that respects the grade.</h2>
           </div>
 
-          <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:28px;">
+          <div class="vg-grid-3">
             {[
               { icon: 'fa-solid fa-shield-halved', title: 'Edge-first armor', body: 'Guards wrap the slab\u2019s edges and corners only — the label, cert number, and card stay fully visible.' },
               { icon: 'fa-solid fa-palette', title: '29 real colorways', body: 'From Aura white to Curse purple-black — every finish is photographed on real slabs, not renders.' },
@@ -78,7 +78,7 @@ app.get('/', (c) => {
 
       {/* ================= IMAGE COMPARISON SLIDER ================= */}
       <section class="vg-section">
-        <div class="vg-container" style="display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center;">
+        <div class="vg-container vg-grid-2">
           <div class="vg-reveal" data-vg-tilt>
             <div id="compare-slider" class="vg-card" style="position:relative; overflow:hidden; border-radius:var(--vg-radius-xl); aspect-ratio:1/1; cursor:ew-resize; user-select:none;">
               <img src={COMPARE_RIGHT} alt="PSA guard" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;" />
@@ -118,7 +118,7 @@ app.get('/', (c) => {
             <h3 style="font-size:20px;">TAG Guards</h3>
             <span class="vg-pill vg-pill-gold">Fits 3.125&Prime; &times; 5.25&Prime; slabs</span>
           </div>
-          <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:22px; margin-bottom:56px;">
+          <div class="vg-grid-4" style="margin-bottom:56px;">
             {featuredTag.map((g, i) => (
               <div class="vg-reveal vg-card" data-delay={String(i % 4)} style="overflow:hidden; padding:0;">
                 <div style="aspect-ratio:1/1; background:var(--vg-ivory-50);">
@@ -144,7 +144,7 @@ app.get('/', (c) => {
             <h3 style="font-size:20px;">PSA Guards</h3>
             <span class="vg-pill vg-pill-gold">Fits 3.25&Prime; &times; 5.375&Prime; slabs</span>
           </div>
-          <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:22px;">
+          <div class="vg-grid-4">
             {featuredPsa.map((g, i) => (
               <div class="vg-reveal vg-card" data-delay={String(i % 4)} style="overflow:hidden; padding:0;">
                 <div style="aspect-ratio:1/1; background:var(--vg-ivory-50);">
@@ -188,7 +188,7 @@ app.get('/', (c) => {
 
       {/* ================= FOUNDER STORY ================= */}
       <section id="story" class="vg-section" style="background:var(--vg-navy-900); color:var(--vg-ivory-100);">
-        <div class="vg-container" style="display:grid; grid-template-columns:1fr 1.3fr; gap:56px; align-items:center;">
+        <div class="vg-container vg-grid-2">
           <div class="vg-reveal">
             <div style="width:100%; aspect-ratio:4/5; border-radius:var(--vg-radius-lg); overflow:hidden; box-shadow:var(--vg-shadow-lg);">
               <img src={HERO_IMG} alt="Founder" style="width:100%; height:100%; object-fit:cover; filter:grayscale(0.15);" />
@@ -216,7 +216,7 @@ app.get('/', (c) => {
             <div class="vg-eyebrow">Trusted by collectors</div>
             <h2 style="font-size:38px; margin-top:14px;">What the vault says.</h2>
           </div>
-          <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:24px;">
+          <div class="vg-grid-3">
             {[
               { name: 'D. Alvarez', tag: 'PSA collector', quote: 'Fits my PSA slabs like it was molded for them — because it was. The label is still perfectly readable through the window.' },
               { name: 'M. Chen', tag: 'TAG collector', quote: 'Used The Vault to preview colors before buying. Picked Voidshift and it matched exactly what I saw on screen.' },
