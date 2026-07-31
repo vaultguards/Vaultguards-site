@@ -390,13 +390,29 @@ Key mechanics worth remembering when touching these:
   untracked locally until we needed to edit it. Its `header_announcements_*`
   section has native rotating-message support via multiple `_announcement`
   blocks under one `header-announcements` section (`settings.speed` = seconds
-  per rotation). Currently rotates 2 messages: "Free Shipping On US Orders
-  over $50" and "Save 15% With Code VG15". To add/edit/remove a rotating
-  message, add/edit/remove a block in that file's `blocks` + `block_order`
-  (same `_announcement` shape: `text`, `link`, `font`, `font_size`, `weight`,
-  `letter_spacing`, `case`) — same push/pull/verify method as any other file,
-  just remember this one is a native theme file so don't assume it only
-  contains our custom sections when searching for site copy.
+  per rotation, schema range 2-10). Currently rotates 2 messages in this
+  `block_order`: **1) "Save 15% With Code VG15", 2) "Free Shipping On US
+  Orders over $50"**, at **speed: 3** (3 seconds). To add/edit/remove a
+  rotating message, add/edit/remove a block in that file's `blocks` +
+  `block_order` (same `_announcement` shape: `text`, `link`, `font`,
+  `font_size`, `weight`, `letter_spacing`, `case`); to reorder which shows
+  first, just reorder the `block_order` array — same push/pull/verify method
+  as any other file, just remember this one is a native theme file so don't
+  assume it only contains our custom sections when searching for site copy.
+  Pulled `sections/header-announcements.liquid` once to confirm the actual
+  rotation mechanism: it only enables `autoplay`/cross-fade (and loads
+  `announcement-bar.js`) when `section.blocks.size > 1` — so a single block
+  never rotates (expected/correct), and with 2+ blocks it fades between them
+  automatically with no extra settings needed. If the user ever reports "it's
+  not rotating" again with 2+ blocks already present, it's very likely just
+  a quick glance during the multi-second fade cycle, not an actual bug —
+  the fastest way to confirm from this sandbox is `theme pull` +
+  diff/structural-compare (our normal method) rather than live `curl`/
+  crawler checks, since Cloudflare's local rate limiter on repeated
+  storefront fetches from this sandbox kicks in fast (HTTP 429
+  `local_rate_limited`, `retry-after: 60`) — don't hammer it hoping to see
+  the fade in raw HTML; static HTML always shows all blocks anyway, so
+  fetching it doesn't even reveal the rotation.
 
 ---
 
