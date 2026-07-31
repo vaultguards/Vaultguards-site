@@ -46,9 +46,9 @@
     <div class="vg-reveal" data-delay="1">
       <div class="vg-card" style="padding:28px; border-radius:var(--vg-radius-xl);">
         {% if tag_collection and tag_collection.image %}
-          <img src="{{ tag_collection.image | image_url: width: 900 }}" alt="Vaultguards colorway guard" style="border-radius:26px; width:100%;">
+          <img src="{{ tag_collection.image | image_url: width: 900 }}" alt="Vaultguards colorway guard" style="border-radius:26px; width:100%;" width="900" height="1125">
         {% elsif tag_collection.products.first %}
-          <img src="{{ tag_collection.products.first.featured_image | image_url: width: 900 }}" alt="Vaultguards colorway guard" style="border-radius:26px; width:100%;">
+          <img src="{{ tag_collection.products.first.featured_image | image_url: width: 900 }}" alt="Vaultguards colorway guard" style="border-radius:26px; width:100%;" width="900" height="1125">
         {% endif %}
       </div>
     </div>
@@ -71,7 +71,7 @@
         {% for product in tag_collection.products limit: 4 %}
           <a href="{{ product.url }}" class="vg-card vg-product-card vg-reveal" data-delay="{{ forloop.index0 | modulo: 4 }}">
             <div class="vg-product-card-img">
-              <img src="{{ product.featured_image | image_url: width: 700 }}" alt="{{ product.title }}" loading="lazy">
+              <img src="{{ product.featured_image | image_url: width: 700 }}" alt="{{ product.title }}" loading="lazy" width="700" height="875">
             </div>
             <div class="vg-product-card-body">
               <div style="font-weight:600; font-size:15px; margin-bottom:6px;">{{ product.title }}</div>
@@ -96,7 +96,7 @@
         {% for product in psa_collection.products limit: 4 %}
           <a href="{{ product.url }}" class="vg-card vg-product-card vg-reveal" data-delay="{{ forloop.index0 | modulo: 4 }}">
             <div class="vg-product-card-img">
-              <img src="{{ product.featured_image | image_url: width: 700 }}" alt="{{ product.title }}" loading="lazy">
+              <img src="{{ product.featured_image | image_url: width: 700 }}" alt="{{ product.title }}" loading="lazy" width="700" height="875">
             </div>
             <div class="vg-product-card-body">
               <div style="font-weight:600; font-size:15px; margin-bottom:6px;">{{ product.title }}</div>
@@ -124,7 +124,7 @@
     <div class="vg-reveal vg-in">
       <div class="vg-card" style="padding:26px; background:var(--vg-navy-800); box-shadow:none;">
         <div style="aspect-ratio:4/5; border-radius:var(--vg-radius-md); overflow:hidden; background:var(--vg-navy-700);">
-          <img src="{{ aura.featured_image | image_url: width: 900 }}" alt="{{ aura.title }}" style="width:100%; height:100%; object-fit:cover;" loading="lazy">
+          <img src="{{ aura.featured_image | image_url: width: 900 }}" alt="{{ aura.title }}" style="width:100%; height:100%; object-fit:cover;" loading="lazy" width="900" height="1125">
         </div>
       </div>
     </div>
@@ -194,7 +194,7 @@
     <div class="vg-grid-4">
       {% for product in tag_collection.products offset: 4 limit: 2 %}
         <a href="{{ product.url }}" class="vg-card vg-product-card vg-reveal">
-          <div class="vg-product-card-img"><img src="{{ product.featured_image | image_url: width: 700 }}" alt="{{ product.title }}" loading="lazy"></div>
+          <div class="vg-product-card-img"><img src="{{ product.featured_image | image_url: width: 700 }}" alt="{{ product.title }}" loading="lazy" width="700" height="875"></div>
           <div class="vg-product-card-body">
             <div style="font-weight:600; font-size:15px; margin-bottom:6px;">{{ product.title }}</div>
             <span style="color:var(--vg-navy-600);">{{ product.price | money }}</span>
@@ -203,7 +203,7 @@
       {% endfor %}
       {% for product in psa_collection.products offset: 4 limit: 2 %}
         <a href="{{ product.url }}" class="vg-card vg-product-card vg-reveal">
-          <div class="vg-product-card-img"><img src="{{ product.featured_image | image_url: width: 700 }}" alt="{{ product.title }}" loading="lazy"></div>
+          <div class="vg-product-card-img"><img src="{{ product.featured_image | image_url: width: 700 }}" alt="{{ product.title }}" loading="lazy" width="700" height="875"></div>
           <div class="vg-product-card-body">
             <div style="font-weight:600; font-size:15px; margin-bottom:6px;">{{ product.title }}</div>
             <span style="color:var(--vg-navy-600);">{{ product.price | money }}</span>
