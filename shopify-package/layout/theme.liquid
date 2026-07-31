@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>{{ page_title }}{% unless page_title contains shop.name %} &mdash; {{ shop.name }}{% endunless %}</title>
+  <title>{{ page_title }}{% unless page_title contains shop.name %} | {{ shop.name }}{% endunless %}</title>
   {% if page_description %}<meta name="description" content="{{ page_description | escape }}">{% endif %}
   <link rel="canonical" href="{{ canonical_url }}">
   {{ content_for_header }}
@@ -78,11 +78,11 @@
 .vg-card-flat { background: var(--vg-ivory-50); border-radius: var(--vg-radius-md); box-shadow: var(--vg-shadow-sm); }
 .vg-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: var(--vg-font-body); font-weight: 600; font-size: 15px; padding: 15px 30px; border-radius: var(--vg-radius-pill); border: none; cursor: pointer; transition: transform var(--vg-dur-fast) var(--vg-ease-soft), box-shadow var(--vg-dur-fast) var(--vg-ease-soft), background var(--vg-dur-fast) var(--vg-ease-soft), opacity var(--vg-dur-fast) var(--vg-ease-soft); -webkit-tap-highlight-color: transparent; }
 .vg-btn:active { transform: scale(.97); }
-.vg-btn-primary { background: linear-gradient(180deg, var(--vg-navy-800), var(--vg-navy-900)); color: var(--vg-ivory-100); box-shadow: var(--vg-shadow-md); }
+.vg-btn-primary { background: linear-gradient(180deg, var(--vg-navy-800), var(--vg-navy-900)); color: #FFFFFF !important; box-shadow: var(--vg-shadow-md); }
 .vg-btn-primary:hover { box-shadow: var(--vg-shadow-lg); transform: translateY(-2px); }
-.vg-btn-gold { background: linear-gradient(180deg, var(--vg-gold-400), var(--vg-gold-500)); color: #0B1620; box-shadow: var(--vg-shadow-gold-glow); }
+.vg-btn-gold { background: linear-gradient(180deg, var(--vg-gold-400), var(--vg-gold-500)); color: #0B1620 !important; box-shadow: var(--vg-shadow-gold-glow); }
 .vg-btn-gold:hover { box-shadow: 0 12px 36px rgba(78,124,153,.4); transform: translateY(-2px); }
-.vg-btn-ghost { background: var(--vg-ivory-50); color: var(--vg-navy-900); box-shadow: var(--vg-shadow-sm); }
+.vg-btn-ghost { background: var(--vg-ivory-50); color: var(--vg-navy-900) !important; box-shadow: var(--vg-shadow-sm); }
 .vg-btn-ghost:hover { box-shadow: var(--vg-shadow-md); }
 .vg-btn:disabled { opacity: .42; cursor: not-allowed; box-shadow: none; transform: none !important; }
 .vg-announce { background: var(--vg-navy-900); color: var(--vg-ivory-100); text-align: center; font-size: 12.5px; font-weight: 600; letter-spacing: .03em; padding: 9px var(--vg-space-4); }
@@ -128,7 +128,8 @@
 .vg-product-card-body { padding: 18px 20px 22px; }
 .vg-form-field { margin-bottom: 18px; }
 .vg-form-field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 7px; color: var(--vg-navy-700); }
-.vg-form-field input, .vg-form-field textarea { width: 100%; padding: 13px 16px; border-radius: 12px; border: none; background: var(--vg-ivory-100); font-family: inherit; font-size: 15px; color: var(--vg-text); }
+.vg-form-field input, .vg-form-field textarea { width: 100%; padding: 13px 16px; border-radius: 12px; border: 1px solid var(--vg-ivory-300); background: var(--vg-surface); font-family: inherit; font-size: 15px; color: var(--vg-text); box-shadow: var(--vg-shadow-xs); transition: border-color var(--vg-dur-fast) var(--vg-ease-soft), box-shadow var(--vg-dur-fast) var(--vg-ease-soft); }
+.vg-form-field input:focus, .vg-form-field textarea:focus { outline: none; border-color: var(--vg-gold-400); box-shadow: 0 0 0 3px var(--vg-gold-050); }
 .vg-form-field textarea { resize: vertical; }
   </style>
 </head>
@@ -202,7 +203,7 @@
         <div>
           <div style="font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--vg-gold-400); margin-bottom:14px;">Explore</div>
           <div style="display:flex; flex-direction:column; gap:10px; font-size:14px; color:var(--vg-navy-300);">
-            <a href="{{ pages['the-vault'].url | default: '/pages/the-vault' }}">The Vault &mdash; Try It On</a>
+            <a href="{{ pages['the-vault'].url | default: '/pages/the-vault' }}">The Vault: Try It On</a>
             <a href="{{ routes.root_url }}#watch">Watch Once You Buy</a>
           </div>
         </div>

@@ -44,7 +44,7 @@
         {% assign in_stock_count = 0 %}
         {% for product in collection.products %}{% if product.available %}{% assign in_stock_count = in_stock_count | plus: 1 %}{% endif %}{% endfor %}
         &middot;
-        {% if in_stock_count > 0 %}{{ in_stock_count }} in stock{% else %}currently sold out &mdash; preview any of them live in The Vault{% endif %}
+        {% if in_stock_count > 0 %}{{ in_stock_count }} in stock{% else %}currently sold out. Preview any of them live in The Vault{% endif %}
       </p>
     </div>
 

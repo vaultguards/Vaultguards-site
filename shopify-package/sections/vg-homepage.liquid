@@ -38,7 +38,7 @@
         A perfect fit,<br><em style="color:var(--vg-gold-500); font-style:normal;">every angle.</em>
       </h1>
       <p style="font-size:18px; color:var(--vg-navy-400); max-width:440px; margin-bottom:34px;">
-        Precision-molded colorway guards for TAG and PSA slabs &mdash; engineered edge protection
+        Precision-molded colorway guards for TAG and PSA slabs, engineered as edge protection
         that never covers the label you paid to see.
       </p>
       <div style="display:flex; gap:14px; flex-wrap:wrap;">
@@ -46,18 +46,29 @@
         <a href="{{ pages['the-vault'].url | default: '/pages/the-vault' }}" class="vg-btn vg-btn-ghost" data-vg-haptic="tap"><i class="fa-solid fa-vault"></i> Try It On in The Vault</a>
       </div>
       <div style="display:flex; gap:28px; margin-top:44px; flex-wrap:wrap;">
-        <div><div style="font-family:var(--vg-font-display); font-size:26px;">29+</div><div style="font-size:12px; color:var(--vg-navy-400);">Colorways</div></div>
-        <div><div style="font-family:var(--vg-font-display); font-size:26px;">2</div><div style="font-size:12px; color:var(--vg-navy-400);">Brand fits &mdash; TAG &amp; PSA</div></div>
+        <div style="max-width:150px;"><div style="font-family:var(--vg-font-display); font-size:20px; color:var(--vg-gold-500);"><i class="fa-solid fa-bullseye"></i></div><div style="font-size:12px; color:var(--vg-navy-400); margin-top:6px;">Precision fit for 2 brands: TAG and PSA slabs</div></div>
+        <div><div style="font-family:var(--vg-font-display); font-size:26px;">2</div><div style="font-size:12px; color:var(--vg-navy-400);">Brand fits: TAG &amp; PSA</div></div>
         <div><div style="font-family:var(--vg-font-display); font-size:26px;">100%</div><div style="font-size:12px; color:var(--vg-navy-400);">Label visibility</div></div>
       </div>
     </div>
     <div class="vg-reveal" data-delay="1">
       <div class="vg-card" style="padding:28px; border-radius:var(--vg-radius-xl);">
-        <div style="aspect-ratio:4/5; border-radius:26px; overflow:hidden;">
-          {% if tag_collection and tag_collection.image %}
-            <img src="{{ tag_collection.image | image_url: width: 900 }}" alt="Vaultguards colorway guard" style="width:100%; height:100%; object-fit:cover;" width="900" height="1125">
-          {% elsif tag_collection.products.first %}
-            <img src="{{ tag_collection.products.first.featured_image | image_url: width: 900 }}" alt="Vaultguards colorway guard" style="width:100%; height:100%; object-fit:cover;" width="900" height="1125">
+        <div id="vg-hero-rotator" style="position:relative; aspect-ratio:4/5; border-radius:26px; overflow:hidden; background:var(--vg-ivory-200);">
+          {% assign vg_hero_shown = 0 %}
+          {% for product in tag_collection.products limit: 4 %}
+            {% if product.featured_image %}
+              <img src="{{ product.featured_image | image_url: width: 900 }}" alt="{{ product.title | default: 'Vaultguards colorway guard' }}" class="vg-hero-slide{% if vg_hero_shown == 0 %} vg-hero-slide-active{% endif %}" width="900" height="1125">
+              {% assign vg_hero_shown = vg_hero_shown | plus: 1 %}
+            {% endif %}
+          {% endfor %}
+          {% for product in psa_collection.products limit: 4 %}
+            {% if product.featured_image %}
+              <img src="{{ product.featured_image | image_url: width: 900 }}" alt="{{ product.title | default: 'Vaultguards colorway guard' }}" class="vg-hero-slide{% if vg_hero_shown == 0 %} vg-hero-slide-active{% endif %}" width="900" height="1125">
+              {% assign vg_hero_shown = vg_hero_shown | plus: 1 %}
+            {% endif %}
+          {% endfor %}
+          {% if vg_hero_shown == 0 and tag_collection and tag_collection.image %}
+            <img src="{{ tag_collection.image | image_url: width: 900 }}" alt="Vaultguards colorway guard" class="vg-hero-slide vg-hero-slide-active" width="900" height="1125">
           {% endif %}
         </div>
       </div>
@@ -143,9 +154,9 @@
       <h2 style="font-size:36px; margin:16px 0 16px; color:#fff;">Meet <em style="color:var(--vg-gold-400); font-style:normal;">Aura</em>.</h2>
       <p style="color:var(--vg-navy-300); font-size:16px; line-height:1.7; max-width:440px; margin-bottom:16px;">
         Completely clear. No tint, no finish, nothing between you and the slab. Aura is built for the
-        purist collector who doesn&rsquo;t want to take anything away from the clean look of a TAG slab &mdash;
-        full edge and corner protection, plus the same solid acrylic backing as every other colorway,
-        without changing how the card looks in your hand.
+        purist collector who doesn&rsquo;t want to take anything away from the clean look of a TAG slab.
+        It still gives full edge and corner protection, plus the same solid acrylic backing as every
+        other colorway, without changing how the card looks in your hand.
       </p>
       <div style="display:flex; align-items:center; gap:12px; margin-bottom:28px;">
         <span style="font-size:19px; color:#fff; font-weight:600;">{{ aura.price | money }}</span>
@@ -172,17 +183,17 @@
       <div class="vg-reveal vg-card" data-delay="0" style="padding:30px;">
         <div style="width:48px; height:48px; border-radius:14px; background:var(--vg-gold-050); display:flex; align-items:center; justify-content:center; color:var(--vg-gold-500); font-size:18px; margin-bottom:16px;"><i class="fa-solid fa-shield-halved"></i></div>
         <h3 style="font-size:17px; margin-bottom:9px;">Edge-first armor</h3>
-        <p style="color:var(--vg-navy-400); font-size:14px; margin:0;">Guards wrap the slab&rsquo;s edges and corners only &mdash; the label, cert number, and card stay fully visible.</p>
+        <p style="color:var(--vg-navy-400); font-size:14px; margin:0;">Guards wrap the slab&rsquo;s edges and corners only, so the label, cert number, and card stay fully visible.</p>
       </div>
       <div class="vg-reveal vg-card" data-delay="1" style="padding:30px;">
         <div style="width:48px; height:48px; border-radius:14px; background:var(--vg-gold-050); display:flex; align-items:center; justify-content:center; color:var(--vg-gold-500); font-size:18px; margin-bottom:16px;"><i class="fa-solid fa-layer-group"></i></div>
         <h3 style="font-size:17px; margin-bottom:9px;">Solid acrylic backing</h3>
-        <p style="color:var(--vg-navy-400); font-size:14px; margin:0;">Every guard ships with a clear acrylic back panel, not a soft bumper &mdash; full rear protection for your slab.</p>
+        <p style="color:var(--vg-navy-400); font-size:14px; margin:0;">Every guard ships with a clear acrylic back panel, not a soft bumper, for full rear protection.</p>
       </div>
       <div class="vg-reveal vg-card" data-delay="2" style="padding:30px;">
         <div style="width:48px; height:48px; border-radius:14px; background:var(--vg-gold-050); display:flex; align-items:center; justify-content:center; color:var(--vg-gold-500); font-size:18px; margin-bottom:16px;"><i class="fa-solid fa-palette"></i></div>
         <h3 style="font-size:17px; margin-bottom:9px;">29 real colorways</h3>
-        <p style="color:var(--vg-navy-400); font-size:14px; margin:0;">From Aura white to Curse purple-black &mdash; every finish is photographed on real slabs, not renders.</p>
+        <p style="color:var(--vg-navy-400); font-size:14px; margin:0;">From Aura white to Curse purple-black, every finish is photographed on real slabs, not renders.</p>
       </div>
       <div class="vg-reveal vg-card" data-delay="3" style="padding:30px;">
         <div style="width:48px; height:48px; border-radius:14px; background:var(--vg-gold-050); display:flex; align-items:center; justify-content:center; color:var(--vg-gold-500); font-size:18px; margin-bottom:16px;"><i class="fa-solid fa-vault"></i></div>
@@ -232,7 +243,7 @@
       <div class="vg-eyebrow" style="color:var(--vg-gold-400);">How it opens</div>
       <h2 style="font-size:36px; margin-top:14px; color:#fff;">Watch once you buy.</h2>
       <p style="color:var(--vg-navy-300); margin-top:12px; font-size:15.5px;">
-        A quick look at Vaultguards&rsquo; unique pull-tab unboxing &mdash; two pulls, press the perforated edge, and your guard is ready.
+        A quick look at Vaultguards&rsquo; unique pull-tab unboxing: two pulls, press the perforated edge, and your guard is ready.
       </p>
     </div>
     <div class="vg-reveal" style="max-width:900px; margin:0 auto;">
@@ -252,6 +263,34 @@
     </a>
   </div>
 </section>
+
+<style>
+  .vg-hero-slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1100ms var(--vg-ease-soft); }
+  .vg-hero-slide-active { opacity: 1; }
+</style>
+
+<script>
+(function () {
+  function vgInitHeroRotator() {
+    var rotator = document.getElementById('vg-hero-rotator');
+    if (!rotator) return;
+    var slides = rotator.querySelectorAll('.vg-hero-slide');
+    if (slides.length < 2) return;
+    var idx = 0;
+    Array.prototype.forEach.call(slides, function (s, i) { if (i > 0) s.classList.remove('vg-hero-slide-active'); });
+    setInterval(function () {
+      slides[idx].classList.remove('vg-hero-slide-active');
+      idx = (idx + 1) % slides.length;
+      slides[idx].classList.add('vg-hero-slide-active');
+    }, 3200);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', vgInitHeroRotator);
+  } else {
+    vgInitHeroRotator();
+  }
+})();
+</script>
 
 {% schema %}
 {
