@@ -1,0 +1,71 @@
+{% comment %}
+  VAULTGUARDS — Contact Page (Shopify's NATIVE contact form)
+  No API key, no backend, no third-party service. Submits straight to
+  whatever email is set in: Shopify Admin > Settings > Notifications >
+  "Contact form" recipient (defaults to your store's customer email).
+
+  INSTALL:
+  1. Online Store > Themes > Edit code > Templates > Add a new template
+     > select "page" as the type > name it "contact" > it will save as
+     "page.contact.liquid" > paste this whole file in > Save.
+  2. Online Store > Pages > Add page (or edit your existing Contact page)
+     > Title it "Contact" > in the "Theme template" dropdown on the right,
+     choose "page.contact" > Save.
+  3. Check Settings > Notifications > scroll to "Contact form" > confirm
+     the recipient email is paul@vaultguards.co (this is where messages
+     from this form will be sent).
+{% endcomment %}
+
+<link rel="stylesheet" href="{{ 'vg-theme.css' | asset_url }}">
+
+<div class="vg-root">
+  <section class="vg-section vg-container" style="max-width:640px;">
+    <h1 style="margin-bottom:8px;">Contact Us</h1>
+    <p style="color:var(--vg-text-muted); margin-bottom:32px;">
+      Questions about fit, colorways, or an order? Send us a message and we'll get back to you.
+    </p>
+
+    {% form 'contact' %}
+      {% if form.posted_successfully? %}
+        <div class="vg-card" style="padding:20px; margin-bottom:24px; border-left:4px solid var(--vg-gold-400);">
+          <strong>Thanks — your message was sent.</strong><br>
+          We'll reply to your email as soon as we can.
+        </div>
+      {% endif %}
+
+      {% if form.errors %}
+        <div class="vg-card" style="padding:20px; margin-bottom:24px; border-left:4px solid #c0392b;">
+          <strong>Please fix the following:</strong>
+          <ul style="margin:8px 0 0 20px;">
+            {% for field in form.errors %}
+              <li>{{ form.errors.translated_fields[field] | capitalize }} {{ form.errors.messages[field] }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <div class="vg-form-field">
+        <label for="ContactFormName">Name</label>
+        <input type="text" id="ContactFormName" name="contact[name]" value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}">
+      </div>
+
+      <div class="vg-form-field">
+        <label for="ContactFormEmail">Email <span aria-hidden="true">*</span></label>
+        <input
+          type="email"
+          id="ContactFormEmail"
+          name="contact[email]"
+          autocomplete="email"
+          required
+          value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}">
+      </div>
+
+      <div class="vg-form-field">
+        <label for="ContactFormMessage">Message <span aria-hidden="true">*</span></label>
+        <textarea id="ContactFormMessage" name="contact[body]" rows="6" required>{% if form.body %}{{ form.body }}{% endif %}</textarea>
+      </div>
+
+      <button type="submit" class="vg-btn vg-btn-primary" data-vg-haptic="tap">Send Message</button>
+    {% endform %}
+  </section>
+</div>

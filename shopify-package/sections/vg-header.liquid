@@ -1,0 +1,77 @@
+{% comment %}
+  VAULTGUARDS — Header / Nav
+  INSTALL: Online Store > Themes > Edit code > Sections > Add a new section
+  > name it "vg-header" > paste this whole file in > Save.
+  Then: Customize theme > Add section near the top (above your existing
+  header, or replacing it) > choose "VG Header".
+  Recommended: in Customize, HIDE/remove your theme's default header on
+  pages where you use this one, so you don't get two navs stacked.
+
+  LOGO: Upload vaultguards-logo.png via Online Store > Themes > Edit code >
+  Assets > Add a new asset > Upload files > select the PNG. Once uploaded,
+  this section finds it automatically by filename. If you'd rather manage
+  the logo from the theme editor instead of hardcoding the filename, use
+  the "Logo image" setting below (it overrides the file lookup).
+{% endcomment %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{{ 'vg-theme.css' | asset_url }}">
+
+<div class="vg-root">
+  <header class="vg-nav">
+    <div class="vg-nav-inner">
+      <a href="{{ routes.root_url }}" class="vg-logo">
+        {% if section.settings.logo_image %}
+          <img src="{{ section.settings.logo_image | image_url: width: 64 }}" alt="{{ shop.name }}" class="vg-logo-mark">
+        {% else %}
+          <img src="{{ 'vaultguards-logo.png' | asset_url }}" alt="{{ shop.name }}" class="vg-logo-mark">
+        {% endif %}
+        {{ shop.name | default: 'Vaultguards' }}
+      </a>
+
+      <nav class="vg-nav-links">
+        <a href="{{ section.settings.shop_link | default: '/#shop' }}">Shop</a>
+        <a href="{{ section.settings.vault_link | default: '/pages/the-vault' }}">The Vault</a>
+        <a href="{{ pages.contact.url | default: '/pages/contact' }}">Contact</a>
+      </nav>
+
+      <a href="{{ section.settings.vault_link | default: '/pages/the-vault' }}"
+         class="vg-btn vg-btn-gold"
+         style="padding:10px 20px;font-size:13px"
+         data-vg-haptic="tap">
+        <i class="fa-solid fa-vault"></i> Try It On
+      </a>
+    </div>
+  </header>
+</div>
+
+{% schema %}
+{
+  "name": "VG Header",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo_image",
+      "label": "Logo image (optional — overrides vaultguards-logo.png asset)"
+    },
+    {
+      "type": "url",
+      "id": "shop_link",
+      "label": "Shop link",
+      "default": "/#shop"
+    },
+    {
+      "type": "url",
+      "id": "vault_link",
+      "label": "The Vault link",
+      "default": "/pages/the-vault"
+    }
+  ],
+  "presets": [
+    { "name": "VG Header" }
+  ]
+}
+{% endschema %}
