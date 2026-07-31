@@ -376,13 +376,27 @@ Key mechanics worth remembering when touching these:
     `product.featured_image` / `collection.image` live from Shopify, so
     there is nothing to "sync" when the user updates product photography.
 - **Homepage "Watch once you buy" video section**: lives right before the
-  "Protection that respects the grade" features grid (moved there from its
-  original spot after "Suggested for you" per user request). Real video ID
+  features grid (moved there from its original spot after "Suggested for
+  you" per user request; the "Protection that respects the grade" /
+  "Why collectors switch" headings above that grid have since been removed
+  entirely per user request — the grid itself is unchanged). Real video ID
   is set via `{% assign youtube_id = '...' %}` right above the section —
   currently `JPYy9seWNDY` (the user's real unboxing video, extracted from
   `https://youtu.be/JPYy9seWNDY`). To swap the video later, just change that
   one assign line to the new ID from any `youtu.be/<ID>` or
   `youtube.com/watch?v=<ID>` URL.
+- **Announcement bar (top strip) is a native Horizon file, not a custom
+  `vg-` section**: `sections/header-group.json` — previously untouched/
+  untracked locally until we needed to edit it. Its `header_announcements_*`
+  section has native rotating-message support via multiple `_announcement`
+  blocks under one `header-announcements` section (`settings.speed` = seconds
+  per rotation). Currently rotates 2 messages: "Free Shipping On US Orders
+  over $50" and "Save 15% With Code VG15". To add/edit/remove a rotating
+  message, add/edit/remove a block in that file's `blocks` + `block_order`
+  (same `_announcement` shape: `text`, `link`, `font`, `font_size`, `weight`,
+  `letter_spacing`, `case`) — same push/pull/verify method as any other file,
+  just remember this one is a native theme file so don't assume it only
+  contains our custom sections when searching for site copy.
 
 ---
 
