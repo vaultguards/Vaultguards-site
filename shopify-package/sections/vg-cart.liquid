@@ -1,0 +1,250 @@
+{% comment %}
+  VAULTGUARDS - Cart Section
+
+  This theme only exposes a JSON template for the cart (no plain Liquid
+  template file to paste into), so this ships as a SECTION instead, wired to
+  the cart page through templates/cart.json (same approach already used for
+  Product and Collection: it overrides the store's default cart page for
+  everyone automatically, no manual per-page click needed once this theme is
+  the live theme).
+
+  INSTALL (only needed if you are pasting this by hand instead of using the
+  CLI push already set up for this project):
+  1. Admin > Online Store > Themes > Edit code.
+  2. In the left sidebar, find "Sections" > click the plus icon next to it >
+     name the new file "vg-cart" (it will be saved as sections/vg-cart.liquid)
+     > select all the placeholder text > delete > paste this whole file in >
+     Save.
+  3. Make sure templates/cart.json points its "main" section at "vg-cart"
+     (already set up in this project).
+
+  CHECKOUT: the "Checkout" button is a real Shopify submit button
+  (name="checkout") inside a native {% form 'cart', cart %}, so it hands off
+  to Shopify's own hosted Checkout exactly like the default cart does.
+  Quantity changes use the same native "updates[line-item-key]" pattern.
+
+  DISCOUNT CODE / GIFT CARD: the classic Shopify cart page has no native
+  in-cart discount box, only Checkout does. To still give a working spot for
+  this on our own Cart page, the field here uses Shopify's own documented
+  discount-link route (/discount/CODE?redirect=...), which applies the code
+  and carries it into Checkout automatically, no custom backend needed. Gift
+  cards are recognized by that same field once on the Checkout step itself
+  (Shopify's native behavior), which is why the helper text below the field
+  says so.
+{% endcomment %}
+
+<section class="vg-section" style="padding-top:56px;">
+  <div class="vg-container">
+    <a href="{{ routes.root_url }}#shop" style="color:var(--vg-navy-400); font-size:13px; text-decoration:none;">
+      <i class="fa-solid fa-arrow-left"></i> Continue shopping
+    </a>
+
+    <div class="vg-reveal vg-in" style="margin-top:18px; margin-bottom:36px;">
+      <div class="vg-eyebrow">Your Cart</div>
+      {% if cart.item_count > 0 %}
+        <h1 style="font-size:38px; margin-top:14px;">
+          {{ cart.item_count }} {% if cart.item_count == 1 %}item{% else %}items{% endif %} ready for checkout.
+        </h1>
+      {% else %}
+        <h1 style="font-size:38px; margin-top:14px;">Your cart is empty.</h1>
+      {% endif %}
+    </div>
+
+    {% if cart.item_count == 0 %}
+      <div class="vg-card" style="padding:56px 32px; text-align:center; max-width:520px; margin:0 auto;">
+        <i class="fa-solid fa-bag-shopping" style="font-size:34px; color:var(--vg-navy-300);"></i>
+        <p style="color:var(--vg-navy-400); margin:18px 0 26px; font-size:15px;">
+          Nothing in here yet. Browse the shop to find a precision fit guard for your slab.
+        </p>
+        <a href="{{ routes.root_url }}#shop" class="vg-btn vg-btn-primary" data-vg-haptic="tap">
+          <i class="fa-solid fa-shop"></i> Shop Guards
+        </a>
+      </div>
+    {% else %}
+      {% form 'cart', cart, id: 'vg-cart-form' %}
+        <div class="vg-cart-layout">
+          <div class="vg-reveal vg-in">
+            <div class="vg-card" style="padding:8px 24px;">
+              {% for item in cart.items %}
+                <div class="vg-cart-line">
+                  <div class="vg-cart-line-img">
+                    <img src="{{ item.image | image_url: width: 300 }}" alt="{{ item.product_title | escape }}" loading="lazy" width="300" height="375">
+                  </div>
+                  <div class="vg-cart-line-body">
+                    <a href="{{ item.url }}" style="font-weight:600; font-size:15px; color:var(--vg-navy-900); text-decoration:none;">{{ item.product_title }}</a>
+                    {% unless item.variant.title contains 'Default' %}
+                      <div style="font-size:13px; color:var(--vg-navy-400); margin-top:3px;">{{ item.variant.title }}</div>
+                    {% endunless %}
+                    <div style="font-size:14px; color:var(--vg-navy-600); margin-top:8px;">{{ item.final_price | money }} each</div>
+
+                    <div class="vg-cart-qty-row">
+                      <div class="vg-cart-qty">
+                        <button type="button" class="vg-cart-qty-btn" data-vg-cart-step="-1" data-vg-cart-key="{{ item.key }}" aria-label="Decrease quantity">&minus;</button>
+                        <input type="number" name="updates[{{ item.key }}]" value="{{ item.quantity }}" min="0" inputmode="numeric" class="vg-cart-qty-input" data-vg-cart-qty-input="{{ item.key }}" aria-label="Quantity for {{ item.product_title | escape }}">
+                        <button type="button" class="vg-cart-qty-btn" data-vg-cart-step="1" data-vg-cart-key="{{ item.key }}" aria-label="Increase quantity">+</button>
+                      </div>
+                      <button type="button" class="vg-cart-remove" data-vg-cart-remove="{{ item.key }}">
+                        <i class="fa-solid fa-trash-can"></i> Remove
+                      </button>
+                    </div>
+                  </div>
+                  <div class="vg-cart-line-total">{{ item.final_line_price | money }}</div>
+                </div>
+                {% unless forloop.last %}<div class="vg-cart-line-divider"></div>{% endunless %}
+              {% endfor %}
+            </div>
+            <button type="submit" name="update" class="vg-btn vg-btn-ghost" style="margin-top:16px;" data-vg-haptic="tap">
+              <i class="fa-solid fa-rotate"></i> Update Cart
+            </button>
+          </div>
+
+          <div class="vg-reveal vg-in" data-delay="1">
+            <div class="vg-card vg-cart-summary">
+              <div style="font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--vg-navy-400); margin-bottom:18px;">Order Summary</div>
+
+              <div style="display:flex; justify-content:space-between; font-size:14px; color:var(--vg-navy-600); margin-bottom:10px;">
+                <span>Subtotal</span>
+                <span>{{ cart.original_total_price | money }}</span>
+              </div>
+              {% if cart.total_discount > 0 %}
+                <div style="display:flex; justify-content:space-between; font-size:14px; color:var(--vg-success); margin-bottom:10px;">
+                  <span>Discount</span>
+                  <span>&minus;{{ cart.total_discount | money }}</span>
+                </div>
+              {% endif %}
+              <div style="font-size:12px; color:var(--vg-navy-400); margin-bottom:18px;">
+                Shipping and taxes are calculated at checkout.
+              </div>
+
+              <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:600; color:var(--vg-navy-900); padding-top:16px; border-top:1px solid var(--vg-ivory-200); margin-bottom:22px;">
+                <span>Total</span>
+                <span>{{ cart.total_price | money }}</span>
+              </div>
+
+              <div class="vg-form-field" style="margin-bottom:16px;">
+                <label for="vg-cart-discount">Discount code or gift card</label>
+                <div style="display:flex; gap:8px;">
+                  <input type="text" id="vg-cart-discount" placeholder="Enter code" autocomplete="off" style="flex:1;">
+                  <button type="button" id="vg-cart-discount-apply" class="vg-btn vg-btn-ghost" style="padding:13px 18px; font-size:13px; white-space:nowrap;">Apply</button>
+                </div>
+                <div style="font-size:11.5px; color:var(--vg-navy-400); margin-top:8px; line-height:1.5;">
+                  Discount codes apply right away. Gift cards are redeemed in this same field on the next step.
+                </div>
+              </div>
+
+              <button type="submit" name="checkout" id="vg-cart-checkout" class="vg-btn vg-btn-primary" style="width:100%; padding:16px;" data-vg-haptic="tap">
+                <i class="fa-solid fa-lock"></i> Checkout
+              </button>
+
+              <a href="{{ pages['the-vault'].url | default: '/pages/the-vault' }}" class="vg-btn vg-btn-ghost" style="width:100%; margin-top:10px; justify-content:center;" data-vg-haptic="tap">
+                <i class="fa-solid fa-vault"></i> Preview Another Guard
+              </a>
+
+              <div style="display:flex; align-items:center; gap:8px; justify-content:center; margin-top:20px; color:var(--vg-navy-300); font-size:12px;">
+                <i class="fa-solid fa-shield-halved"></i> Secure checkout powered by Shopify
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endform %}
+    {% endif %}
+  </div>
+</section>
+
+<style>
+.vg-cart-layout { display:grid; grid-template-columns: 1fr 380px; gap:32px; align-items:start; }
+@media (max-width: 860px) { .vg-cart-layout { grid-template-columns: 1fr; gap:24px; } }
+.vg-cart-summary { padding:28px 26px; position:sticky; top:100px; }
+@media (max-width: 860px) { .vg-cart-summary { position:static; } }
+.vg-cart-line { display:grid; grid-template-columns: 92px 1fr auto; gap:18px; align-items:flex-start; padding:20px 0; }
+@media (max-width: 480px) { .vg-cart-line { grid-template-columns: 72px 1fr; } .vg-cart-line-total { grid-column: 2; text-align:left; margin-top:10px; } }
+.vg-cart-line-img { width:92px; aspect-ratio:4/5; border-radius:var(--vg-radius-md); overflow:hidden; background:var(--vg-ivory-50); flex-shrink:0; }
+@media (max-width: 480px) { .vg-cart-line-img { width:72px; } }
+.vg-cart-line-img img { width:100%; height:100%; object-fit:cover; display:block; }
+.vg-cart-line-total { font-weight:600; font-size:15px; color:var(--vg-navy-900); text-align:right; white-space:nowrap; padding-top:2px; }
+.vg-cart-line-divider { height:1px; background:var(--vg-ivory-200); }
+.vg-cart-qty-row { display:flex; align-items:center; gap:14px; margin-top:12px; flex-wrap:wrap; }
+.vg-cart-qty { display:inline-flex; align-items:center; background:var(--vg-ivory-50); border-radius:var(--vg-radius-pill); overflow:hidden; }
+.vg-cart-qty-btn { border:none; background:none; width:32px; height:32px; font-size:16px; color:var(--vg-navy-700); cursor:pointer; display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent; }
+.vg-cart-qty-btn:hover { background:var(--vg-ivory-200); }
+.vg-cart-qty-input { width:38px; text-align:center; border:none; background:none; font-size:14px; font-family:inherit; color:var(--vg-text); padding:6px 0; }
+.vg-cart-qty-input::-webkit-outer-spin-button, .vg-cart-qty-input::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+.vg-cart-remove { display:inline-flex; align-items:center; gap:6px; border:none; background:none; color:var(--vg-navy-400); font-size:12.5px; font-weight:600; cursor:pointer; padding:4px 0; -webkit-tap-highlight-color:transparent; }
+.vg-cart-remove:hover { color:var(--vg-danger); }
+</style>
+
+<script>
+(function () {
+  function clampQty(v) {
+    v = parseInt(v, 10);
+    if (isNaN(v) || v < 0) v = 0;
+    return v;
+  }
+
+  document.addEventListener('click', function (e) {
+    var stepBtn = e.target.closest('[data-vg-cart-step]');
+    if (stepBtn) {
+      var key = stepBtn.getAttribute('data-vg-cart-key');
+      var input = document.querySelector('[data-vg-cart-qty-input="' + key + '"]');
+      if (input) {
+        input.value = clampQty(clampQty(input.value) + parseInt(stepBtn.getAttribute('data-vg-cart-step'), 10));
+      }
+      return;
+    }
+
+    var removeBtn = e.target.closest('[data-vg-cart-remove]');
+    if (removeBtn) {
+      var rKey = removeBtn.getAttribute('data-vg-cart-remove');
+      var rInput = document.querySelector('[data-vg-cart-qty-input="' + rKey + '"]');
+      var form = document.getElementById('vg-cart-form');
+      if (rInput && form) {
+        rInput.value = 0;
+        if (form.requestSubmit) { form.requestSubmit(); } else { form.submit(); }
+      }
+      return;
+    }
+  });
+
+  function applyDiscount(redirectPath) {
+    var input = document.getElementById('vg-cart-discount');
+    var code = input ? input.value.trim() : '';
+    if (!code) return false;
+    window.location.href = '{{ routes.root_url }}discount/' + encodeURIComponent(code) + '?redirect=' + encodeURIComponent(redirectPath);
+    return true;
+  }
+
+  var applyBtn = document.getElementById('vg-cart-discount-apply');
+  if (applyBtn) {
+    applyBtn.addEventListener('click', function () { applyDiscount('/cart'); });
+  }
+
+  var discountInput = document.getElementById('vg-cart-discount');
+  if (discountInput) {
+    discountInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); applyDiscount('/cart'); }
+    });
+  }
+
+  var checkoutBtn = document.getElementById('vg-cart-checkout');
+  if (checkoutBtn) {
+    checkoutBtn.addEventListener('click', function (e) {
+      if (applyDiscount('/checkout')) { e.preventDefault(); }
+    });
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Vaultguards Cart",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Vaultguards Cart"
+    }
+  ],
+  "enabled_on": {
+    "templates": ["cart"]
+  }
+}
+{% endschema %}
