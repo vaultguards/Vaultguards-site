@@ -53,21 +53,39 @@
     <div class="vg-reveal" data-delay="1">
       <div class="vg-card" style="padding:28px; border-radius:var(--vg-radius-xl);">
         <div id="vg-hero-rotator" style="position:relative; aspect-ratio:4/5; border-radius:26px; overflow:hidden; background:var(--vg-ivory-200);">
+          {% comment %}
+            By default this rotates real photos pulled straight from your TAG
+            and PSA products, so it always matches current inventory with no
+            setup. If you want full manual control instead, open Theme
+            Customize > this section's settings and upload photos into "Hero
+            photo 1-4": as soon as one is uploaded, it replaces the automatic
+            product photos below.
+          {% endcomment %}
           {% assign vg_hero_shown = 0 %}
-          {% for product in tag_collection.products limit: 4 %}
-            {% if product.featured_image %}
-              <img src="{{ product.featured_image | image_url: width: 900 }}" alt="{{ product.title | default: 'Vaultguards colorway guard' }}" class="vg-hero-slide{% if vg_hero_shown == 0 %} vg-hero-slide-active{% endif %}" width="900" height="1125">
+          {% assign vg_hero_keys = 'hero_photo_1,hero_photo_2,hero_photo_3,hero_photo_4' | split: ',' %}
+          {% for vg_key in vg_hero_keys %}
+            {% assign vg_hero_img = section.settings[vg_key] %}
+            {% if vg_hero_img %}
+              <img src="{{ vg_hero_img | image_url: width: 900 }}" alt="Vaultguards colorway guard" class="vg-hero-slide{% if vg_hero_shown == 0 %} vg-hero-slide-active{% endif %}" width="900" height="1125">
               {% assign vg_hero_shown = vg_hero_shown | plus: 1 %}
             {% endif %}
           {% endfor %}
-          {% for product in psa_collection.products limit: 4 %}
-            {% if product.featured_image %}
-              <img src="{{ product.featured_image | image_url: width: 900 }}" alt="{{ product.title | default: 'Vaultguards colorway guard' }}" class="vg-hero-slide{% if vg_hero_shown == 0 %} vg-hero-slide-active{% endif %}" width="900" height="1125">
-              {% assign vg_hero_shown = vg_hero_shown | plus: 1 %}
+          {% if vg_hero_shown == 0 %}
+            {% for product in tag_collection.products limit: 4 %}
+              {% if product.featured_image %}
+                <img src="{{ product.featured_image | image_url: width: 900 }}" alt="{{ product.title | default: 'Vaultguards colorway guard' }}" class="vg-hero-slide{% if vg_hero_shown == 0 %} vg-hero-slide-active{% endif %}" width="900" height="1125">
+                {% assign vg_hero_shown = vg_hero_shown | plus: 1 %}
+              {% endif %}
+            {% endfor %}
+            {% for product in psa_collection.products limit: 4 %}
+              {% if product.featured_image %}
+                <img src="{{ product.featured_image | image_url: width: 900 }}" alt="{{ product.title | default: 'Vaultguards colorway guard' }}" class="vg-hero-slide{% if vg_hero_shown == 0 %} vg-hero-slide-active{% endif %}" width="900" height="1125">
+                {% assign vg_hero_shown = vg_hero_shown | plus: 1 %}
+              {% endif %}
+            {% endfor %}
+            {% if vg_hero_shown == 0 and tag_collection and tag_collection.image %}
+              <img src="{{ tag_collection.image | image_url: width: 900 }}" alt="Vaultguards colorway guard" class="vg-hero-slide vg-hero-slide-active" width="900" height="1125">
             {% endif %}
-          {% endfor %}
-          {% if vg_hero_shown == 0 and tag_collection and tag_collection.image %}
-            <img src="{{ tag_collection.image | image_url: width: 900 }}" alt="Vaultguards colorway guard" class="vg-hero-slide vg-hero-slide-active" width="900" height="1125">
           {% endif %}
         </div>
       </div>
@@ -138,13 +156,20 @@
   </div>
 </section>
 
+{% comment %}
+  The spotlight photo defaults to the Aura product's real photo. To swap it
+  without touching the product, open Theme Customize > this section's
+  settings and upload a photo into "Spotlight photo override".
+{% endcomment %}
+{% assign vg_spotlight_img = section.settings.spotlight_photo %}
+{% unless vg_spotlight_img %}{% assign vg_spotlight_img = aura.featured_image %}{% endunless %}
 {% if aura %}
 <section class="vg-section" style="background:var(--vg-navy-900); overflow:hidden;">
   <div class="vg-container vg-grid-2">
     <div class="vg-reveal vg-in">
       <div class="vg-card" style="padding:26px; background:var(--vg-navy-800); box-shadow:none;">
         <div style="aspect-ratio:4/5; border-radius:var(--vg-radius-md); overflow:hidden; background:var(--vg-navy-700);">
-          <img src="{{ aura.featured_image | image_url: width: 900 }}" alt="{{ aura.title }}" style="width:100%; height:100%; object-fit:cover;" loading="lazy" width="900" height="1125">
+          <img src="{{ vg_spotlight_img | image_url: width: 900 }}" alt="{{ aura.title }}" style="width:100%; height:100%; object-fit:cover;" loading="lazy" width="900" height="1125">
         </div>
       </div>
     </div>
@@ -294,7 +319,49 @@
 {% schema %}
 {
   "name": "Vaultguards Homepage",
-  "settings": [],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Hero photo rotator (optional)"
+    },
+    {
+      "type": "paragraph",
+      "content": "Leave these empty to keep automatically rotating real photos from your TAG and PSA products (default, always matches your inventory). Upload your own photos here instead if you want full manual control over what shows in the big rotating photo next to \"A perfect fit, every angle.\""
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_photo_1",
+      "label": "Hero photo 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_photo_2",
+      "label": "Hero photo 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_photo_3",
+      "label": "Hero photo 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_photo_4",
+      "label": "Hero photo 4"
+    },
+    {
+      "type": "header",
+      "content": "Spotlight colorway photo (optional)"
+    },
+    {
+      "type": "paragraph",
+      "content": "Leave empty to automatically use the Aura product's real photo (default)."
+    },
+    {
+      "type": "image_picker",
+      "id": "spotlight_photo",
+      "label": "Spotlight photo override"
+    }
+  ],
   "presets": [
     {
       "name": "Vaultguards Homepage"
