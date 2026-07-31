@@ -8,20 +8,7 @@
         "announcement_BxgCk9": {
           "type": "_announcement",
           "settings": {
-            "text": "Free Shipping On US Orders over $50",
-            "link": "",
-            "font": "var(--font-subheading--family)",
-            "font_size": "0.75rem",
-            "weight": "",
-            "letter_spacing": "normal",
-            "case": "none"
-          },
-          "blocks": {}
-        },
-        "announcement_Vg15Cd": {
-          "type": "_announcement",
-          "settings": {
-            "text": "Save 15% With Code VG15",
+            "text": "Free US Shipping over $50\nUse code VG15 for 15% off",
             "link": "",
             "font": "var(--font-subheading--family)",
             "font_size": "0.75rem",
@@ -33,7 +20,6 @@
         }
       },
       "block_order": [
-        "announcement_Vg15Cd",
         "announcement_BxgCk9"
       ],
       "name": "t:names.announcement_bar",
@@ -42,8 +28,8 @@
         "section_width": "page-width",
         "color_scheme": "scheme-1",
         "divider_width": 1,
-        "padding-block-start": 15,
-        "padding-block-end": 15
+        "padding-block-start": 12,
+        "padding-block-end": 12
       }
     },
     "header_section": {

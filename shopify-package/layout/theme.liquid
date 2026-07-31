@@ -87,6 +87,8 @@
 .vg-btn:disabled { opacity: .42; cursor: not-allowed; box-shadow: none; transform: none !important; }
 .vg-announce { background: var(--vg-navy-900); color: var(--vg-ivory-100); text-align: center; font-size: 12.5px; font-weight: 600; letter-spacing: .03em; padding: 9px var(--vg-space-4); }
 .vg-announce i { color: var(--vg-gold-400); margin-right: 7px; }
+/* Native top announcement bar: render both lines statically (no rotation), let the newline in the text setting produce a real line break */
+.announcement-bar__text { white-space: pre-line; line-height: 1.5 !important; }
 .vg-nav { position: sticky; top: 0; z-index: 100; background: rgba(230,231,233,.9); backdrop-filter: blur(18px) saturate(1.2); -webkit-backdrop-filter: blur(18px) saturate(1.2); box-shadow: 0 1px 0 rgba(18,22,27,.06); }
 .vg-nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 18px var(--vg-space-4); max-width: 1180px; margin: 0 auto; }
 .vg-logo { font-family: var(--vg-font-display); font-size: 21px; font-weight: 600; letter-spacing: .02em; display: flex; align-items: center; gap: 6px; }
