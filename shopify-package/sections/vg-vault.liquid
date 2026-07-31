@@ -1,28 +1,39 @@
 {% comment %}
-  VAULTGUARDS - The Vault (virtual try-on page), connected to real products.
-  Fully client-side: no server, no data storage. A visitor uploads a photo
-  of their slab (it stays only in their own browser tab - nothing is sent
-  anywhere or saved), picks a real product from your TAG or PSA collection,
-  and previews a guard-color frame around their photo - the tint is sampled
-  live from that real product photo, so it is not a fake/placeholder color.
-  From there they can jump to that product page or add it straight to cart.
+  VAULTGUARDS - The Vault Section (virtual try-on), connected to real
+  products. Fully client-side: no server, no data storage. A visitor uploads
+  a photo of their slab (it stays only in their own browser tab - nothing is
+  sent anywhere or saved), picks a real product from your TAG or PSA
+  collection, and previews a guard-color frame around their photo - the tint
+  is sampled live from that real product photo, so it is not a
+  fake/placeholder color. From there they can jump to that product page or
+  add it straight to cart.
 
   CONFIG: edit the two handles below if your collection handles ever change.
 
+  This theme only exposes a JSON view for page templates (no plain Liquid
+  template file to paste into), so this ships as a SECTION instead. Sections
+  are added on top of the page through the theme editor.
+
   INSTALL:
-  1. In Shopify Admin: Online Store > Pages > Add page. Title it
-     "The Vault". Set the URL handle to exactly "the-vault" (every other
-     file already links to /pages/the-vault - matching this handle means
-     zero other edits anywhere else on the site). Save.
-  2. Edit code > Templates > Add a new template > type "page" > name it
-     "vault" (this creates templates/page.vault.liquid) > select all >
-     delete > paste this whole file in > Save.
-     (If Shopify only gives you a JSON view here with no plain text editor
-     to paste into, stop and tell me - we will rebuild this one as a
-     Section too, the same fix used for the homepage.)
-  3. Back on "The Vault" page in Admin > find "Theme template" in the
-     right sidebar > select "page.vault" > Save.
-  4. Open your storefront > click "Try It On" in the nav, or visit
+  1. Admin > Online Store > Themes > Edit code.
+  2. In the left sidebar, find "Sections" > click the plus icon next to it >
+     name the new file "vg-vault" (it will be saved as
+     sections/vg-vault.liquid) > select all the placeholder text > delete >
+     paste this whole file in > Save.
+  3. Online Store > Pages > Add page. Title it "The Vault". Set the URL
+     handle to exactly "the-vault" (every other file already links to
+     /pages/the-vault - matching this handle means zero other edits anywhere
+     else on the site). Save.
+  4. Go to Online Store > Themes > Customize.
+  5. At the very top of the Customize screen there is a page picker
+     dropdown. Switch it to "Pages" > choose the "The Vault" page you just
+     created.
+  6. In the left panel, scroll to the bottom of the section list and click
+     "Add section" > find "Vaultguards Vault" > click it to add it.
+  7. Remove or hide any other sections already on this page template so only
+     Vaultguards Vault shows.
+  8. Click Save in the top right.
+  9. Open your storefront > click "Try It On" in the nav, or visit
      /pages/the-vault directly > upload a photo, pick a product, try
      Add to Cart.
 {% endcomment %}
@@ -297,3 +308,10 @@
   setBrand('tag');
 })();
 </script>
+
+{% schema %}
+{
+  "name": "Vaultguards Vault",
+  "settings": []
+}
+{% endschema %}
