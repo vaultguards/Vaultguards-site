@@ -41,7 +41,8 @@ the method itself changes (new theme id, new token, new store, etc.) — the
       collection.json
       page.contact.json
       page.vault.json
-      page.pauls-vault.json
+      page.founder-collection.json  <- Paul's Vault template (deliberately NOT named
+                                        "page.pauls-vault.json" - see Section 7)
       product.json
     assets/
       vaultguards-logo.png         <- circular "V" shield icon (unchanged master asset)
@@ -293,7 +294,7 @@ export SHOPIFY_CLI_THEME_TOKEN=shptka_d8f98845fd2d7cf7569c5ed16b4f9d42
 | Contact page | `sections/vg-contact.liquid` | `templates/page.contact.json` |
 | The Vault (virtual try-on) | `sections/vg-vault.liquid` | `templates/page.vault.json` |
 | Cart | `sections/vg-cart.liquid` | `templates/cart.json` |
-| Paul's Vault (founder collection) | `sections/vg-pauls-vault.liquid` | `templates/page.pauls-vault.json` |
+| Paul's Vault (founder collection) | `sections/vg-pauls-vault.liquid` | `templates/page.founder-collection.json` |
 
 Key mechanics worth remembering when touching these:
 - **Cart**: single `{% form 'cart', cart, id: '...' %}` wraps the WHOLE
@@ -346,6 +347,11 @@ Key mechanics worth remembering when touching these:
 - Confirm the user has manually assigned the "Vaultguards Contact" /
   "Vaultguards Vault" page templates via the Shopify Admin page editor
   dropdown (should finally be visible now that `vaultguards.theme` is live).
+- There is a harmless orphaned `templates/page.pauls-vault.json` file still
+  sitting on the live theme (superseded by `page.founder-collection.json`,
+  see Section 8's naming-collision lesson). No page should be assigned to it
+  after the fix; safe to delete manually via Admin > Online Store > Themes >
+  Edit code whenever convenient, not urgent.
 
 ---
 
@@ -359,3 +365,33 @@ Key mechanics worth remembering when touching these:
   Liquid theme, deployed via Shopify CLI, not Cloudflare Pages.
 - Never run `shopify login`/OAuth flows in this sandbox — auth is entirely via
   the `SHOPIFY_CLI_THEME_TOKEN` env var.
+- **Never run `theme push` without `--nodelete`, even scoped with `--only`.**
+  The `shopify-theme-push/` staging dir only contains OUR custom overlay
+  files (layout/theme.liquid, our sections/templates/assets) — it does NOT
+  contain the rest of the live Horizon theme (config/, locales/, snippets/,
+  default templates, layout/password.liquid, etc.). Whether `--only` fully
+  scopes deletion behavior alongside `--nodelete` is undocumented/reportedly
+  inconsistent (see Shopify CLI GitHub issues about templates being deleted
+  unexpectedly even with scoping flags) — don't test this on production.
+  Practical effect: there is **no safe CLI way to delete a single remote
+  theme file** from this sandbox. If a stray/renamed file needs removing
+  from the live theme, either leave it as a harmless orphan (preferred, see
+  Section 7) or delete it manually via Admin > Online Store > Themes > Edit
+  code (safe, scoped to one file, official UI).
+- **Naming collision lesson (page templates)**: Shopify's page-editor "Theme
+  template" dropdown displays a humanized version of each `page.<suffix>.json`
+  filename (e.g. `page.vault.json` → "Vault", `page.pauls-vault.json` →
+  "Pauls vault"). Similar-looking names in that list are an easy pick-the-
+  wrong-one mistake for the user, with a confusing symptom: visiting the new
+  page renders the OLD page's content (or vice versa) because the wrong
+  template got assigned to it, while the actual section/template files on
+  disk are completely correct and separate — don't assume a code bug when a
+  user reports this. When adding a new page whose name is verbally similar
+  to an existing one (e.g. "Paul's Vault" next to "The Vault"), proactively
+  pick a `page.<suffix>.json` filename with **zero shared words** from any
+  existing template (this project uses `page.founder-collection.json`, not
+  `page.pauls-vault.json`, for exactly this reason). Fixing a live mix-up
+  requires the user to go into Admin and re-pick the correct dropdown entry
+  per page — the Theme Access token used here cannot read or write Page
+  resources (only theme files), so this step can never be automated from
+  this sandbox.
