@@ -53,12 +53,10 @@ vault.get('/', (c) => {
                 <button class="vault-brand-btn" data-brand="TAG" data-vg-haptic="tap">
                   <div class="vault-brand-swatch" style="background:linear-gradient(135deg,#eee,#ccc);"></div>
                   <div style="font-weight:700; font-size:18px; margin-top:14px;">TAG Slab</div>
-                  <div style="color:var(--vg-navy-400); font-size:12.5px; margin-top:4px;">3.125&Prime; &times; 5.25&Prime;</div>
                 </button>
                 <button class="vault-brand-btn" data-brand="PSA" data-vg-haptic="tap">
                   <div class="vault-brand-swatch" style="background:linear-gradient(135deg,#dbe7f7,#9fc0e8);"></div>
                   <div style="font-weight:700; font-size:18px; margin-top:14px;">PSA Slab</div>
-                  <div style="color:var(--vg-navy-400); font-size:12.5px; margin-top:4px;">3.25&Prime; &times; 5.375&Prime;</div>
                 </button>
               </div>
             </div>

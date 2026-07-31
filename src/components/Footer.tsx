@@ -5,7 +5,7 @@ export function Footer() {
         <div class="vg-footer-grid" style="display:grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap:40px;">
           <div>
             <div class="vg-logo" style="color:#fff;">
-              <span class="vg-logo-dot"></span> Vaultguards
+              <img src="/static/images/vaultguards-logo.png" alt="Vaultguards" class="vg-logo-mark" /> Vaultguards
             </div>
             <p style="color:var(--vg-navy-300); font-size:14px; max-width:280px; margin-top:14px;">
               Precision-fit colorway guards for TAG and PSA graded slabs. Built for collectors who
@@ -24,8 +24,7 @@ export function Footer() {
             <div style="font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--vg-gold-400); margin-bottom:14px;">Explore</div>
             <div style="display:flex; flex-direction:column; gap:10px; font-size:14px; color:var(--vg-navy-300);">
               <a href="/vault">The Vault — Try It On</a>
-              <a href="/#story">Our Story</a>
-              <a href="/#reviews">Reviews</a>
+              <a href="/#watch">Watch Once You Buy</a>
             </div>
           </div>
           <div>

@@ -9,8 +9,9 @@ const app = new Hono()
 app.use(renderer)
 
 const HERO_IMG = 'https://cdn.shopify.com/s/files/1/1003/1035/2165/files/DSC04243-Photoroom.jpg?v=1781079082'
-const COMPARE_LEFT = 'https://cdn.shopify.com/s/files/1/1003/1035/2165/files/DSC04116-Photoroom_2.jpg?v=1779945779'
-const COMPARE_RIGHT = 'https://cdn.shopify.com/s/files/1/1003/1035/2165/files/DSC04202-Photoroom.jpg?v=1780962288'
+
+// "Watch Once You Buy" unboxing video — swap this ID for the real how-to-open video.
+const HOW_TO_OPEN_YOUTUBE_ID = 'dQw4w9WgXcQ'
 
 app.get('/', (c) => {
   const featuredTag = TAG_GUARDS.filter((g) => !g.mystery).slice(0, 4)
@@ -50,8 +51,74 @@ app.get('/', (c) => {
         </div>
       </section>
 
+      {/* ================= SHOP GRID (moved up, near top) ================= */}
+      <section id="shop" class="vg-section" style="background:var(--vg-bg-alt); padding-top:56px;">
+        <div class="vg-container">
+          <div class="vg-reveal" style="text-align:center; max-width:600px; margin:0 auto 50px;">
+            <div class="vg-eyebrow">The Collection</div>
+            <h2 style="font-size:38px; margin-top:14px;">Shop by brand fit.</h2>
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+            <h3 style="font-size:20px;">TAG Guards</h3>
+            <a href="/#shop-tag" class="vg-pill vg-pill-gold" style="text-decoration:none;">Shop TAG Collection</a>
+          </div>
+          <div class="vg-grid-4" style="margin-bottom:56px;" id="shop-tag">
+            {featuredTag.map((g, i) => (
+              <a href={`/product/${g.handle}`} class="vg-reveal vg-card vg-product-card" data-delay={String(i % 4)} style="overflow:hidden; padding:0; display:block; text-decoration:none; color:inherit;">
+                <div style="aspect-ratio:1/1; background:var(--vg-ivory-50);">
+                  <img src={g.image} alt={g.title} style="width:100%; height:100%; object-fit:cover;" />
+                </div>
+                <div style="padding:18px 20px 22px;">
+                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                    <span style={`width:14px;height:14px;border-radius:50%;background:${g.hex};box-shadow:var(--vg-shadow-xs)`}></span>
+                    <span style="font-weight:600; font-size:15px;">{g.title}</span>
+                  </div>
+                  <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <span style="color:var(--vg-navy-400); font-size:14px;">${g.price.toFixed(2)}</span>
+                    <span class={g.stock > 0 ? 'vg-pill vg-pill-in' : 'vg-pill vg-pill-out'} style="font-size:10px; padding:3px 10px;">
+                      {g.stock > 0 ? 'In stock' : 'Out of stock'}
+                    </span>
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+            <h3 style="font-size:20px;">PSA Guards</h3>
+            <a href="/#shop-psa" class="vg-pill vg-pill-gold" style="text-decoration:none;">Shop PSA Collection</a>
+          </div>
+          <div class="vg-grid-4" id="shop-psa">
+            {featuredPsa.map((g, i) => (
+              <a href={`/product/${g.handle}`} class="vg-reveal vg-card vg-product-card" data-delay={String(i % 4)} style="overflow:hidden; padding:0; display:block; text-decoration:none; color:inherit;">
+                <div style="aspect-ratio:1/1; background:var(--vg-ivory-50);">
+                  <img src={g.image} alt={g.title} style="width:100%; height:100%; object-fit:cover;" />
+                </div>
+                <div style="padding:18px 20px 22px;">
+                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                    <span style={`width:14px;height:14px;border-radius:50%;background:${g.hex};box-shadow:var(--vg-shadow-xs)`}></span>
+                    <span style="font-weight:600; font-size:15px;">{g.title}</span>
+                  </div>
+                  <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <span style="color:var(--vg-navy-400); font-size:14px;">${g.price.toFixed(2)}</span>
+                    <span class={g.stock > 0 ? 'vg-pill vg-pill-in' : 'vg-pill vg-pill-out'} style="font-size:10px; padding:3px 10px;">
+                      {g.stock > 0 ? 'In stock' : 'Out of stock'}
+                    </span>
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+
+          <div style="text-align:center; margin-top:48px;">
+            <a href="/vault" class="vg-btn vg-btn-gold" data-vg-haptic="tap"><i class="fa-solid fa-vault"></i> Preview Your Slab in The Vault</a>
+          </div>
+        </div>
+      </section>
+
       {/* ================= SCROLL-REVEAL FEATURES ================= */}
-      <section class="vg-section" style="background:var(--vg-bg-alt);">
+      <section class="vg-section">
         <div class="vg-container">
           <div class="vg-reveal" style="text-align:center; max-width:640px; margin:0 auto 64px;">
             <div class="vg-eyebrow">Why collectors switch</div>
@@ -76,104 +143,8 @@ app.get('/', (c) => {
         </div>
       </section>
 
-      {/* ================= IMAGE COMPARISON SLIDER ================= */}
-      <section class="vg-section">
-        <div class="vg-container vg-grid-2">
-          <div class="vg-reveal" data-vg-tilt>
-            <div id="compare-slider" class="vg-card" style="position:relative; overflow:hidden; border-radius:var(--vg-radius-xl); aspect-ratio:1/1; cursor:ew-resize; user-select:none;">
-              <img src={COMPARE_RIGHT} alt="PSA guard" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;" />
-              <div id="compare-left-wrap" style="position:absolute; inset:0; width:50%; overflow:hidden;">
-                <img src={COMPARE_LEFT} alt="TAG guard" style="position:absolute; inset:0; width:200%; max-width:none; height:100%; object-fit:cover;" />
-              </div>
-              <div id="compare-handle" style="position:absolute; top:0; bottom:0; left:50%; width:3px; background:rgba(255,255,255,0.9); box-shadow:0 0 0 8px rgba(255,255,255,0.15);">
-                <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:44px; height:44px; border-radius:50%; background:#fff; box-shadow:var(--vg-shadow-lg); display:flex; align-items:center; justify-content:center; color:var(--vg-navy-900);">
-                  <i class="fa-solid fa-arrows-left-right"></i>
-                </div>
-              </div>
-              <div style="position:absolute; top:20px; left:20px;" class="vg-pill" >TAG fit</div>
-              <div style="position:absolute; top:20px; right:20px;" class="vg-pill">PSA fit</div>
-            </div>
-          </div>
-          <div class="vg-reveal" data-delay="1">
-            <div class="vg-eyebrow">Two brands, two exact fits</div>
-            <h2 style="font-size:34px; margin:14px 0 18px;">TAG and PSA slabs aren&rsquo;t the same shape.</h2>
-            <p style="color:var(--vg-navy-400); font-size:16px; max-width:440px;">
-              Drag the slider to compare. Every Vaultguards guard is molded to the exact slab
-              dimensions of its brand — TAG at 3.125&Prime;&times;5.25&Prime;, PSA at 3.25&Prime;&times;5.375&Prime; —
-              so there&rsquo;s never a wobble, gap, or overhang.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ================= SHOP GRID ================= */}
-      <section id="shop" class="vg-section" style="background:var(--vg-bg-alt);">
-        <div class="vg-container">
-          <div class="vg-reveal" style="text-align:center; max-width:600px; margin:0 auto 50px;">
-            <div class="vg-eyebrow">The Collection</div>
-            <h2 style="font-size:38px; margin-top:14px;">Shop by brand fit.</h2>
-          </div>
-
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-            <h3 style="font-size:20px;">TAG Guards</h3>
-            <span class="vg-pill vg-pill-gold">Fits 3.125&Prime; &times; 5.25&Prime; slabs</span>
-          </div>
-          <div class="vg-grid-4" style="margin-bottom:56px;">
-            {featuredTag.map((g, i) => (
-              <div class="vg-reveal vg-card" data-delay={String(i % 4)} style="overflow:hidden; padding:0;">
-                <div style="aspect-ratio:1/1; background:var(--vg-ivory-50);">
-                  <img src={g.image} alt={g.title} style="width:100%; height:100%; object-fit:cover;" />
-                </div>
-                <div style="padding:18px 20px 22px;">
-                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-                    <span style={`width:14px;height:14px;border-radius:50%;background:${g.hex};box-shadow:var(--vg-shadow-xs)`}></span>
-                    <span style="font-weight:600; font-size:15px;">{g.title}</span>
-                  </div>
-                  <div style="display:flex; align-items:center; justify-content:space-between;">
-                    <span style="color:var(--vg-navy-400); font-size:14px;">${g.price.toFixed(2)}</span>
-                    <span class={g.stock > 0 ? 'vg-pill vg-pill-in' : 'vg-pill vg-pill-out'} style="font-size:10px; padding:3px 10px;">
-                      {g.stock > 0 ? 'In stock' : 'Out of stock'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-            <h3 style="font-size:20px;">PSA Guards</h3>
-            <span class="vg-pill vg-pill-gold">Fits 3.25&Prime; &times; 5.375&Prime; slabs</span>
-          </div>
-          <div class="vg-grid-4">
-            {featuredPsa.map((g, i) => (
-              <div class="vg-reveal vg-card" data-delay={String(i % 4)} style="overflow:hidden; padding:0;">
-                <div style="aspect-ratio:1/1; background:var(--vg-ivory-50);">
-                  <img src={g.image} alt={g.title} style="width:100%; height:100%; object-fit:cover;" />
-                </div>
-                <div style="padding:18px 20px 22px;">
-                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-                    <span style={`width:14px;height:14px;border-radius:50%;background:${g.hex};box-shadow:var(--vg-shadow-xs)`}></span>
-                    <span style="font-weight:600; font-size:15px;">{g.title}</span>
-                  </div>
-                  <div style="display:flex; align-items:center; justify-content:space-between;">
-                    <span style="color:var(--vg-navy-400); font-size:14px;">${g.price.toFixed(2)}</span>
-                    <span class={g.stock > 0 ? 'vg-pill vg-pill-in' : 'vg-pill vg-pill-out'} style="font-size:10px; padding:3px 10px;">
-                      {g.stock > 0 ? 'In stock' : 'Out of stock'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div style="text-align:center; margin-top:48px;">
-            <a href="/vault" class="vg-btn vg-btn-gold" data-vg-haptic="tap"><i class="fa-solid fa-vault"></i> Preview Your Slab in The Vault</a>
-          </div>
-        </div>
-      </section>
-
       {/* ================= SUGGESTED / SMART BUNDLE ================= */}
-      <section class="vg-section">
+      <section class="vg-section" style="background:var(--vg-bg-alt);">
         <div class="vg-container" id="bundle-root">
           <div class="vg-reveal" style="text-align:center; max-width:600px; margin:0 auto 50px;">
             <div class="vg-eyebrow">Complete the set</div>
@@ -186,51 +157,27 @@ app.get('/', (c) => {
         </div>
       </section>
 
-      {/* ================= FOUNDER STORY ================= */}
-      <section id="story" class="vg-section" style="background:var(--vg-navy-900); color:var(--vg-ivory-100);">
-        <div class="vg-container vg-grid-2">
-          <div class="vg-reveal">
-            <div style="width:100%; aspect-ratio:4/5; border-radius:var(--vg-radius-lg); overflow:hidden; box-shadow:var(--vg-shadow-lg);">
-              <img src={HERO_IMG} alt="Founder" style="width:100%; height:100%; object-fit:cover; filter:grayscale(0.15);" />
-            </div>
-          </div>
-          <div class="vg-reveal" data-delay="1">
-            <div class="vg-eyebrow" style="color:var(--vg-gold-400);">Our Story</div>
-            <h2 style="font-size:34px; margin:14px 0 20px; color:#fff;">Started with one bent corner.</h2>
-            <p style="color:var(--vg-navy-300); font-size:16.5px; line-height:1.75; max-width:540px;">
-              Vaultguards began the way most collector businesses do — with a slab that got chipped
-              in transit. We built the first guard prototype to protect our own graded cards during
-              shipping and shows, then kept refining the fit until it disappeared entirely against
-              the slab. Every colorway since has been designed the same way: protect the corners,
-              never touch the label, and make it look like it belongs in your collection, not on top
-              of it.
+      {/* ================= WATCH ONCE YOU BUY ================= */}
+      <section id="watch" class="vg-section" style="background:var(--vg-navy-900);">
+        <div class="vg-container">
+          <div class="vg-reveal" style="text-align:center; max-width:600px; margin:0 auto 40px;">
+            <div class="vg-eyebrow" style="color:var(--vg-gold-400);">How it opens</div>
+            <h2 style="font-size:36px; margin-top:14px; color:#fff;">Watch once you buy.</h2>
+            <p style="color:var(--vg-navy-300); margin-top:12px; font-size:15.5px;">
+              A quick look at Vaultguards&rsquo; unique pull-tab unboxing — two pulls, press the
+              perforated edge, and your guard is ready.
             </p>
           </div>
-        </div>
-      </section>
-
-      {/* ================= TESTIMONIALS ================= */}
-      <section id="reviews" class="vg-section" style="background:var(--vg-bg-alt);">
-        <div class="vg-container">
-          <div class="vg-reveal" style="text-align:center; max-width:600px; margin:0 auto 50px;">
-            <div class="vg-eyebrow">Trusted by collectors</div>
-            <h2 style="font-size:38px; margin-top:14px;">What the vault says.</h2>
-          </div>
-          <div class="vg-grid-3">
-            {[
-              { name: 'D. Alvarez', tag: 'PSA collector', quote: 'Fits my PSA slabs like it was molded for them — because it was. The label is still perfectly readable through the window.' },
-              { name: 'M. Chen', tag: 'TAG collector', quote: 'Used The Vault to preview colors before buying. Picked Voidshift and it matched exactly what I saw on screen.' },
-              { name: 'R. Osei', tag: 'Show dealer', quote: 'I run a booth every weekend — these corners take the hits so my slabs don\u2019t have to.' },
-            ].map((t, i) => (
-              <div class="vg-reveal vg-card" data-delay={String(i)} style="padding:32px;">
-                <div style="color:var(--vg-gold-500); margin-bottom:14px; font-size:14px;">
-                  <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                </div>
-                <p style="font-size:15px; color:var(--vg-navy-700); line-height:1.65; margin-bottom:20px;">&ldquo;{t.quote}&rdquo;</p>
-                <div style="font-weight:600; font-size:14px;">{t.name}</div>
-                <div style="color:var(--vg-navy-400); font-size:12.5px;">{t.tag}</div>
-              </div>
-            ))}
+          <div class="vg-reveal" style="max-width:900px; margin:0 auto;">
+            <div class="vg-video-frame">
+              <iframe
+                src={`https://www.youtube-nocookie.com/embed/${HOW_TO_OPEN_YOUTUBE_ID}`}
+                title="How to open your Vaultguards guard"
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+            </div>
           </div>
         </div>
       </section>
@@ -251,13 +198,14 @@ app.get('/', (c) => {
       <script src="/static/js/products-data.js"></script>
       <script src="/static/js/haptic-scroll.js"></script>
       <script src="/static/js/bundle-widget.js"></script>
-      <script src="/static/js/compare-slider.js"></script>
       <script>{`VG.initHapticScroll();`}</script>
     </>
   )
 })
 
 import vault from './routes/vault'
+import product from './routes/product'
 app.route('/vault', vault)
+app.route('/product', product)
 
 export default app

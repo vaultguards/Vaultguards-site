@@ -338,7 +338,10 @@
   }
 
   /**
-   * Composite the customer's slab into the guard's window region.
+   * Composite the customer's slab into the guard's window region, on any
+   * target canvas context (used for both the big preview canvas AND the
+   * small swatch-grid thumbnails — the math is purely percentage-based so
+   * it scales cleanly to any W/H).
    *
    * Real guard product photos are opaque (single flat shot with a demo card
    * already inside), not pre-cut transparent frame assets. To make the
@@ -352,49 +355,53 @@
    *      the customer's slab shows through, while the colored frame plastic,
    *      shadow, and background from the real photo remain fully intact.
    */
-  function compositeGuard(guard) {
-    var W = previewCanvas.width, H = previewCanvas.height;
-    previewCtx.clearRect(0, 0, W, H);
-    previewCtx.fillStyle = '#FFFFFF';
-    previewCtx.fillRect(0, 0, W, H);
+  function drawGuardComposite(ctx, W, H, guard, guardImg) {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, W, H);
 
     var win = Cat.GUARD_WINDOW[guard.brand];
     var winX = (win.left / 100) * W;
     var winY = (win.top / 100) * H;
     var winW = W - winX - (win.right / 100) * W;
     var winH = H - winY - (win.bottom / 100) * H;
+    var r = Math.max(2, Math.round(W * 0.0125));
 
+    // 1) customer slab, clipped to window (only if the customer has uploaded one)
+    if (state.slabImage) {
+      ctx.save();
+      ctx.beginPath();
+      roundRectPath(ctx, winX, winY, winW, winH, r);
+      ctx.clip();
+
+      // Map align-stage coordinates proportionally into the window rect.
+      var guide = guideRectForBrand();
+      var relX = (alignCanvas.width / 2 + state.align.x - guide.x) / guide.w;
+      var relY = (alignCanvas.height / 2 + state.align.y - guide.y) / guide.h;
+      var baseHRatio = (alignCanvas.height * 0.5 * state.align.scale) / guide.h;
+      var slabH = winH * baseHRatio;
+      var slabW = slabH * state.slabNaturalAspect;
+      var slabCx = winX + relX * winW;
+      var slabCy = winY + relY * winH;
+
+      ctx.drawImage(state.slabImage, slabCx - slabW / 2, slabCy - slabH / 2, slabW, slabH);
+      ctx.restore();
+    }
+
+    // 2) guard frame photo, masked to hide its center window so step-1 shows through
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, W, H);
+    roundRectPath(ctx, winX, winY, winW, winH, r);
+    ctx.clip('evenodd');
+    ctx.drawImage(guardImg, 0, 0, W, H);
+    ctx.restore();
+  }
+
+  function compositeGuard(guard) {
+    var W = previewCanvas.width, H = previewCanvas.height;
     return loadGuardImage(guard).then(function (guardImg) {
-      // 1) customer slab, clipped to window
-      if (state.slabImage) {
-        previewCtx.save();
-        previewCtx.beginPath();
-        roundRectPath(previewCtx, winX, winY, winW, winH, 10);
-        previewCtx.clip();
-
-        // Map align-stage coordinates proportionally into the window rect.
-        var guide = guideRectForBrand();
-        var relX = (alignCanvas.width / 2 + state.align.x - guide.x) / guide.w;
-        var relY = (alignCanvas.height / 2 + state.align.y - guide.y) / guide.h;
-        var baseHRatio = (alignCanvas.height * 0.5 * state.align.scale) / guide.h;
-        var slabH = winH * baseHRatio;
-        var slabW = slabH * state.slabNaturalAspect;
-        var slabCx = winX + relX * winW;
-        var slabCy = winY + relY * winH;
-
-        previewCtx.drawImage(state.slabImage, slabCx - slabW / 2, slabCy - slabH / 2, slabW, slabH);
-        previewCtx.restore();
-      }
-
-      // 2) guard frame photo, masked to hide its center window so step-1 shows through
-      previewCtx.save();
-      previewCtx.beginPath();
-      previewCtx.rect(0, 0, W, H);
-      roundRectPath(previewCtx, winX, winY, winW, winH, 10);
-      previewCtx.clip('evenodd');
-      previewCtx.drawImage(guardImg, 0, 0, W, H);
-      previewCtx.restore();
-
+      drawGuardComposite(previewCtx, W, H, guard, guardImg);
       return true;
     });
   }
@@ -408,21 +415,55 @@
     ctx.closePath();
   }
 
+  // Small swatch-card thumbnails: each shows the guard's own name + real
+  // product photo. If the customer has already uploaded/aligned a slab, we
+  // additionally composite THEIR slab into that thumbnail (same math as the
+  // big preview canvas, just scaled down) so every option previews their
+  // actual card, not just a flat color chip.
+  var SWATCH_THUMB_W = 160, SWATCH_THUMB_H = 200;
+
+  function renderSwatchThumb(canvas, guard) {
+    var ctx = canvas.getContext('2d');
+    loadGuardImage(guard).then(function (guardImg) {
+      drawGuardComposite(ctx, SWATCH_THUMB_W, SWATCH_THUMB_H, guard, guardImg);
+    }).catch(function () {
+      // If the real photo fails to load for some reason, fall back to a flat
+      // color chip so the swatch is never left blank.
+      ctx.fillStyle = guard.hex;
+      ctx.fillRect(0, 0, SWATCH_THUMB_W, SWATCH_THUMB_H);
+    });
+  }
+
   function renderSwatchGrid() {
     var grid = document.getElementById('swatch-grid');
     grid.innerHTML = '';
     state.guards.forEach(function (g) {
       var btn = document.createElement('button');
       btn.className = 'vault-swatch';
-      btn.style.background = g.hex;
       btn.title = g.title + (g.stock > 0 ? '' : ' (out of stock — preview only)');
       btn.setAttribute('data-vg-haptic', 'tap');
+
+      var thumbWrap = document.createElement('div');
+      thumbWrap.className = 'vault-swatch-thumb';
+      var canvas = document.createElement('canvas');
+      canvas.width = SWATCH_THUMB_W;
+      canvas.height = SWATCH_THUMB_H;
+      thumbWrap.appendChild(canvas);
       if (g.stock <= 0) {
         var dot = document.createElement('span');
         dot.className = 'vault-swatch-oos-dot';
         dot.innerHTML = '<i class="fa-solid fa-xmark"></i>';
-        btn.appendChild(dot);
+        thumbWrap.appendChild(dot);
       }
+      btn.appendChild(thumbWrap);
+
+      var label = document.createElement('div');
+      label.className = 'vault-swatch-label';
+      label.textContent = g.title;
+      btn.appendChild(label);
+
+      renderSwatchThumb(canvas, g);
+
       btn.addEventListener('click', function () { selectGuard(g); });
       grid.appendChild(btn);
     });

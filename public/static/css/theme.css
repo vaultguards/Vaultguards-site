@@ -307,6 +307,13 @@ h1, h2, h3, h4 {
   box-shadow: 0 0 0 4px rgba(78,124,153,0.22);
 }
 
+.vg-logo-mark {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
 .vg-nav-links {
   display: flex;
   gap: var(--vg-space-5);
@@ -501,19 +508,44 @@ h1, h2, h3, h4 {
 
 .vault-swatch {
   width: 100%;
-  aspect-ratio: 1/1;
   border-radius: 12px;
   border: none;
   cursor: pointer;
   position: relative;
+  background: var(--vg-surface);
+  padding: 0 0 8px;
   box-shadow: var(--vg-shadow-xs);
+  overflow: hidden;
   transition: transform var(--vg-dur-fast) var(--vg-ease-soft), box-shadow var(--vg-dur-fast) var(--vg-ease-soft);
 }
 .vault-swatch:hover { transform: translateY(-2px); box-shadow: var(--vg-shadow-sm); }
 .vault-swatch.vault-swatch-active { box-shadow: 0 0 0 3px var(--vg-navy-900); }
+
+.vault-swatch-thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/5;
+  background: var(--vg-ivory-50);
+}
+.vault-swatch-thumb canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+}
+.vault-swatch-label {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--vg-navy-700);
+  padding: 6px 6px 0;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .vault-swatch .vault-swatch-oos-dot {
-  position: absolute; top: -4px; right: -4px;
-  width: 14px; height: 14px; border-radius: 50%;
+  position: absolute; top: 6px; right: 6px;
+  width: 16px; height: 16px; border-radius: 50%;
   background: var(--vg-danger);
   box-shadow: 0 0 0 2px #fff;
   font-size: 8px; color: #fff; display: flex; align-items: center; justify-content: center;
@@ -535,9 +567,32 @@ h1, h2, h3, h4 {
   padding: 6px 12px; border-radius: 999px; font-size: 12px; cursor: pointer;
 }
 
+/* ==========================================================================
+   "Watch Once You Buy" — responsive horizontal video embed
+   ========================================================================== */
+.vg-video-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--vg-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--vg-shadow-lg);
+  background: var(--vg-navy-800);
+}
+.vg-video-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+@media (max-width: 640px) {
+  .vg-video-frame { border-radius: var(--vg-radius-md); }
+}
+
 .vault-card-pad { padding: 40px; }
 .vault-preview-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 30px; }
-.vault-swatch-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 26px; }
+.vault-swatch-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 26px; }
 
 @media (max-width: 780px) {
   .vault-preview-grid { grid-template-columns: 1fr; }
@@ -562,7 +617,7 @@ h1, h2, h3, h4 {
 
   .vault-align-stage { max-width: 100%; }
 
-  .vault-swatch-grid { grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .vault-swatch-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
 
   #panel-upload .vg-btn-ghost,
   #panel-align .vg-btn-ghost,
@@ -576,7 +631,7 @@ h1, h2, h3, h4 {
 }
 
 @media (max-width: 380px) {
-  .vault-swatch-grid { grid-template-columns: repeat(4, 1fr); }
+  .vault-swatch-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* Ensure canvases used for compositing always scale to their container on
