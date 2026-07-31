@@ -1,0 +1,153 @@
+{% comment %}
+  VAULTGUARDS - The Vault (virtual try-on page). This is a first-pass MVP:
+  fully client-side, no server, no data storage. A visitor uploads a photo
+  of their slab (it stays only in their own browser tab - nothing is sent
+  anywhere or saved), then taps a color swatch to preview a simplified
+  colored guard frame around it.
+
+  This ships with a STARTER palette of 10 placeholder colorway names/hex
+  codes in the script below. Swap those for your real 29 colorway names
+  and hex codes whenever you are ready - just edit the VG_VAULT_COLORS
+  array near the top of the script tag at the bottom of this file.
+
+  INSTALL:
+  1. In Shopify Admin: Online Store > Pages > Add page. Title it
+     "The Vault". Set the URL handle to exactly "the-vault" (this matters
+     - the rest of the site already links to /pages/the-vault). Save.
+  2. Edit code > Templates > Add a new template > type "page" > name it
+     "vault" (this creates templates/page.vault.liquid) > select all >
+     delete > paste this whole file in > Save.
+     (If Shopify only gives you a JSON view here with no plain text editor
+     to paste into, stop and tell me - we will rebuild this one as a
+     Section too, the same fix used for the homepage.)
+  3. Back on "The Vault" page in Admin > find "Theme template" in the
+     right sidebar > select "page.vault" > Save.
+  4. Open your storefront > click "Try It On" in the nav, or visit
+     /pages/the-vault directly > try uploading a photo and tapping colors.
+{% endcomment %}
+
+<section class="vg-section" style="padding-top:56px;">
+  <div class="vg-container" style="max-width:760px;">
+    <div class="vg-reveal vg-in" style="text-align:center; margin-bottom:40px;">
+      <div class="vg-eyebrow">Virtual Try-On</div>
+      <h1 style="font-size:40px; margin-top:14px;">Welcome to The Vault.</h1>
+      <p style="color:var(--vg-navy-400); margin-top:12px; font-size:16px;">
+        Upload a photo of your slab and preview it in every colorway before you buy.
+        Your photo stays in your browser only - nothing is uploaded or saved anywhere.
+      </p>
+    </div>
+
+    <div class="vg-card vg-reveal" style="padding:28px;">
+      <div style="display:flex; gap:10px; justify-content:center; margin-bottom:22px;">
+        <button type="button" class="vg-fb-btn vg-fb-active" id="vg-vault-tag-btn">TAG Slab</button>
+        <button type="button" class="vg-fb-btn" id="vg-vault-psa-btn">PSA Slab</button>
+      </div>
+
+      <div id="vg-vault-frame" style="position:relative; max-width:340px; margin:0 auto 26px; aspect-ratio:0.72; border-radius:18px; padding:16px; background:#D8DEE3; transition:background 220ms var(--vg-ease-soft), aspect-ratio 220ms var(--vg-ease-soft);">
+        <div style="width:100%; height:100%; border-radius:8px; background:#fff; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+          <img id="vg-vault-photo" src="" alt="Your uploaded slab" style="display:none; width:100%; height:100%; object-fit:contain;" width="340" height="472">
+          <div id="vg-vault-placeholder" style="text-align:center; color:var(--vg-navy-400); font-size:13px; padding:20px;">
+            <i class="fa-solid fa-image" style="font-size:26px; display:block; margin-bottom:10px;"></i>
+            Upload a photo to preview
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center; margin-bottom:26px;">
+        <label for="vg-vault-upload" class="vg-btn vg-btn-primary" data-vg-haptic="tap" style="cursor:pointer;">
+          <i class="fa-solid fa-upload"></i> Upload Your Slab Photo
+        </label>
+        <input type="file" id="vg-vault-upload" accept="image/*" style="display:none;">
+      </div>
+
+      <div style="margin-bottom:8px; text-align:center; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--vg-navy-400);">
+        Pick a colorway
+      </div>
+      <div id="vg-vault-swatches" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
+        {% comment %} Swatches are rendered by the script below from VG_VAULT_COLORS - edit that array to match your real 29 colorways and hex codes {% endcomment %}
+      </div>
+
+      <div style="text-align:center; margin-top:30px;">
+        <a href="{{ routes.root_url }}#shop" class="vg-btn vg-btn-ghost" data-vg-haptic="tap">Explore All Colorways <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  /* ---- Starter colorway palette - EDIT to match your real 29 colorways and their real hex codes ---- */
+  var VG_VAULT_COLORS = [
+    { name: 'Aura', hex: '#F5F7F9' },
+    { name: 'Aquapulse', hex: '#3FA9C9' },
+    { name: 'Curse', hex: '#2A1B33' },
+    { name: 'Ember', hex: '#C1502E' },
+    { name: 'Verdant', hex: '#3E8E5A' },
+    { name: 'Blush', hex: '#E38FA4' },
+    { name: 'Nightfall', hex: '#1B2128' },
+    { name: 'Citrine', hex: '#E8B33D' },
+    { name: 'Frost', hex: '#A9D3E0' },
+    { name: 'Garnet', hex: '#7A2331' }
+  ];
+
+  var frame = document.getElementById('vg-vault-frame');
+  var swatchRow = document.getElementById('vg-vault-swatches');
+  var photo = document.getElementById('vg-vault-photo');
+  var placeholder = document.getElementById('vg-vault-placeholder');
+  var upload = document.getElementById('vg-vault-upload');
+  var tagBtn = document.getElementById('vg-vault-tag-btn');
+  var psaBtn = document.getElementById('vg-vault-psa-btn');
+
+  function setColor(hex) {
+    if (frame) frame.style.background = hex;
+  }
+
+  VG_VAULT_COLORS.forEach(function (c, i) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.title = c.name;
+    btn.setAttribute('aria-label', c.name);
+    btn.style.width = '34px';
+    btn.style.height = '34px';
+    btn.style.borderRadius = '50%';
+    btn.style.border = i === 0 ? '3px solid var(--vg-navy-900)' : '3px solid transparent';
+    btn.style.background = c.hex;
+    btn.style.cursor = 'pointer';
+    btn.style.boxShadow = 'var(--vg-shadow-xs)';
+    btn.style.padding = '0';
+    btn.addEventListener('click', function () {
+      setColor(c.hex);
+      Array.prototype.forEach.call(swatchRow.children, function (el) {
+        el.style.border = '3px solid transparent';
+      });
+      btn.style.border = '3px solid var(--vg-navy-900)';
+    });
+    swatchRow.appendChild(btn);
+  });
+
+  if (VG_VAULT_COLORS.length) setColor(VG_VAULT_COLORS[0].hex);
+
+  if (upload) {
+    upload.addEventListener('change', function (e) {
+      var file = e.target.files && e.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function (evt) {
+        photo.src = evt.target.result;
+        photo.style.display = 'block';
+        if (placeholder) placeholder.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function setBrand(brand) {
+    if (!frame) return;
+    frame.style.aspectRatio = brand === 'psa' ? '0.78' : '0.72';
+    if (tagBtn) tagBtn.classList.toggle('vg-fb-active', brand === 'tag');
+    if (psaBtn) psaBtn.classList.toggle('vg-fb-active', brand === 'psa');
+  }
+  if (tagBtn) tagBtn.addEventListener('click', function () { setBrand('tag'); });
+  if (psaBtn) psaBtn.addEventListener('click', function () { setBrand('psa'); });
+})();
+</script>
