@@ -45,7 +45,7 @@
         <a href="{{ pages['the-vault'].url | default: '/pages/the-vault' }}" class="vg-btn vg-btn-ghost" data-vg-haptic="tap"><i class="fa-solid fa-vault"></i> Try It On in The Vault</a>
       </div>
       <a href="#watch" class="vg-hero-video-link" data-vg-haptic="tap">
-        <i class="fa-solid fa-circle-play"></i> A Unique Unboxing Experience
+        <i class="fa-solid fa-circle-play"></i> Click to see how Vaultguards stands out
       </a>
       <div style="display:flex; gap:28px; margin-top:44px; flex-wrap:wrap;">
         <div style="max-width:170px;"><div style="font-family:var(--vg-font-display); font-size:20px; color:var(--vg-gold-500);"><i class="fa-solid fa-bullseye"></i></div><div style="font-size:12px; color:var(--vg-navy-400); margin-top:6px;">Precision fit for 2 brands: TAG and PSA slabs</div></div>
@@ -304,9 +304,10 @@
   .vg-hero-wordmark { height: 48px; width: auto; display: block; }
   @media (max-width: 640px) { .vg-hero-wordmark { height: 34px; } }
   html { scroll-behavior: smooth; }
-  .vg-hero-video-link { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; font-size: 14px; font-weight: 600; color: var(--vg-navy-400); text-decoration: none; }
-  .vg-hero-video-link i { color: var(--vg-gold-500); font-size: 16px; }
-  .vg-hero-video-link:hover { color: var(--vg-navy-900); }
+  .vg-hero-video-link { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; padding: 10px 18px; border-radius: var(--vg-radius-pill); background: var(--vg-gold-050); color: var(--vg-gold-500); font-size: 13px; font-weight: 600; text-decoration: none; box-shadow: var(--vg-shadow-sm); transition: box-shadow var(--vg-dur-fast) var(--vg-ease-soft), transform var(--vg-dur-fast) var(--vg-ease-soft); }
+  .vg-hero-video-link i { font-size: 15px; }
+  .vg-hero-video-link:hover { box-shadow: var(--vg-shadow-md); transform: translateY(-1px); }
+  .vg-hero-video-link:active { transform: scale(.97); }
 </style>
 
 <script>
