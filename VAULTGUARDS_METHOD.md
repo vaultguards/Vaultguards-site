@@ -35,11 +35,13 @@ the method itself changes (new theme id, new token, new store, etc.) — the
       vg-contact.liquid        <- Contact page (emails via Resend)
       vg-vault.liquid          <- "The Vault" virtual try-on tool
       vg-cart.liquid           <- Cart page
+      vg-pauls-vault.liquid    <- "Paul's Vault" founder collection showcase page
     templates/
       cart.json                <- {"sections":{"main":{"type":"vg-cart"}}, ...}
       collection.json
       page.contact.json
       page.vault.json
+      page.pauls-vault.json
       product.json
     assets/
       vaultguards-logo.png         <- circular "V" shield icon (unchanged master asset)
@@ -291,6 +293,7 @@ export SHOPIFY_CLI_THEME_TOKEN=shptka_d8f98845fd2d7cf7569c5ed16b4f9d42
 | Contact page | `sections/vg-contact.liquid` | `templates/page.contact.json` |
 | The Vault (virtual try-on) | `sections/vg-vault.liquid` | `templates/page.vault.json` |
 | Cart | `sections/vg-cart.liquid` | `templates/cart.json` |
+| Paul's Vault (founder collection) | `sections/vg-pauls-vault.liquid` | `templates/page.pauls-vault.json` |
 
 Key mechanics worth remembering when touching these:
 - **Cart**: single `{% form 'cart', cart, id: '...' %}` wraps the WHOLE
@@ -310,6 +313,20 @@ Key mechanics worth remembering when touching these:
   hidden input with `capture="environment"` is wired to an explicit "Take a
   Photo Instead" button (with `e.stopPropagation()` so it doesn't also trigger
   the primary dropzone's click handler).
+- **Paul's Vault (founder collection)**: unlike the fixed `image_picker`
+  settings used for the homepage hero photos, this page uses **repeatable
+  schema blocks** (block type `"photo"`, each with an `image_picker` +
+  optional `text` caption). That's the correct native mechanism whenever the
+  user wants to add an *unbounded, growing* number of images over time purely
+  through Online Store > Themes > Customize — no code edits ever needed for a
+  new photo, just "Add block". Fixed numbered settings (`photo_1`..`photo_N`)
+  only make sense for a small, capped set of override slots (like the
+  homepage hero rotator); reach for blocks instead whenever the count is
+  open-ended. Remember the one-time manual step this pattern still requires:
+  the user must create the actual Shopify **Page** resource (Online Store >
+  Pages > Add page) and set its Theme template to match the `page.<handle>.json`
+  filename — the Theme Access token used here can only push theme *files*, not
+  create Page resources via Admin API, so that step is always on the user.
 - **Header nav layout**: `.vg-nav-inner` is a flex row,
   `justify-content:space-between`, containing the logo, `.vg-nav-links`
   (hidden below 720px), and `.vg-nav-actions` (CTA button + cart icon +
