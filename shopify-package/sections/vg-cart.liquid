@@ -121,6 +121,13 @@
                 <span>{{ cart.total_price | money }}</span>
               </div>
 
+              {% if cart.total_discount == 0 %}
+                <button type="button" id="vg-cart-vg15-hint" class="vg-cart-discount-hint" data-vg-haptic="tap">
+                  <i class="fa-solid fa-tag"></i>
+                  <span>Did you add a discount? Use code <strong>VG15</strong> for 15% off — tap to apply.</span>
+                </button>
+              {% endif %}
+
               <div class="vg-form-field" style="margin-bottom:16px;">
                 <label for="vg-cart-discount">Discount code or gift card</label>
                 <input type="text" id="vg-cart-discount" placeholder="Enter discount code or gift card number" autocomplete="off" style="width:100%; margin-bottom:10px;">
@@ -171,6 +178,11 @@
 .vg-cart-qty-input::-webkit-outer-spin-button, .vg-cart-qty-input::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
 .vg-cart-remove { display:inline-flex; align-items:center; gap:6px; border:none; background:none; color:var(--vg-navy-400); font-size:12.5px; font-weight:600; cursor:pointer; padding:4px 0; -webkit-tap-highlight-color:transparent; }
 .vg-cart-remove:hover { color:var(--vg-danger); }
+.vg-cart-discount-hint { display:flex; align-items:center; gap:10px; width:100%; text-align:left; border:none; cursor:pointer; background:var(--vg-gold-050); color:var(--vg-gold-500); border-radius:var(--vg-radius-md); padding:12px 14px; margin-bottom:16px; font-size:12.5px; font-weight:600; line-height:1.4; box-shadow:var(--vg-shadow-sm); transition:box-shadow var(--vg-dur-fast) var(--vg-ease-soft), transform var(--vg-dur-fast) var(--vg-ease-soft); -webkit-tap-highlight-color:transparent; }
+.vg-cart-discount-hint i { font-size:14px; flex-shrink:0; }
+.vg-cart-discount-hint strong { color:var(--vg-navy-900); }
+.vg-cart-discount-hint:hover { box-shadow:var(--vg-shadow-md); transform:translateY(-1px); }
+.vg-cart-discount-hint:active { transform:scale(.98); }
 </style>
 
 <script>
@@ -222,6 +234,15 @@
   var applyBtn = document.getElementById('vg-cart-discount-apply');
   if (applyBtn) {
     applyBtn.addEventListener('click', function () { applyDiscount('/cart'); });
+  }
+
+  var vg15Hint = document.getElementById('vg-cart-vg15-hint');
+  if (vg15Hint) {
+    vg15Hint.addEventListener('click', function () {
+      var input = document.getElementById('vg-cart-discount');
+      if (input) { input.value = 'VG15'; }
+      applyDiscount('/cart');
+    });
   }
 
   var discountInput = document.getElementById('vg-cart-discount');
