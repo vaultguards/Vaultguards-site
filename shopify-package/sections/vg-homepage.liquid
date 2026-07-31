@@ -53,11 +53,13 @@
     </div>
     <div class="vg-reveal" data-delay="1">
       <div class="vg-card" style="padding:28px; border-radius:var(--vg-radius-xl);">
-        {% if tag_collection and tag_collection.image %}
-          <img src="{{ tag_collection.image | image_url: width: 900 }}" alt="Vaultguards colorway guard" style="border-radius:26px; width:100%;" width="900" height="1125">
-        {% elsif tag_collection.products.first %}
-          <img src="{{ tag_collection.products.first.featured_image | image_url: width: 900 }}" alt="Vaultguards colorway guard" style="border-radius:26px; width:100%;" width="900" height="1125">
-        {% endif %}
+        <div style="aspect-ratio:4/5; border-radius:26px; overflow:hidden;">
+          {% if tag_collection and tag_collection.image %}
+            <img src="{{ tag_collection.image | image_url: width: 900 }}" alt="Vaultguards colorway guard" style="width:100%; height:100%; object-fit:cover;" width="900" height="1125">
+          {% elsif tag_collection.products.first %}
+            <img src="{{ tag_collection.products.first.featured_image | image_url: width: 900 }}" alt="Vaultguards colorway guard" style="width:100%; height:100%; object-fit:cover;" width="900" height="1125">
+          {% endif %}
+        </div>
       </div>
     </div>
   </div>
