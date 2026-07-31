@@ -217,8 +217,10 @@ app.get('/', (c) => {
 import vault from './routes/vault'
 import product from './routes/product'
 import collection from './routes/collection'
+import contact from './routes/contact'
 app.route('/vault', vault)
 app.route('/product', product)
 app.route('/collection', collection)
+app.route('/contact', contact)
 
 export default app

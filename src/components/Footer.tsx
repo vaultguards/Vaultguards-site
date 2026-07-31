@@ -30,7 +30,7 @@ export function Footer() {
           <div>
             <div style="font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--vg-gold-400); margin-bottom:14px;">Support</div>
             <div style="display:flex; flex-direction:column; gap:10px; font-size:14px; color:var(--vg-navy-300);">
-              <a href="#">Contact</a>
+              <a href="/contact">Contact</a>
               <a href="#">Shipping</a>
               <a href="#">FAQ</a>
             </div>
