@@ -350,7 +350,39 @@ Key mechanics worth remembering when touching these:
   `@media (max-width: ...)` breakpoint that hides the CTA button's `<span>`
   text down to icon-only — it exists specifically to prevent overlap at
   narrow/mid mobile widths, and its exact px threshold needs to move if the
-  logo/button visual weight changes materially.
+  logo/button visual weight changes materially. Current header circle icon
+  size is **36px** (`vg-logo-mark`, doubled from an earlier 18px per user
+  feedback) — check `layout/theme.liquid` around the `.vg-logo` anchor if
+  this needs to change again.
+- **Homepage photos auto-update from Shopify with zero code changes** —
+  by design, do not treat this as something that needs "turning on":
+  - The big rotating hero photo ("photo collage") and the Aura spotlight
+    photo both default to pulling real, live `featured_image` values
+    straight from the TAG/PSA collection products (and the `aura` product)
+    at render time. Confirmed via pulling the live `templates/index.json`:
+    the `vg_homepage_*` section instance's `settings` is `{}` (empty) on the
+    live theme, meaning no manual override is set — so it is already
+    running in full automatic mode. Whenever the user replaces/reorders
+    product photos in Shopify Admin, the homepage collage and spotlight
+    reflect that automatically on the next page load, no theme edit needed.
+  - Manual override slots still exist for when the user *wants* fixed
+    control instead: `hero_photo_1`..`hero_photo_4` and `spotlight_photo`
+    under this section's settings in Theme Customize. As soon as any of
+    those is set, it takes priority over the automatic product photos for
+    that slot — so if "my photo updates aren't showing up" is ever reported,
+    check whether one of these overrides got set accidentally.
+  - All product/collection photos elsewhere on the site (PDP, collection
+    grid, "Suggested for you", etc.) work the same way — they render
+    `product.featured_image` / `collection.image` live from Shopify, so
+    there is nothing to "sync" when the user updates product photography.
+- **Homepage "Watch once you buy" video section**: lives right before the
+  "Protection that respects the grade" features grid (moved there from its
+  original spot after "Suggested for you" per user request). Real video ID
+  is set via `{% assign youtube_id = '...' %}` right above the section —
+  currently `JPYy9seWNDY` (the user's real unboxing video, extracted from
+  `https://youtu.be/JPYy9seWNDY`). To swap the video later, just change that
+  one assign line to the new ID from any `youtu.be/<ID>` or
+  `youtube.com/watch?v=<ID>` URL.
 
 ---
 
