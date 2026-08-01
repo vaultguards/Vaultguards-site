@@ -289,8 +289,12 @@
     tag: {{ tag_products_json }},
     psa: {{ psa_products_json }}
   };
+  // TAG window uses TAG's own published slab dimensions (5.25in x 3.125in,
+  // https://help.taggrading.com) as the authoritative width:height ratio -
+  // top/bottom kept from the measured photo boundary, left/right solved so
+  // the window itself is TAG-slab-proportioned, not just a traced photo edge.
   var GUARD_WINDOW = {
-    tag: { top: 17.0, left: 24.5, right: 24.5, bottom: 20.0 },
+    tag: { top: 17.0, left: 26.56, right: 26.56, bottom: 20.0 },
     psa: { top: 13.2, left: 21.9, right: 21.8, bottom: 13.0 }
   };
 
@@ -368,7 +372,16 @@
 
   function loadBgRemoval() {
     if (!_bgRemovalModulePromise) {
-      _bgRemovalModulePromise = import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/dist/index.mjs');
+      // IMPORTANT: must use jsDelivr's "+esm" combined-ESM endpoint, NOT the
+      // raw dist/index.mjs file. The raw dist file contains bare module
+      // specifiers (import("onnxruntime-web")) meant to be resolved by a
+      // bundler at build time - loaded directly in a browser via <script>
+      // import(), that throws "Failed to resolve module specifier
+      // 'onnxruntime-web'" every single time, which this code's catch()
+      // was silently swallowing as "background removal unavailable". The
+      // +esm endpoint rewrites those bare imports into real CDN URLs so it
+      // works with zero build step. Verified end-to-end in a real browser.
+      _bgRemovalModulePromise = import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm');
     }
     return _bgRemovalModulePromise;
   }
@@ -432,6 +445,11 @@
           throw new Error('removeBackground export not found on module');
         }
         return removeBackground(objectUrl, {
+          // Quantized/small model (~40MB vs ~80MB default) - this storefront
+          // can't set the cross-origin-isolation headers that would enable
+          // multi-threaded WASM, so it always runs single-threaded; the
+          // smaller model keeps first-run time reasonable on that path.
+          model: 'isnet_quint8',
           progress: function (key, current, total) {
             if (total > 0) {
               var pct = Math.round((current / total) * 100);
@@ -446,6 +464,11 @@
         useImageAsIs(url);
       })
       .catch(function (err) {
+        // Log the real reason to the console so this is diagnosable from
+        // browser devtools instead of failing silently. The UI still falls
+        // back to the original (background-intact) photo so the tool stays
+        // usable even if a visitor's browser/network blocks the download.
+        console.error('[Vaultguards Vault] Background removal failed, using original photo:', err);
         useImageAsIs(objectUrl, 'Background removal unavailable - using original photo.');
       });
   }
