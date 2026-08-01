@@ -119,6 +119,7 @@
 .vg-fb-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: none; background: var(--vg-ivory-100); color: var(--vg-navy-500); font-family: var(--vg-font-body); font-weight: 600; font-size: 13px; padding: 11px 14px; border-radius: var(--vg-radius-pill); cursor: pointer; transition: background var(--vg-dur-fast) var(--vg-ease-soft), color var(--vg-dur-fast) var(--vg-ease-soft), box-shadow var(--vg-dur-fast) var(--vg-ease-soft); -webkit-tap-highlight-color: transparent; }
 .vg-fb-btn:hover { background: var(--vg-ivory-200); }
 .vg-fb-btn.vg-fb-active { background: var(--vg-navy-900); color: #fff; box-shadow: var(--vg-shadow-sm); }
+@media (max-width: 420px) { .vg-front-back-toggle { gap: 6px; } .vg-fb-btn { padding: 10px 6px; font-size: 12px; gap: 5px; } }
 .vg-video-frame { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: var(--vg-radius-lg); overflow: hidden; box-shadow: var(--vg-shadow-lg); background: var(--vg-navy-800); }
 .vg-video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 @media (max-width: 640px) { .vg-video-frame { border-radius: var(--vg-radius-md); } }

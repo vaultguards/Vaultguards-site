@@ -30,13 +30,17 @@
   9. Open a real product page on your storefront to confirm it shows this
      design instead of the default Shopify layout.
 
-  FRONT/BACK PHOTOS: uses product.images[0] and product.images[1] -
-  confirmed on your live store that image position 1 = front, position 2 =
-  back (acrylic backing) for every real guard product.
+  FRONT/BACK/SIDE PHOTOS: uses product.images[0], [1] and [2] - confirmed on
+  your live store that image position 1 = front, position 2 = back (acrylic
+  backing), position 3 = side (profile/edge) for every real guard product
+  with at least 3 photos. The Side button only renders when a 3rd image
+  actually exists, so products with fewer photos just show Front/Back as
+  before - no manual per-product configuration needed.
 {% endcomment %}
 
 {% assign front_image = product.images[0] %}
 {% assign back_image = product.images[1] %}
+{% assign side_image = product.images[2] %}
 
 <section class="vg-section">
   <div class="vg-container vg-grid-2">
@@ -52,12 +56,26 @@
         </div>
         {% if back_image %}
           <div class="vg-front-back-toggle" style="margin-top:14px;">
-            <button type="button" class="vg-fb-btn vg-fb-active" data-vg-fb="front" data-vg-front="{{ front_image | image_url: width: 900 }}" data-vg-back="{{ back_image | image_url: width: 900 }}">
+            <button type="button" class="vg-fb-btn vg-fb-active" data-vg-fb="front"
+              data-vg-front="{{ front_image | image_url: width: 900 }}"
+              data-vg-back="{{ back_image | image_url: width: 900 }}"
+              {% if side_image %}data-vg-side="{{ side_image | image_url: width: 900 }}"{% endif %}>
               <i class="fa-solid fa-image"></i> Front
             </button>
-            <button type="button" class="vg-fb-btn" data-vg-fb="back" data-vg-front="{{ front_image | image_url: width: 900 }}" data-vg-back="{{ back_image | image_url: width: 900 }}">
+            <button type="button" class="vg-fb-btn" data-vg-fb="back"
+              data-vg-front="{{ front_image | image_url: width: 900 }}"
+              data-vg-back="{{ back_image | image_url: width: 900 }}"
+              {% if side_image %}data-vg-side="{{ side_image | image_url: width: 900 }}"{% endif %}>
               <i class="fa-solid fa-image"></i> Back
             </button>
+            {% if side_image %}
+              <button type="button" class="vg-fb-btn" data-vg-fb="side"
+                data-vg-front="{{ front_image | image_url: width: 900 }}"
+                data-vg-back="{{ back_image | image_url: width: 900 }}"
+                data-vg-side="{{ side_image | image_url: width: 900 }}">
+                <i class="fa-solid fa-image"></i> Side
+              </button>
+            {% endif %}
           </div>
         {% endif %}
       </div>
@@ -141,7 +159,13 @@ document.addEventListener('click', function (e) {
   var img = document.getElementById('vg-pdp-image');
   if (!img) return;
   var which = btn.getAttribute('data-vg-fb');
-  img.src = which === 'back' ? btn.getAttribute('data-vg-back') : btn.getAttribute('data-vg-front');
+  if (which === 'back') {
+    img.src = btn.getAttribute('data-vg-back');
+  } else if (which === 'side') {
+    img.src = btn.getAttribute('data-vg-side');
+  } else {
+    img.src = btn.getAttribute('data-vg-front');
+  }
   var row = btn.closest('.vg-front-back-toggle');
   row.querySelectorAll('.vg-fb-btn').forEach(function (b) { b.classList.remove('vg-fb-active'); });
   btn.classList.add('vg-fb-active');
