@@ -452,6 +452,69 @@ Key mechanics worth remembering when touching these:
     the cart with no discount applied and no clear error shown to the
     shopper. The user needs to verify/create the VG15 discount code
     themselves in Admin — this agent cannot do it with the current token.
+- **The Vault (`sections/vg-vault.liquid`) — `GUARD_WINDOW.tag` geometry
+  fix**: Vaultguards' TAG product photos were replaced on Shopify
+  (position-1/featured image, used both as the try-on preview image AND
+  the product page's default "Front" photo) with new shots that frame the
+  guard's clear display window differently/smaller than the old photos the
+  original `GUARD_WINDOW.tag` percentages were tuned against. Symptom
+  reported by the user: "the guards are being cut off ... the picture
+  that's being uploaded is too big" — i.e. with the old (too-generous)
+  window percentages, a user's uploaded slab photo (clipped to that
+  oversized window) would spill past the guard's actual clear-window edges
+  and paint over/erase the colored plastic frame entirely, so the frame
+  disappeared instead of framing the user's photo.
+  - **How the fix was derived** (no Admin/product-image-editing access
+    needed — this is pure math/config in the section file): pulled several
+    real TAG product photos directly from the public, unauthenticated
+    storefront JSON endpoint (`https://vaultguards.co/collections/<handle>/
+    products.json`, works around the admin-token limitation entirely — no
+    login needed for this one), downloaded them via their `cdn.shopify.com`
+    URLs (not subject to the vaultguards.co-domain rate limiter), and used
+    grid-overlay + AI-vision analysis across 3 different colorways to
+    triangulate the actual inner-window boundary as a % of image width/
+    height. Landed on `{ top: 17.0, left: 24.5, right: 24.5, bottom: 20.0 }`
+    (up from `{ top: 13.7, left: 22.5, right: 22.1, bottom: 13.8 }`) —
+    confirmed "good fit" by AI vision on 3 separate products, then
+    **independently re-confirmed by simulating the exact JS compositing
+    algorithm in Python** (same clip-to-window + evenodd-cutout logic) with
+    a placeholder "user photo" sized to perfectly fill the align guide: with
+    the OLD numbers the simulated guard frame was completely invisible
+    (i.e. reproduced the user's exact bug); with the NEW numbers the frame
+    rendered fully intact on all 4 sides. This dual-verification approach
+    (measure the real photos + simulate the actual algorithm) is the
+    reusable pattern for any future "the guard/frame looks wrong in the
+    Vault" report — don't just eyeball the live canvas.
+  - Only `GUARD_WINDOW.tag` was touched, per the user's explicit instruction
+    to leave PSA alone. `GUARD_WINDOW.psa` is unchanged from its original
+    values.
+  - Both the align-step guide box (`guideRectForBrand()`) and the final
+    preview/swatch compositing (`drawGuardComposite()`) read from the same
+    `GUARD_WINDOW` object, so this one config change fixes both the
+    alignment guide the user drags/pinches their photo into AND the final
+    composited preview consistently — no separate places to update.
+  - If TAG photos are ever swapped again in the future and this drifts out
+    of alignment again, repeat the same measurement method: pull a few
+    fresh product photos from the public `products.json` endpoint (per
+    product handle, e.g. `/products/<handle>.json`, or the collection
+    endpoint for several at once), grid-overlay them, and re-derive the 4
+    percentages — then sanity-check with the Python compositing simulation
+    before pushing, not just visual inspection of the raw photo alone.
+- **Product page (`sections/vg-product.liquid`) — added a 3rd "Side" photo
+  toggle** alongside the existing Front/Back buttons. Confirmed via the same
+  public `products.json` endpoint + AI-vision image inspection (checked 2
+  different products) that the image order is consistent for every real
+  guard product: `images[0]` = front (the new updated photo), `images[1]` =
+  back (acrylic backing), `images[2]` = side (profile/edge view). The Side
+  button is wrapped in `{% if side_image %}` (where
+  `side_image = product.images[2]`), so it only renders when a product
+  actually has a 3rd image — products with just 2 photos still show a clean
+  Front/Back-only toggle, no broken button. The existing
+  `.vg-front-back-toggle { display:flex }` /
+  `.vg-fb-btn { flex:1 }` CSS already spaces 3 buttons evenly with no
+  changes needed; added one small mobile refinement (`@media (max-width:
+  420px)`) to tighten padding/font-size slightly so 3 buttons don't feel
+  cramped on small phones.
 
 ---
 
