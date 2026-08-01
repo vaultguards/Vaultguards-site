@@ -518,6 +518,95 @@ Key mechanics worth remembering when touching these:
 
 ---
 
+## 6b. TAG window aspect-ratio correction + background removal fix
+   (`sections/vg-vault.liquid`, follow-up to Section 6)
+
+The Section 6 fix stopped the guard frame from being cut off, but the window
+shape itself was still off — because it was derived by **visually tracing** a
+thin/translucent border in AI-vision-measured product photos, which is an
+inherently imprecise method. The user reported it again ("the dots... not
+shaped correctly") and separately reported background removal not working.
+Both were root-caused and fixed for real this time, with actual proof:
+
+- **Aspect ratio fix**: TAG publishes the real physical slab dimensions on
+  their own site (https://help.taggrading.com — "The standard TAG slab for
+  trading cards up to 50pt measures 5.25in x 3.125in"), giving an
+  authoritative width:height ratio of `3.125/5.25 ≈ 0.595238`. The
+  Section-6 values (`left/right: 24.5`, `top/bottom: 17/20`) implied a ratio
+  of `0.6476` — about 8.8% too wide. Fix: keep `top`/`bottom` (the
+  vertical measurement was fine) and solve `left`/`right` algebraically so
+  the window matches the TRUE ratio instead of a traced edge:
+  `left = right = 26.56` (was `24.5`). Derivation, since the align canvas
+  and preview canvas are both width:height = 0.8:
+  `winW/winH (on canvas) = canvasAspect * (1-(l+r)/100) / (1-(t+b)/100)`,
+  solved for `(l+r)` given the target ratio. **Verified two ways before
+  pushing**: (1) overlaid both the old and new window rects on 3 real TAG
+  guard photos and had AI vision confirm the new, narrower box sits safely
+  inside the actual clear-window opening with margin to spare (never
+  crossing onto the colored frame border — narrowing a window can only ever
+  reduce cutoff risk, never increase it); (2) re-ran the from-scratch Python
+  compositing simulation (Section 6's method) with a synthetic magenta
+  rectangle drawn at the TRUE 3.125x5.25 ratio as the "user's photo" — under
+  the OLD window it overflowed/mismatched the frame opening on the sides,
+  under the NEW window it filled the opening edge-to-edge on all 4 sides
+  with the colored frame border fully and evenly visible. Only `tag` was
+  touched — `psa` untouched, per the user's explicit scope constraint.
+
+- **Background removal fix — actual root cause found and reproduced**: the
+  code imported the library from
+  `https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/dist/index.mjs`
+  — this is the library's **raw, unbundled** dist file, which contains bare
+  module specifiers (`import("onnxruntime-web")`, `import("onnxruntime-web/webgpu")`)
+  meant to be resolved by a build-time bundler (webpack/vite/rollup) that
+  substitutes in the real `onnxruntime-web` package from `node_modules`.
+  Loaded directly in a browser via dynamic `import()` from a CDN — as this
+  theme does, since it has no build step — those bare specifiers can never
+  resolve, and it throws **every single time**, on every visitor, in every
+  browser. This was proven by literally reproducing it: built a minimal test
+  page, served it locally, and opened it with a real Playwright browser
+  (via the `PlaywrightConsoleCapture` tool) — the exact console error was:
+  `TypeError: Failed to resolve module specifier 'onnxruntime-web'` at
+  `getOrt (.../dist/index.mjs:1002:5)`. This is a hard, 100%-reproducible
+  JS error, not a CORS/CSP/network flakiness issue — meaning it was NOT
+  intermittent, it plainly never worked for anyone, and the code's existing
+  silent `.catch()` fallback (falling back to the original un-removed-
+  background photo with a small, easy-to-miss text note) is exactly why the
+  user never saw an explicit error, just a feature that quietly did nothing.
+  **Fix**: use jsDelivr's special `+esm` combined-ESM endpoint instead of the
+  raw dist file —
+  `https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm` — which
+  rewrites every bare import into a real resolvable CDN URL at bundle time
+  (jsDelivr does this server-side, on every request, via Rollup/esbuild), so
+  it works with zero build step. Confirmed this fix actually works, again
+  via a real Playwright browser test against the exact same test page: the
+  module imported cleanly, the ~40MB `isnet_quint8` ONNX model + WASM
+  runtime downloaded, inference ran (with a harmless console warning that
+  multi-threading isn't available without `Cross-Origin-Opener-Policy`/
+  `Cross-Origin-Embedder-Policy` headers — confirmed to be a performance-only
+  fallback, not a functional blocker, per the library's own README), and
+  `removeBackground()` resolved with a real, valid, non-empty PNG blob
+  (background actually removed). Also switched the model from the
+  ~80MB default (`isnet_fp16`) to the ~40MB quantized `isnet_quint8` to keep
+  first-run download time reasonable, since this storefront can't set the
+  cross-origin-isolation headers needed for the faster multi-threaded path.
+  Added a `console.error(err)` right before the existing silent-fallback
+  path so any *future* failure (e.g. a visitor's ad-blocker or corporate
+  network blocking jsDelivr/staticimgly.com) is at least visible in
+  devtools instead of vanishing completely.
+- **Reusable verification technique introduced here**: for any future bug
+  report about client-side JS/WASM/canvas behavior that can't be verified
+  by fetching HTML (fundamentally different limitation than the Cloudflare
+  rate-limiting problem — this is about interactive script execution, not
+  network access) — build a minimal standalone HTML repro of just the
+  suspect code path, serve it with `python3 -m http.server` in the sandbox,
+  get a public URL via `GetServiceUrl`, and open it with the
+  `PlaywrightConsoleCapture` tool to capture real browser console output
+  (including thrown errors with stack traces). This is how both the exact
+  failure mode and the fix were proven here, rather than guessing from
+  documentation alone.
+
+---
+
 ## 7. Open items / known pending decisions
 
 - **Footer wordmark color** (see Section 4) — unresolved, needs the user's
