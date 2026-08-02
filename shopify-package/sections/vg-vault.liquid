@@ -289,30 +289,34 @@
     tag: {{ tag_products_json }},
     psa: {{ psa_products_json }}
   };
-  // TAG window uses TAG's own published slab dimensions (5.25in x 3.125in,
-  // https://help.taggrading.com) as the authoritative width:height ratio -
-  // top/bottom kept from the measured photo boundary, left/right solved so
-  // the window itself is TAG-slab-proportioned, not just a traced photo edge.
+  // Both brands' values below are used ONLY as the generic guide shown
+  // during the align step (before a specific color is chosen) - each is a
+  // representative average, not a per-photo truth. The real per-photo
+  // window for both brands is computed at runtime by
+  // detectContentBox()/getGuardWindowRect() below.
+  // See VAULTGUARDS_METHOD.md section "PSA guard auto-centering" (6c),
+  // "PSA align-guide/window shape correction" (6d) and "TAG guard
+  // auto-centering + align-guide correction" (6e) for the full measurement
+  // method and data behind both these fixed values and
+  // GUARD_WINDOW_AUTO_MARGIN.
   //
-  // PSA's value below is used ONLY as the generic guide shown during the
-  // align step (before a specific color is chosen) - it is a representative
-  // average, not a per-photo truth. The real per-photo window for PSA is
-  // computed at runtime by detectContentBox()/getGuardWindowRect() below.
-  // See VAULTGUARDS_METHOD.md section "PSA guard auto-centering" (6c) and
-  // "PSA align-guide/window shape correction" (6d) for the full measurement
-  // method and data behind both this fixed value and GUARD_WINDOW_AUTO_MARGIN.
+  // Both sets of percentages below are NOT an independent guess - they are
+  // the MEDIAN photo-object position across all real guard photos of that
+  // brand (14 for PSA, 9 for TAG), with GUARD_WINDOW_AUTO_MARGIN's margins
+  // for that brand applied on top, so each fixed guide has the same true
+  // window shape that the real runtime auto-detected windows produce for
+  // that brand.
   //
-  // The percentages below are NOT an independent guess - they are the
-  // MEDIAN photo-object position across all 14 real PSA guard photos, with
-  // GUARD_WINDOW_AUTO_MARGIN.psa's margins applied on top, so this fixed
-  // guide has the same true window shape (~0.577 width:height) that the
-  // real runtime auto-detected windows produce (0.568-0.576 across all 14
-  // photos - see 6d). The previous value here (11.0/27.7/25.6/12.2) had an
-  // aspect ratio of only ~0.487 - visibly too tall/narrow versus a real PSA
-  // slab, which is exactly why a real slab photo scaled to fill the guide's
-  // width left empty space above/below the label and card.
+  // TAG's value was originally derived from TAG's own published slab
+  // dimensions (5.25in x 3.125in, https://help.taggrading.com) as a
+  // theoretical width:height ratio (~0.595). That theoretical value was
+  // superseded in 6e by a user-hand-marked ground truth on a real TAG guard
+  // photo (the same "mark the true guard-to-slab edge" method used for PSA
+  // in 6d) - the theoretical published-dimension ratio turned out to run
+  // ~5% narrower/taller than the guard's actual real-world window opening,
+  // which is what this measured value corrects.
   var GUARD_WINDOW = {
-    tag: { top: 17.0, left: 26.56, right: 26.56, bottom: 20.0 },
+    tag: { top: 17.14, left: 25.70, right: 25.68, bottom: 20.87 },
     psa: { top: 11.25, left: 23.60, right: 21.48, bottom: 12.70 }
   };
 
@@ -325,12 +329,13 @@
   //
   // These margins are NOT an eyeballed guess - they were reverse-engineered
   // from a real ground-truth boundary the user hand-marked directly on one
-  // of our own diagnostic overlay photos: the true edge where a PSA guard's
-  // colored decorative frame ends and the actual frosted PSA slab body
-  // begins (i.e. exactly the area a real uploaded slab photo should be
-  // mapped onto). Measuring that hand-marked box against the auto-detected
-  // outer (guard+slab) box gave left=5.9%, right=7.2%, top=3.4%, bottom=4.0%
-  // of the outer box's own width/height; symmetrized to left=right=6.56%,
+  // of our own diagnostic overlay photos: the true edge where a guard's
+  // colored decorative frame ends and the actual slab body begins (i.e.
+  // exactly the area a real uploaded slab photo should be mapped onto).
+  //
+  // PSA: measuring that hand-marked box against the auto-detected outer
+  // (guard+slab) box gave left=5.9%, right=7.2%, top=3.4%, bottom=4.0% of
+  // the outer box's own width/height; symmetrized to left=right=6.56%,
   // top=bottom=3.72% (the ~1pp asymmetry is consistent with normal freehand
   // marking noise, not a real design asymmetry). Re-verified by re-applying
   // these exact margins to 6 different real PSA guard photos (multiple
@@ -338,12 +343,23 @@
   // that same guard-to-slab boundary in every one - see VAULTGUARDS_METHOD.md
   // section 6d. This also produces a near-constant window aspect ratio
   // (0.568-0.576) across all 14 real photos, vs. the old margins' ~0.48-0.49,
-  // which is what fixes "extra space top/bottom" once a real slab photo is
-  // scaled into this window. TAG is intentionally NOT in this map - its
-  // single photo style was already verified consistent, so it keeps the
-  // fixed GUARD_WINDOW.tag percentages untouched.
+  // which is what fixed "extra space top/bottom" once a real slab photo is
+  // scaled into this window.
+  //
+  // TAG: same method (see 6e) - user hand-marked the guard-to-slab edge on
+  // a real TAG photo, measured (calibrated against known reference lines on
+  // the same diagnostic image for sub-pixel accuracy) at left=4.45%,
+  // right=4.41%, top=2.94%, bottom=2.58% of the outer box; symmetrized to
+  // left=right=4.43%, top=bottom=2.76%. This superseded an earlier TAG
+  // margin set that had been reverse-engineered purely from TAG's
+  // theoretical published slab-dimension ratio - that theoretical value ran
+  // consistently ~5% narrower/taller than the real hand-marked boundary
+  // across all 9 real TAG photos tested (displayed window ratio 0.625-0.630
+  // with the corrected margins vs. only ~0.595 in theory), which is exactly
+  // why the previous TAG window looked "a little off" against a real photo.
   var GUARD_WINDOW_AUTO_MARGIN = {
-    psa: { left: 0.0656, right: 0.0656, top: 0.0372, bottom: 0.0372 }
+    psa: { left: 0.0656, right: 0.0656, top: 0.0372, bottom: 0.0372 },
+    tag: { left: 0.0443, right: 0.0443, top: 0.0276, bottom: 0.0276 }
   };
 
   // Detects the visible (non-white) bounding box of a loaded guard product
@@ -396,7 +412,8 @@
   // Builds the actual window rect (in canvas px) for one guard photo: uses
   // the auto-detected content box + proportional margin when configured and
   // available for this brand, otherwise falls back to the fixed
-  // GUARD_WINDOW percentages (TAG's path, or PSA if detection failed).
+  // GUARD_WINDOW percentages (used for both brands during the pre-upload
+  // align-guide step, before any specific photo has been loaded/detected).
   function getGuardWindowRect(brand, guardImg, W, H) {
     var autoMargin = GUARD_WINDOW_AUTO_MARGIN[brand];
     var box = guardImg && guardImg.__vgvContentBox;
