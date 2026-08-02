@@ -297,18 +297,23 @@
   // PSA's value below is used ONLY as the generic guide shown during the
   // align step (before a specific color is chosen) - it is a representative
   // average, not a per-photo truth. The real per-photo window for PSA is
-  // computed at runtime by detectContentBox()/getGuardWindowRect() below,
-  // because measuring 14 real PSA guard photos pixel-by-pixel showed each
-  // color's product photo was shot at its own zoom/crop (the guard+slab
-  // object's outer edges land anywhere from ~62% to ~66% of the photo's
-  // width depending on the color), so one fixed absolute-canvas-percentage
-  // window could never line up with all of them - it was only ever correct
-  // for whichever photo happened to match that one guess. See
-  // VAULTGUARDS_METHOD.md section "PSA guard auto-centering" for the full
-  // measurement method and data.
+  // computed at runtime by detectContentBox()/getGuardWindowRect() below.
+  // See VAULTGUARDS_METHOD.md section "PSA guard auto-centering" (6c) and
+  // "PSA align-guide/window shape correction" (6d) for the full measurement
+  // method and data behind both this fixed value and GUARD_WINDOW_AUTO_MARGIN.
+  //
+  // The percentages below are NOT an independent guess - they are the
+  // MEDIAN photo-object position across all 14 real PSA guard photos, with
+  // GUARD_WINDOW_AUTO_MARGIN.psa's margins applied on top, so this fixed
+  // guide has the same true window shape (~0.577 width:height) that the
+  // real runtime auto-detected windows produce (0.568-0.576 across all 14
+  // photos - see 6d). The previous value here (11.0/27.7/25.6/12.2) had an
+  // aspect ratio of only ~0.487 - visibly too tall/narrow versus a real PSA
+  // slab, which is exactly why a real slab photo scaled to fill the guide's
+  // width left empty space above/below the label and card.
   var GUARD_WINDOW = {
     tag: { top: 17.0, left: 26.56, right: 26.56, bottom: 20.0 },
-    psa: { top: 11.0, left: 27.7, right: 25.6, bottom: 12.2 }
+    psa: { top: 11.25, left: 23.60, right: 21.48, bottom: 12.70 }
   };
 
   // Auto-center config for brands whose product photos vary shot-to-shot.
@@ -316,15 +321,29 @@
   // own detected visible (non-white) bounding box, then inset by a fixed
   // proportion of that box's own width/height - so it "auto centers" against
   // whatever the real photo actually shows instead of assuming one universal
-  // position. Margins were measured across several real PSA guard photos:
-  // the colored guard border reliably eats up ~13-15% of the object's own
-  // width on the left and right (a thicker gripping rail), but only ~2-4% of
-  // its height on top/bottom (these guards have almost no visible border
-  // above/below the slab). TAG is intentionally NOT in this map - its single
-  // photo style was already verified consistent, so it keeps the fixed
-  // GUARD_WINDOW.tag percentages untouched.
+  // position.
+  //
+  // These margins are NOT an eyeballed guess - they were reverse-engineered
+  // from a real ground-truth boundary the user hand-marked directly on one
+  // of our own diagnostic overlay photos: the true edge where a PSA guard's
+  // colored decorative frame ends and the actual frosted PSA slab body
+  // begins (i.e. exactly the area a real uploaded slab photo should be
+  // mapped onto). Measuring that hand-marked box against the auto-detected
+  // outer (guard+slab) box gave left=5.9%, right=7.2%, top=3.4%, bottom=4.0%
+  // of the outer box's own width/height; symmetrized to left=right=6.56%,
+  // top=bottom=3.72% (the ~1pp asymmetry is consistent with normal freehand
+  // marking noise, not a real design asymmetry). Re-verified by re-applying
+  // these exact margins to 6 different real PSA guard photos (multiple
+  // colors) and visually confirming the resulting window lands exactly on
+  // that same guard-to-slab boundary in every one - see VAULTGUARDS_METHOD.md
+  // section 6d. This also produces a near-constant window aspect ratio
+  // (0.568-0.576) across all 14 real photos, vs. the old margins' ~0.48-0.49,
+  // which is what fixes "extra space top/bottom" once a real slab photo is
+  // scaled into this window. TAG is intentionally NOT in this map - its
+  // single photo style was already verified consistent, so it keeps the
+  // fixed GUARD_WINDOW.tag percentages untouched.
   var GUARD_WINDOW_AUTO_MARGIN = {
-    psa: { left: 0.13, right: 0.13, top: 0.03, bottom: 0.03 }
+    psa: { left: 0.0656, right: 0.0656, top: 0.0372, bottom: 0.0372 }
   };
 
   // Detects the visible (non-white) bounding box of a loaded guard product
