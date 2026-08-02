@@ -1138,6 +1138,82 @@ GitHub.
 
 ---
 
+## 6h. Align-guide "too short" feeling — resolved via copy, not geometry
+
+**Context:** after 6g shipped, the user confirmed *"the amount of guard
+shown on all sides is perfect"* (the render/mask is correct). They then
+raised a separate, second concern: *"the registration lines for when taking
+a picture or uploading the picture is off again. its too short."* - this is
+about the **align-step guide** (the dashed box shown during Step 3, driven
+by the fixed `GUARD_WINDOW` percentages via `guideRectForBrand()`), not the
+render mask (driven by `GUARD_WINDOW_AUTO_MARGIN` + auto-detection, which
+they'd just confirmed was correct). They asked directly: *"if you were to
+adjust would it cover the color of the guard?"*
+
+**Why the guide and the render mask are architecturally decoupled:** the
+align-step guide is used only for two things: (1) drawing the dashed
+overlay the user aligns against, and (2) as the reference frame for
+converting the user's drag/zoom position into a *relative fraction*
+(`relX`, `relY`, `baseHRatio` in `drawGuardComposite()`), which is then
+re-applied onto the real, per-photo `winRect` from `getGuardWindowRect()`.
+Changing the guide's fixed percentages does not touch
+`GUARD_WINDOW_AUTO_MARGIN` or the auto-detected content box at all - so it
+cannot reintroduce the 6f-style frame-vanishing bug. The one thing that
+*does* matter is that the guide's own aspect ratio stays close to the real
+window's ratio (currently ~0.627-0.629, confirmed in 6e/6g), so that
+"filling the guide" during alignment maps proportionally onto "filling the
+window" at render time - this already holds today (`GUARD_WINDOW.tag`'s
+guide ratio computes to ~0.6277, matching).
+
+**Why "too short" is structurally expected, not a bug:** the guard's window
+trims proportionally more off the width (left+right auto-margin 4.43% each)
+than off the height (top+bottom auto-margin 2.76% each) - because that's
+what the real, physically-measured guard hardware does (confirmed in 6e/6g
+across 9 + 3 real photos respectively). This asymmetric trim necessarily
+makes the *visible-through-the-window* ratio (~0.627) wider relative to
+height than a bare TAG slab's own full-body ratio (~0.595-0.61 theoretical).
+Any user photographing their *entire* slab and trying to make it exactly
+fill a guide shaped like the *window* will, by definition, always have some
+top/bottom (or corner) overflow - this is an inherent consequence of the
+guard's own design (the window doesn't show 100% of the slab), not
+something a differently-shaped guide can "solve" without becoming
+inaccurate to the real window.
+
+**Resolution taken - copy, not geometry:** rather than risk a third
+speculative geometry change in a row (6e and 6f each required a correction
+after deploy), and because the user's own follow-up message concluded *"ok
+so the registration lines aren't perfect for tag but it looks great as it
+doesnt mess up the guards picture when uploading it"* (i.e. explicitly
+accepting the current geometry once the render itself was confirmed
+correct), the fix implemented was to the **instructional copy only**,
+updating the single shared Step 3 "Align your slab" text (used identically
+for both PSA and TAG - it's brand-agnostic in the DOM) from:
+
+> Drag to position, pinch or scroll to zoom until your slab fills the guide.
+
+to:
+
+> Drag to position, pinch or scroll to zoom until the guide is fully
+> covered by your slab. Part of the slab may end up cropped off - that's
+> completely normal, just make sure there are no gaps. If your slab photo
+> still shows a guard or case on it, retake or crop the photo so the guard
+> itself is out of frame.
+
+This directly requested addition (a) sets the correct expectation that
+some cropping is normal given the guard's real window shape, reframing
+"fill the guide" as the actual goal (no gaps) rather than "fit the whole
+slab", and (b) reminds users uploading a photo of a slab that already has
+some *other* guard/case on it to remove it from frame first, since the tool
+expects a photo of the bare slab.
+
+**Deployed:** pushed via `shopify theme push --only
+sections/vg-vault.liquid --allow-live --nodelete --force`, verified
+byte-for-byte via a fresh `theme pull` into `/tmp/vg-verify-copytext`
+(banner-stripped diff, exact match), committed (`357ea84`) and pushed to
+GitHub.
+
+---
+
 ## 7. Open items / known pending decisions
 
 - **Footer wordmark color** (see Section 4) — unresolved, needs the user's
