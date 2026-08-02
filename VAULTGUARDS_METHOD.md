@@ -1214,6 +1214,41 @@ GitHub.
 
 ---
 
+## 6i. Align-step instructions redesigned as a scannable checklist
+
+**Request:** the 6h paragraph (*"Drag to position, pinch or scroll to zoom
+until the guide is fully covered by your slab. Part of the slab may end up
+cropped off..."*) was correct in content but the user found it too wordy:
+*"can you clean up the whole explanation on when its explaining how to
+align the slab. the info is needs theres just too much wording. maybe
+bullet points or list checkpoints so its more user friendly."*
+
+**Change made to `sections/vg-vault.liquid`:** replaced the single dense
+`<p>` block (Step 3 "Align your slab", shared identically by PSA and TAG)
+with the same tip-card pattern already used one step earlier in Step 2
+("Upload your slab photo" - a `.vg-card-flat` box with an icon + text) and
+a short checklist, so the instruction is scannable rather than a single
+paragraph:
+- A short bold header line with a drag icon: "Drag to position, pinch or
+  scroll to zoom"
+- Three checkbox-style list items (each with a small gold check icon):
+  1. "Fill the guide completely - no gaps around the edges"
+  2. "Some cropping at the edges is normal - that's OK"
+  3. "Slab already in a guard/case? Retake or crop the photo so it's out
+     of frame"
+
+Same information as 6h, same shared markup for both brands, just
+restructured for scannability per the user's request - no wording meaning
+was changed, no geometry/logic touched.
+
+**Deployed:** pushed via `shopify theme push --only
+sections/vg-vault.liquid --allow-live --nodelete --force`, verified
+byte-for-byte via a fresh `theme pull` into `/tmp/vg-verify-checklist`
+(banner-stripped diff, exact match), committed (`c0609f4`) and pushed to
+GitHub.
+
+---
+
 ## 7. Open items / known pending decisions
 
 - **Footer wordmark color** (see Section 4) — unresolved, needs the user's
