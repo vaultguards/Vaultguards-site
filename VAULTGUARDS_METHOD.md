@@ -923,6 +923,131 @@ GitHub.
 
 ---
 
+## 6f. TAG align-guide height correction — real-slab ground truth supersedes 6e
+
+**Request:** after 6e shipped, the user tested the live align UI against a
+real photographed TAG slab and reported the guide was "a little off" —
+*"the registration lines need to be shorter in width... because when I zoom
+to cover the full dead space it cuts off some of the tag slab."* The user
+provided a screenshot of the live align step for reference.
+
+**First investigation (found no supporting evidence — width was not the
+issue):** the screenshot was analyzed with contamination-free color masking
+restricted to the gray container bounds, plus flat, non-corner edge
+measurements comparing the deployed 6e guide box against the real
+photographed slab's own silhouette in that same screenshot. Result: the 6e
+guide (ratio 0.6265) and the real slab (ratio 0.6269) matched to <0.1% —
+directly contradicting the "too wide" complaint. This evidence (precise
+pixel measurements + magnified flat-edge crops showing the dashed line
+sitting directly on the slab's edge on all 4 sides) was shared back with the
+user, along with a request for a screenshot that actually showed the
+cropping, rather than making an unfounded change on a complaint the data
+didn't support.
+
+**Decisive ground truth, reframing the problem as HEIGHT not width:** the
+user then sent a new annotated screenshot with a hand-drawn **red rectangle**
+("the outside of the guard") and a hand-drawn **black rounded rectangle**
+near the top, explaining: *"you can see that I positioned the slab
+perfectly on sides and the bottom on the perforated guide, but there's a
+lot of missing slab because the rectangle is not long enough. See the Black
+rectangle I created that's the amount that we need to add in height to have
+the slab fit perfectly."* This completely reframed the issue: the guide's
+**top** edge needed to move up (decrease the top-margin percentage) to
+include the slab case's own rounded top cap/lip — a raised blank plastic
+area at the very top of a real TAG slab, distinct from the label/QR-code
+area below it — which the 6e guide had been excluding. Left/right/bottom
+were confirmed still correct as deployed.
+
+**Why 6e's ground truth missed this:** the 6e mark had been drawn on a
+studio photo of the guard **product** (colored frame + cutout), which does
+not include a real slab's own top cap at all — so no amount of careful
+measurement against that photo could have surfaced the gap. It took a
+second, more direct ground truth — hand-marked by the user on a live
+screenshot of an **actual uploaded slab photo** — to reveal it. This also
+explains why the first (width) investigation found a near-perfect match:
+that measurement was only sensitive to whatever portion of the slab was
+visible in that particular screenshot, and didn't surface the top-cap
+exclusion the same way the red/black annotation did.
+
+**Extraction method (same affine-calibration technique as 6d/6e):** the
+annotated image (758×1024) was downloaded and measured programmatically:
+- Background gray: (156,155,150)
+- Red rectangle ("outside of the guard"): left≈121, right≈669.5, top≈54,
+  bottom≈947.5 (ratio 0.6139)
+- Current deployed blue dashed guide line: left≈149, right≈640, top≈144,
+  bottom≈920 — verified via visual overlay to trace exactly onto the real
+  rendered dashed line (critical sanity check before trusting any
+  calibration built on top of it)
+- Black rectangle ("amount to add in height"): top border rows 77-85
+  (center=81), bottom border rows 133-141 (center=137)
+
+Since the user's screenshot is a resized rendition whose absolute scale/
+origin relative to the true canvas is unknown, a per-axis linear (affine)
+fit `pixel = a*frac + b` was solved using the two already-known equations
+from the currently-deployed fixed percentages (mapped to their measured
+pixel positions in the screenshot), then inverted to convert the black
+rectangle's measured top position into canvas-fraction space — giving the
+new `GUARD_WINDOW.tag.top` value.
+
+**Units/methodology error caught mid-calculation:** when first computing the
+corresponding `GUARD_WINDOW_AUTO_MARGIN.tag` top/bottom values, the
+canvasAspect correction described in 6e (`displayedRatio = rawFractionRatio
+* canvasAspect`) was mistakenly applied a **second time** to a quantity that
+was already in canvas-px space, producing wildly wrong, seemingly-impossible
+results. This was caught by cross-verifying the OLD (6e) margins against a
+from-scratch simulation using the exact runtime JS logic (`getGuardWindowRect()`'s
+auto-margin path computes `boxW=(box.right-box.left)*W` and
+`boxH=(box.bottom-box.top)*H` using the actual canvas W,H directly, not the
+photo's own thumbnail dimensions — this already fully replicates
+`ctx.drawImage(guardImg,0,0,W,H)`'s non-uniform stretch, with no further
+aspect correction needed) — confirming it reproduces the previously-
+validated 0.625-0.630 range. The calculation was redone with the corrected
+method.
+
+**Result — corroborated by triangulation:** the corrected calculation still
+showed the exact per-photo top+bottom margin needed (as a fraction of each
+photo's own auto-detected content box) came out **negative** on average
+(-0.0166 across the 9 real TAG photos) — meaning the auto-detected box's own
+natural height, after only left/right trimming, is already essentially the
+correct slab height, with no further vertical shrink needed. Since the
+current code doesn't cleanly support a negative margin, `top=bottom=0` was
+chosen as the closest valid value. This was cross-checked against two
+independent sources before committing to it:
+- TAG's own theoretical published slab ratio (5.25in×3.125in ≈ 0.5952,
+  from `https://help.taggrading.com`, the same spec used in 6b/6e)
+- The "natural" ratio produced by `GUARD_WINDOW_AUTO_MARGIN.tag` with
+  top/bottom margin set to 0 (i.e. no vertical trim at all): ≈0.590 mean
+  across the 9 real TAG photos on both real app canvas sizes (700×875,
+  800×1000), range 0.585-0.596
+
+Both of these closely bracket the direct 6f measurement (0.5804) — a far
+tighter, more physically sensible cluster than 6e's 0.625-0.630 — giving
+high confidence in both the direction and magnitude of the fix.
+
+**Changes made to `sections/vg-vault.liquid`:**
+- `GUARD_WINDOW.tag.top`: `17.14` → **`12.10`** (left/right/bottom unchanged:
+  `25.70`/`25.68`/`20.87`)
+- `GUARD_WINDOW_AUTO_MARGIN.tag`: `top`/`bottom` `0.0276`/`0.0276` →
+  **`0`/`0`** (left/right unchanged: `0.0443`/`0.0443`)
+- Rewrote the surrounding comment blocks documenting the 6e→6f methodology
+  change, the corroboration sources, and why top/bottom auto-margin is now 0.
+
+**Verified before deploying:** re-simulated `getGuardWindowRect()`'s exact
+runtime logic against all 9 real TAG guard photos on both real canvas sizes
+with the new values, confirming the tightly-clustered 0.585-0.596 (mean
+0.590) result above. Also rendered the new computed window (as a green box)
+directly on the user's own red/black-annotated reference image
+(`new_window_overlay.png`) and visually confirmed the new top edge lines up
+almost exactly with the top of the user's hand-drawn black rectangle.
+
+**Deployed:** pushed via `shopify theme push --only
+sections/vg-vault.liquid --allow-live --nodelete --force`, verified
+byte-for-byte via a fresh `theme pull` into `/tmp/vg-verify-tagheight`
+(banner-stripped diff, exact match), committed (`b8bdc7f`) and pushed to
+GitHub.
+
+---
+
 ## 7. Open items / known pending decisions
 
 - **Footer wordmark color** (see Section 4) — unresolved, needs the user's
