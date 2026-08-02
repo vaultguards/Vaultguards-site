@@ -311,23 +311,22 @@
   // dimensions (5.25in x 3.125in, https://help.taggrading.com) as a
   // theoretical width:height ratio (~0.595), then in 6e superseded by a
   // user-hand-marked ground truth on a real TAG guard PRODUCT photo (the
-  // same "mark the true guard-to-slab edge" method used for PSA in 6d).
-  // That 6e mark (top=17.14) was itself superseded in 6f: testing live
-  // against a real photographed slab through the actual align UI showed
-  // the 6e window was too SHORT - the 6e mark had been drawn along the
-  // guard-to-slab boundary on the studio PRODUCT photo, which excludes the
-  // slab case's own rounded top cap/lip area, so it under-counted the
-  // true slab height by ~5pp of window-top-margin. The user then drew a
-  // second, more direct ground truth: a box around the real slab's own
-  // true top edge (including the top cap) on a live screenshot of an
-  // actual uploaded slab photo. See VAULTGUARDS_METHOD.md section 6f for
-  // the full calibrated-pixel measurement. The corrected top (12.10,
-  // down from 17.14) is corroborated by two independent checks: it lands
-  // within 1-2pp of both TAG's theoretical published ratio (~0.595) and
-  // of GUARD_WINDOW_AUTO_MARGIN.tag's own natural (zero-vertical-margin)
-  // ratio (~0.590) - see the AUTO_MARGIN comment below.
+  // same "mark the true guard-to-slab edge" method used for PSA in 6d):
+  // top=17.14, left=25.70, right=25.68, bottom=20.87.
+  //
+  // A 6f attempt to raise this further (top=12.10, based on a
+  // misinterpretation of a user annotation as "the window needs to be
+  // taller") was deployed, found to visibly break the render (it also
+  // zeroed out GUARD_WINDOW_AUTO_MARGIN.tag's vertical margin - see below -
+  // which is what actually controls the real render, and that is what
+  // caused the guard's own colored frame border to vanish completely at
+  // top/bottom, confirmed by the user's screenshot and reverted in 6g).
+  // This fixed GUARD_WINDOW.tag value itself was restored to the 6e number
+  // (17.14) as part of that revert, keeping the align-guide shown before a
+  // photo is uploaded consistent with the real (6e-margin) render window.
+  // See VAULTGUARDS_METHOD.md sections 6e/6f/6g for the full history.
   var GUARD_WINDOW = {
-    tag: { top: 12.10, left: 25.70, right: 25.68, bottom: 20.87 },
+    tag: { top: 17.14, left: 25.70, right: 25.68, bottom: 20.87 },
     psa: { top: 11.25, left: 23.60, right: 21.48, bottom: 12.70 }
   };
 
@@ -357,28 +356,46 @@
   // which is what fixed "extra space top/bottom" once a real slab photo is
   // scaled into this window.
   //
-  // TAG: left/right (4.43% each) are unchanged from 6e and still correct -
-  // the user's 6f live-photo test confirmed the sides and bottom already
-  // fit "perfectly", the only problem was insufficient height. top/bottom
-  // were originally 2.76% each (6e), reverse-engineered from a studio
-  // PRODUCT photo mark that (per 6f) excluded the slab case's own rounded
-  // top cap. Recalculated in 6f directly from the corrected GUARD_WINDOW.tag
-  // top value (12.10, see above) by solving, per real TAG photo, what
-  // top+bottom margin (as a fraction of that photo's own auto-detected
-  // content box) reproduces the same target window ratio - this came out
-  // NEGATIVE on average (-0.0166, i.e. the auto-detected box's own natural
-  // height, with only left/right trimmed, is already essentially the
-  // correct slab height with no further vertical trim needed), so top and
-  // bottom are now set to 0 (the closest valid value) rather than a small
-  // negative number the current code doesn't support. With top=bottom=0,
-  // the resulting window ratio across all 9 real TAG photos is 0.585-0.596
-  // (mean 0.590) on both real app canvas sizes - within ~1-2% of both the
-  // 6f-measured target (0.580) and TAG's theoretical published ratio
-  // (0.595), a far tighter, more physically sensible cluster than 6e's
-  // 0.625-0.630. See VAULTGUARDS_METHOD.md section 6f.
+  // TAG: left=right=4.43%, top=bottom=2.76% - the original 6e values,
+  // reverse-engineered from a user-hand-marked guard-to-slab boundary on a
+  // real TAG guard PRODUCT photo, applied to all 9 real TAG photos (see 6e).
+  //
+  // In 6f these top/bottom margins were changed to 0 in an attempt to show
+  // more of the slab's height. This was a critical mistake: since
+  // getGuardWindowRect()'s returned rect is used in drawGuardComposite() to
+  // BOTH (a) clip the user's slab photo to draw only inside it, AND (b)
+  // clip the guard product image (via an evenodd "donut" clip) to draw only
+  // OUTSIDE it - the margin here is not merely "how much slab to show", it
+  // is the literal boundary between "rendered as guard frame" and
+  // "rendered as slab window". A 0% top/bottom margin means the window's
+  // top/bottom edges sit exactly on the guard's own outer silhouette edge
+  // (as auto-detected from the photo), leaving zero pixels for the guard's
+  // frame to ever be drawn at top/bottom - so the guard's own colored
+  // border (visible on the left/right, since those margins were untouched)
+  // was completely absent at top/bottom in the final render. The user
+  // caught this immediately from a live render screenshot ("the color of
+  // the guard is cut off" at top and bottom) - confirmed by an
+  // understand_images check of that screenshot, which found the red/black
+  // frame band fully present on the left/right edges but entirely missing
+  // at top/bottom, the slab's own white plastic running straight to the
+  // outer edge there.
+  //
+  // 6g reverted top/bottom to the original 6e value (0.0276) and
+  // independently re-verified it is correct: directly pixel-measuring the
+  // frame-to-slab colour transition (via zoomed, gridlined crops, visually
+  // read) on 3 different real TAG guard photos (aquafrost, voidshift,
+  // solarshade - 3 different frame colors) gave top margins of 2.10%,
+  // 2.51%, 2.11% (avg 2.24%) and bottom margins of 2.54%, 2.26%, 2.50%
+  // (avg 2.43%) of each photo's own outer-box height - closely matching
+  // the existing 2.76% value (well within normal measurement tolerance,
+  // and nowhere close to 0%). Re-simulating getGuardWindowRect() with the
+  // reverted 0.0276 value across all 9 real TAG photos on both real app
+  // canvas sizes reproduces the previously-validated 0.625-0.630 window
+  // ratio range exactly, confirming the revert restores the known-good 6e
+  // state. See VAULTGUARDS_METHOD.md section 6g.
   var GUARD_WINDOW_AUTO_MARGIN = {
     psa: { left: 0.0656, right: 0.0656, top: 0.0372, bottom: 0.0372 },
-    tag: { left: 0.0443, right: 0.0443, top: 0, bottom: 0 }
+    tag: { left: 0.0443, right: 0.0443, top: 0.0276, bottom: 0.0276 }
   };
 
   // Detects the visible (non-white) bounding box of a loaded guard product
