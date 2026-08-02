@@ -802,6 +802,127 @@ stripped diff), committed (`e68caf2`) and pushed to GitHub.
 
 ---
 
+## 6e. TAG guard auto-centering + align-guide correction — user-verified ground truth
+
+**Request:** after 6d shipped and was confirmed "absolutely perfect", the
+user asked for the exact same auto-centering treatment for TAG guards:
+*"I need it to Auto center just like the PSA guards did for the colors...
+the sizing of the Tag slab for photos is perfect already, so I want it to
+be exactly the same type of accuracy you did with PSA but Tag specific for
+the Tag guards."*
+
+**Initial approach (superseded mid-task):** since the existing fixed
+`GUARD_WINDOW.tag` value (5.25"x3.125" slab-proportioned, from 6b) was
+believed already correct, the first attempt was to *reverse-engineer* an
+auto-margin set that would exactly reproduce that known-good fixed window
+when applied to each real TAG photo's own detected outer box — i.e. treat
+6b's value as ground truth and just add the auto-detect wrapper around it.
+This worked mathematically (reconstructed the old window to <0.01% error
+across all 9 real TAG photos) and was even visually plausible in isolation.
+
+**New complication discovered along the way:** TAG's live product photos
+had recently been reshot at 1800×2400px (native aspect 0.75) — different
+from PSA's 1920×2400 (0.8) and from the app canvas's own aspect (0.8, e.g.
+700×875 / 800×1000). Since `drawGuardComposite()` draws the guard image via
+`ctx.drawImage(guardImg, 0, 0, W, H)`, which stretches the image
+non-uniformly to exactly fill the canvas, a window's aspect ratio expressed
+as a fraction of the image's own width/height ("raw fraction ratio") is
+**not** the same as its final on-canvas *displayed* ratio — the correct
+relationship is `displayedRatio = rawFractionRatio * (canvasAspect)`, since
+canvasAspect already folds in the image→canvas stretch (a fraction of width
+divided by a fraction of height is aspect-ratio-independent of the image's
+own native pixel dimensions; it only needs multiplying by the canvas's own
+W/H to know how it will actually look once stretched to fill that canvas).
+This nuance mattered for sanity-checking any window ratio against TAG's
+"true" ratio and had to be tracked carefully throughout this fix.
+
+**Decisive ground truth, again from the user:** while the reverse-engineered
+auto-margins were being visually verified, the user sent back one of the
+generated diagnostic overlays (blue = auto-detected outer box, red = the
+reverse-engineered window) with a **hand-drawn green rectangle** directly on
+top of it, stating explicitly: *"the blue line you set represents the slab
+with the guard on. The red is where you were going to have the perforated
+area... but that is wrong. THE BLACK/GREEN rectangle that I made bordering
+the very edge of the beginning of the guard is the correct dimension and
+shape... be precise, and how you did it with psa guards and how it fit, and
+auto centered is what I need for TAG."* This is the exact same "hand-mark
+the true guard-to-slab boundary on a real photo" ground-truth method used
+for PSA in 6d — and it revealed that the *theoretical* TAG window (from 6b's
+published 3.125"x5.25" slab dimensions, which the reverse-engineered margins
+had faithfully reconstructed) was itself measurably off against a real
+photo, not just imprecisely centered.
+
+**Extraction method (mirrors 6d, avoiding the established anchoring-bias
+pitfall):** rather than asking a vision model to read off the user's
+hand-drawn line (risk of anchoring on whatever reference value is already
+visible in the same image), the annotated screenshot was downloaded and the
+green line's position was found **programmatically** — scanning column/row
+pixel-count profiles for a distinctive green color (`G−R>40 & G−B>40 &
+G>100`) and locating the four dense straight-line runs (left/right/top/bottom
+edges), exactly as was done for PSA's black line in 6d. The same technique
+was also used to precisely re-locate the existing blue (outer box) and red
+(old computed window) lines already burned into that same image, using a
+tight, distinct color threshold for each. Because the user's screenshot was
+a resized/letterboxed rendition of the original overlay (not pixel-identical
+to the source file), the blue and red lines' **already-known exact positions**
+in the original 1800×2400 image were used as calibration anchors: a linear
+(affine) fit from "original-image fraction" → "screenshot pixel" was solved
+per axis using all 4 known blue+red edge positions, with sub-pixel residuals
+(<1px) confirming the fit was reliable — then the same fit was inverted to
+map the newly-measured green line back into the original image's own
+fraction space, fully independent of any assumption about how the screenshot
+tool scaled/padded the image.
+
+**Result:** measured margins (as fraction of the outer detected box, same
+convention as `GUARD_WINDOW_AUTO_MARGIN`): left=4.45%, right=4.41%,
+top=2.94%, bottom=2.58%; symmetrized to left=right=4.43%, top=bottom=2.76%
+(comparable-magnitude L/R and T/B asymmetry to PSA's 6d measurement, treated
+the same way as freehand-marking noise). Applying these margins to all 9
+real TAG photos gives a tightly-clustered displayed window ratio of
+0.625-0.630 (mean 0.6276, spread <1%) — vs. the theoretical published-
+dimension ratio of 0.5952, meaning the *theoretical* TAG window had been
+running ~5.4% narrower/taller than the guard's actual real-world window
+opening all along. This is exactly what the user meant by the red overlay
+looking "a little off": the shape itself needed correcting, not just its
+position.
+
+**Changes made to `sections/vg-vault.liquid`:**
+- Added `GUARD_WINDOW_AUTO_MARGIN.tag = { left: 0.0443, right: 0.0443, top:
+  0.0276, bottom: 0.0276 }` — TAG now uses the exact same runtime
+  bounding-box auto-detection architecture as PSA (`detectContentBox()` +
+  `getGuardWindowRect()`), auto-centering per real photo instead of relying
+  on one universal fixed window. No changes were needed to either function's
+  code — the architecture already generalized to any brand added to this
+  map.
+- Recomputed `GUARD_WINDOW.tag` (the fixed pre-upload align-guide value,
+  shown before a specific color/photo is loaded) as the median photo-object
+  position across all 9 real TAG photos with the new margins applied:
+  `{ top: 17.14, left: 25.70, right: 25.68, bottom: 20.87 }` (previously `{
+  top: 17.0, left: 26.56, right: 26.56, bottom: 20.0 }`, which had been
+  derived from the now-superseded theoretical slab-dimension ratio).
+- Updated surrounding comments to remove the now-stale "TAG is intentionally
+  not in this map" language and document the corrected methodology and the
+  image/canvas aspect-ratio nuance discovered along the way.
+
+**Verified before deploying:** visually inspected the resulting window
+overlay on 7 of the 9 real TAG photos (multiple different colors/cards),
+confirming the window now lands tightly on the true guard-to-slab edge in
+every case — visibly tighter/more accurate than the old (theoretical-ratio)
+window, and matching the user's own hand-marked line almost exactly on the
+photo they annotated. Also re-ran a from-scratch Python simulation mirroring
+`detectContentBox()`/`getGuardWindowRect()` exactly, on both real app canvas
+sizes (700×875 align canvas, 800×1000 preview canvas — both aspect 0.8),
+confirming the same 0.625-0.630 clustering holds on the actual canvases the
+app uses, not just in raw-image-fraction space.
+
+**Deployed:** pushed via `shopify theme push --only
+sections/vg-vault.liquid --allow-live --nodelete --force`, verified
+byte-for-byte via a fresh `theme pull` into `/tmp/vg-verify-tagfix`
+(banner-stripped diff, exact match), committed (`70c0926`) and pushed to
+GitHub.
+
+---
+
 ## 7. Open items / known pending decisions
 
 - **Footer wordmark color** (see Section 4) — unresolved, needs the user's
