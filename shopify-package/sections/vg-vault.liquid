@@ -130,12 +130,26 @@
             <i class="fa-solid fa-arrow-left"></i> Retake photo
           </button>
         </div>
-        <p style="color:var(--vg-navy-400); font-size:13.5px; margin-bottom:22px;">
-          Drag to position, pinch or scroll to zoom until the guide is fully covered by your slab.
-          Part of the slab may end up cropped off - that's completely normal, just make sure there
-          are no gaps. If your slab photo still shows a guard or case on it, retake or crop the
-          photo so the guard itself is out of frame.
-        </p>
+        <div class="vg-card-flat" style="padding:16px 20px; margin-bottom:22px;">
+          <div style="font-weight:600; font-size:13.5px; color:var(--vg-navy-700); margin-bottom:10px;">
+            <i class="fa-solid fa-arrows-up-down-left-right" style="color:var(--vg-gold-500); margin-right:6px;"></i>
+            Drag to position, pinch or scroll to zoom
+          </div>
+          <ul style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px;">
+            <li style="display:flex; gap:9px; align-items:flex-start; font-size:13px; color:var(--vg-navy-600); line-height:1.5;">
+              <i class="fa-solid fa-check" style="color:var(--vg-gold-500); font-size:11px; margin-top:4px; flex-shrink:0;"></i>
+              <span>Fill the guide completely - no gaps around the edges</span>
+            </li>
+            <li style="display:flex; gap:9px; align-items:flex-start; font-size:13px; color:var(--vg-navy-600); line-height:1.5;">
+              <i class="fa-solid fa-check" style="color:var(--vg-gold-500); font-size:11px; margin-top:4px; flex-shrink:0;"></i>
+              <span>Some cropping at the edges is normal - that's OK</span>
+            </li>
+            <li style="display:flex; gap:9px; align-items:flex-start; font-size:13px; color:var(--vg-navy-600); line-height:1.5;">
+              <i class="fa-solid fa-check" style="color:var(--vg-gold-500); font-size:11px; margin-top:4px; flex-shrink:0;"></i>
+              <span>Slab already in a guard/case? Retake or crop the photo so it's out of frame</span>
+            </li>
+          </ul>
+        </div>
 
         <div id="vgv-align-stage" class="vgv-align-stage">
           <canvas id="vgv-align-canvas" width="700" height="875"></canvas>
