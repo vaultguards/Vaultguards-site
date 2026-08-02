@@ -1046,6 +1046,96 @@ byte-for-byte via a fresh `theme pull` into `/tmp/vg-verify-tagheight`
 (banner-stripped diff, exact match), committed (`b8bdc7f`) and pushed to
 GitHub.
 
+**⚠️ This fix was itself found to be a regression — see 6g immediately
+below, which reverts it.**
+
+---
+
+## 6g. Revert of 6f — zero vertical margin broke the guard's own frame border
+
+**The bug, caught immediately by the user testing live:** after 6f shipped,
+the user tested with a real photographed TAG slab (a graded Pokemon Mewtwo
+card) and reported: *"look at how off it is now. if you look at the top and
+bottom this is the result, the color of the guard is cut off."* An
+`understand_images` check of the screenshot confirmed it precisely: the
+left/right edges showed the guard's normal black-outer/red-inner colored
+frame band, but at top and bottom that same colored band was **completely
+absent** — the slab's own white plastic ran straight to the outer casing
+edge, with no frame color at all top/bottom.
+
+**Root cause — a fundamental misunderstanding of what the window rect
+controls:** re-reading `drawGuardComposite()` closely revealed that
+`getGuardWindowRect()`'s returned rect is not merely "how much of the slab
+photo to show" - it is used for **two** clips:
+1. The user's slab photo is clipped to draw *only inside* this rect.
+2. The guard product image is clipped (via an evenodd "donut" path: outer
+   canvas rect XOR the window rect) to draw *only outside* this rect.
+
+This means the window rect **is** the literal, exact boundary between
+"rendered as guard frame" and "rendered as slab window" in the final
+composite - it is not a soft preference, it is a hard mask. 6f's change of
+`GUARD_WINDOW_AUTO_MARGIN.tag.top/bottom` from `0.0276` to `0` meant the
+window's top/bottom edges were set to sit exactly on the guard photo's own
+auto-detected outer silhouette edge (zero inset) - leaving **zero pixels**
+of vertical space in which the guard's own frame material could ever be
+drawn. The frame didn't get thinner; it was mathematically eliminated at
+top/bottom. The 6f reasoning that arrived at this value (solving for a
+"negative" needed margin, then rounding up to the nearest valid value of 0)
+was a plausible-looking derivation that nonetheless produced an obviously
+wrong result once actually rendered - this is exactly the failure mode this
+change should have been visually checked against (a rendered composite,
+not just a numeric ratio simulation) before deploying, and wasn't.
+
+**Independent re-verification that 6e's original margin was correct all
+along:** rather than just reverting on faith, the frame-to-slab boundary
+was re-measured directly and independently, using a different technique
+than 6e's single user-hand-mark: zoomed, pixel-gridlined crops of the top
+and bottom edge regions of 3 different real TAG guard product photos
+(aquafrost/blue, voidshift/dark purple, solarshade/orange - chosen for
+color variety) were generated and visually read frame-by-frame to find the
+exact row where the colored frame material transitions to the slab's own
+plastic/label color. (An initial attempt to fully automate this via
+gradient/edge detection was tried first and discarded - it proved unreliable,
+picking up glitter-texture and JPEG-noise gradients instead of the true
+seam; direct visual reading of gridlined crops was more trustworthy.)
+Results: top margins of 2.10%, 2.51%, 2.11% of each photo's own outer-box
+height (average 2.24%), bottom margins of 2.54%, 2.26%, 2.50% (average
+2.43%) - closely matching the existing 6e value of 2.76% (well within
+normal measurement tolerance for a 3-photo spot check), and nowhere close
+to 0%. Re-simulating `getGuardWindowRect()`'s exact runtime logic with the
+reverted 0.0276 margin across all 9 real TAG photos on both real app canvas
+sizes reproduced the previously-validated 0.625-0.630 ratio range exactly.
+
+**Changes made to `sections/vg-vault.liquid`:**
+- `GUARD_WINDOW_AUTO_MARGIN.tag.top/bottom`: `0`/`0` → **`0.0276`/`0.0276`**
+  (the 6e value, restored)
+- `GUARD_WINDOW.tag.top`: `12.10` → **`17.14`** (the 6e value, restored, so
+  the align-guide shown before a photo is uploaded stays a consistent shape
+  with the actual 6e-margin render window)
+- Rewrote the surrounding comments to document the 6f regression, why it
+  broke the render (the clip-boundary mechanism above), and the 3-photo
+  independent re-verification supporting the revert.
+
+**What this does NOT resolve:** the original concern behind 6f - that a
+real user's photographed slab might show its rounded top cap getting
+covered by the guard's frame - is not further addressed by this revert.
+6g's finding is that the *window's* margin is constrained by the guard
+product's own physical frame border (confirmed present at ~2.1-2.5% on 3
+different real guard colors) and cannot be reduced without destroying that
+visible border - if a real slab is taller than this physical window, that
+is a property of the real product, not a software bug, and the tool should
+render it faithfully rather than paper over it by masking out the guard's
+own frame. If cropping is still observed after this revert, the next step
+should be a direct, unedited photo of the user's own physical guard+slab
+(not a screenshot of this tool) so the true physical window can be
+compared against a real, non-tool-generated reference.
+
+**Deployed:** pushed via `shopify theme push --only
+sections/vg-vault.liquid --allow-live --nodelete --force`, verified
+byte-for-byte via a fresh `theme pull` into `/tmp/vg-verify-tagrevert`
+(banner-stripped diff, exact match), committed (`8908da4`) and pushed to
+GitHub.
+
 ---
 
 ## 7. Open items / known pending decisions
