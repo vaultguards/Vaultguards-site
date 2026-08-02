@@ -708,6 +708,100 @@ committed and pushed to GitHub.
 
 ---
 
+## 6d. PSA align-guide/window shape correction — user-verified ground truth
+
+**Problem reported by user (with screenshot):** after 6c shipped, the user
+sent a screenshot of the align-step guide with a real PSA Mewtwo slab photo
+positioned inside it, showing clearly visible empty space above the label
+and below the card, still inside the dashed guide boundary. Quote: *"it
+needs to perfectly fit the dimensions of a PSA slab... the registration
+lines from the picture need to match perfectly all angles of the slab."*
+
+**Root cause:** 6c's fix solved *position* (per-photo auto-centering) but
+never validated *shape*. The margins used in `GUARD_WINDOW_AUTO_MARGIN.psa`
+(13%/13% left-right, 3%/3% top-bottom) were an eyeballed guess from a quick
+visual pass, not measured against any authoritative boundary. Reverse-
+engineering the resulting window's aspect ratio (all Vault canvases share a
+fixed 0.8 width:height ratio, so `windowAspect = boxAspect * (1-marginL-
+marginR)/(1-marginT-marginB)`) showed these margins produced windows with
+aspect ≈ 0.48-0.49 — and the align-guide's own separate fixed
+`GUARD_WINDOW.psa` value (itself only a median of those same flawed
+per-photo windows) inherited the same ≈0.487 ratio. A real PSA slab is
+nowhere near that elongated, so scaling a real slab photo to fill the
+guide's width left visible empty space top/bottom — exactly the bug
+reported.
+
+**Why not just use PSA's published slab dimensions (the TAG-fix approach)?**
+Web research on PSA's *external slab* dimensions converged on a
+width:height ratio of ~0.60 (multiple independent sources: forum ruler
+measurements of 3-3/16"x5-5/16", a third-party grading-slab size-comparison
+table citing 3.25"x5.375", etc.) On its own this would have been a
+reasonable next guess (mirroring the TAG fix's method exactly), but it
+describes the *whole outer slab*, not necessarily the *exact cutout window*
+a specific guard manufacturer designs into their product — and this tool
+needed the latter. Rather than guess further, the user was shown one of our
+own diagnostic overlay images (blue = auto-detected outer guard+slab
+silhouette, red = the then-current per-photo window) and hand-drew a black
+box directly on it marking the true boundary: *"the black rectangle...
+bordering the very edge of the beginning of the guard is the correct
+dimension."*
+
+**Extracting ground truth from the user's hand-drawn box:** downloaded the
+user's annotated image, then, instead of trusting a second vision-model
+pass (see the anchoring-bias caveat in 6c — still applies), located the
+box programmatically: scanned fixed-position rows/columns in the flat
+background margin areas (avoiding the rounded corners and card art) for
+runs of near-black pixels (`grayscale < 70`), which cleanly isolates the
+straight ruler-drawn lines from the card's own dark artwork. Measured
+against the same-image's auto-detected outer box (found the same way as
+`detectContentBox()`, via simple color-channel thresholding):
+- left margin = 5.9%, right = 7.2%, top = 3.4%, bottom = 4.0% (as a
+  fraction of the outer box's own width/height)
+- symmetrized to `left = right = 6.56%`, `top = bottom = 3.72%` (the ~1pp
+  L/R and T/B asymmetry is consistent with normal freehand-drawing noise on
+  a physically symmetric manufactured product, not a real design asymmetry)
+
+**Re-verification:** re-applied these exact margins (0.0656/0.0656/0.0372/
+0.0372) to 6 different real PSA guard photos spanning different colors
+(curse, voltshift, halo, solarwind, aquapulse, shockwave) and visually
+inspected each resulting overlay myself (`Read` tool, not a second
+vision-model call) — the computed window lands exactly on the same
+guard-frame-to-slab boundary in every case, confirming the margins
+generalize across the whole product line, not just the one annotated
+photo. Across all 14 real photos this produces a window aspect ratio of
+0.568-0.576 (essentially constant, ±1.5%) — a dramatic improvement over the
+old margins' ~0.48-0.49, and reassuringly close to the independently
+web-researched PSA slab ratio (~0.60), confirming both methods point the
+same direction even though the user's hand-marked ground truth was used as
+the authoritative source since it reflects this exact manufactured
+product's own cutout, not just the generic slab spec.
+
+**Fix applied:**
+- `GUARD_WINDOW_AUTO_MARGIN.psa` (runtime per-photo composite window):
+  `{ left: 0.0656, right: 0.0656, top: 0.0372, bottom: 0.0372 }` (previously
+  `{ left: 0.13, right: 0.13, top: 0.03, bottom: 0.03 }`).
+- `GUARD_WINDOW.psa` (fixed align-guide-only value): recomputed as the
+  median photo-object position across all 14 photos with the new margins
+  applied on top, giving `{ top: 11.25, left: 23.60, right: 21.48, bottom:
+  12.70 }` (previously `{ top: 11.0, left: 27.7, right: 25.6, bottom: 12.2
+  }`) — aspect ≈0.577, matching the real per-photo windows' 0.568-0.576
+  range, so the align guide and the final composite are now shape-consistent
+  with each other and with the real product.
+- `getGuardWindowRect()`/`detectContentBox()`/`loadGuardImage()` logic
+  itself is unchanged — only the numeric margin/window values changed; no
+  code-path change was needed since the existing auto-detect architecture
+  already supported per-axis margins correctly, it was only fed the wrong
+  numbers.
+- TAG's fixed `GUARD_WINDOW.tag` value is untouched (still 5.25"x3.125"
+  slab-proportioned per section 6b).
+
+**Deployed:** pushed via `shopify theme push --only
+sections/vg-vault.liquid --allow-live --nodelete --force`, verified
+byte-for-byte via `theme pull` into `/tmp/vg-verify-alignfix` (banner-
+stripped diff), committed (`e68caf2`) and pushed to GitHub.
+
+---
+
 ## 7. Open items / known pending decisions
 
 - **Footer wordmark color** (see Section 4) — unresolved, needs the user's
