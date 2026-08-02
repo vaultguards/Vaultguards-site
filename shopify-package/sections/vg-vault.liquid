@@ -293,10 +293,110 @@
   // https://help.taggrading.com) as the authoritative width:height ratio -
   // top/bottom kept from the measured photo boundary, left/right solved so
   // the window itself is TAG-slab-proportioned, not just a traced photo edge.
+  //
+  // PSA's value below is used ONLY as the generic guide shown during the
+  // align step (before a specific color is chosen) - it is a representative
+  // average, not a per-photo truth. The real per-photo window for PSA is
+  // computed at runtime by detectContentBox()/getGuardWindowRect() below,
+  // because measuring 14 real PSA guard photos pixel-by-pixel showed each
+  // color's product photo was shot at its own zoom/crop (the guard+slab
+  // object's outer edges land anywhere from ~62% to ~66% of the photo's
+  // width depending on the color), so one fixed absolute-canvas-percentage
+  // window could never line up with all of them - it was only ever correct
+  // for whichever photo happened to match that one guess. See
+  // VAULTGUARDS_METHOD.md section "PSA guard auto-centering" for the full
+  // measurement method and data.
   var GUARD_WINDOW = {
     tag: { top: 17.0, left: 26.56, right: 26.56, bottom: 20.0 },
-    psa: { top: 13.2, left: 21.9, right: 21.8, bottom: 13.0 }
+    psa: { top: 11.0, left: 27.7, right: 25.6, bottom: 12.2 }
   };
+
+  // Auto-center config for brands whose product photos vary shot-to-shot.
+  // For each such brand, the window is derived at runtime from THAT PHOTO'S
+  // own detected visible (non-white) bounding box, then inset by a fixed
+  // proportion of that box's own width/height - so it "auto centers" against
+  // whatever the real photo actually shows instead of assuming one universal
+  // position. Margins were measured across several real PSA guard photos:
+  // the colored guard border reliably eats up ~13-15% of the object's own
+  // width on the left and right (a thicker gripping rail), but only ~2-4% of
+  // its height on top/bottom (these guards have almost no visible border
+  // above/below the slab). TAG is intentionally NOT in this map - its single
+  // photo style was already verified consistent, so it keeps the fixed
+  // GUARD_WINDOW.tag percentages untouched.
+  var GUARD_WINDOW_AUTO_MARGIN = {
+    psa: { left: 0.13, right: 0.13, top: 0.03, bottom: 0.03 }
+  };
+
+  // Detects the visible (non-white) bounding box of a loaded guard product
+  // photo, as fractions (0..1) of its own width/height. Downscales onto a
+  // small offscreen canvas first purely for speed - a few hundred px is
+  // already far more resolution than this needs, since guard photos are
+  // shot on a plain white background with a single centered object. Returns
+  // null if the canvas can't be read (e.g. a CORS-blocked image) so callers
+  // can fall back to the fixed GUARD_WINDOW percentages.
+  function detectContentBox(img) {
+    var w = img.naturalWidth || img.width;
+    var h = img.naturalHeight || img.height;
+    if (!w || !h) return null;
+    var scale = Math.min(1, 240 / w);
+    var cw = Math.max(1, Math.round(w * scale));
+    var ch = Math.max(1, Math.round(h * scale));
+    var c = document.createElement('canvas');
+    c.width = cw; c.height = ch;
+    var cctx = c.getContext('2d');
+    cctx.drawImage(img, 0, 0, cw, ch);
+    var data;
+    try {
+      data = cctx.getImageData(0, 0, cw, ch).data;
+    } catch (e) {
+      return null;
+    }
+    var minX = cw, maxX = -1, minY = ch, maxY = -1;
+    var THRESH = 12;
+    for (var y = 0; y < ch; y++) {
+      for (var x = 0; x < cw; x++) {
+        var i = (y * cw + x) * 4;
+        var r = data[i], g = data[i + 1], b = data[i + 2];
+        if ((255 - r) > THRESH || (255 - g) > THRESH || (255 - b) > THRESH) {
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
+        }
+      }
+    }
+    if (maxX < 0 || maxY < 0) return null;
+    return {
+      left: minX / cw,
+      right: (maxX + 1) / cw,
+      top: minY / ch,
+      bottom: (maxY + 1) / ch
+    };
+  }
+
+  // Builds the actual window rect (in canvas px) for one guard photo: uses
+  // the auto-detected content box + proportional margin when configured and
+  // available for this brand, otherwise falls back to the fixed
+  // GUARD_WINDOW percentages (TAG's path, or PSA if detection failed).
+  function getGuardWindowRect(brand, guardImg, W, H) {
+    var autoMargin = GUARD_WINDOW_AUTO_MARGIN[brand];
+    var box = guardImg && guardImg.__vgvContentBox;
+    if (autoMargin && box) {
+      var boxW = (box.right - box.left) * W;
+      var boxH = (box.bottom - box.top) * H;
+      var x = box.left * W + autoMargin.left * boxW;
+      var right = box.right * W - autoMargin.right * boxW;
+      var y = box.top * H + autoMargin.top * boxH;
+      var bottom = box.bottom * H - autoMargin.bottom * boxH;
+      return { x: x, y: y, w: right - x, h: bottom - y };
+    }
+    var win = GUARD_WINDOW[brand] || GUARD_WINDOW.tag;
+    var x2 = (win.left / 100) * W;
+    var y2 = (win.top / 100) * H;
+    var w2 = W - x2 - (win.right / 100) * W;
+    var h2 = H - y2 - (win.bottom / 100) * H;
+    return { x: x2, y: y2, w: w2, h: h2 };
+  }
 
   var haptic = (window.VG && window.VG.haptic) || { tap: function () {}, success: function () {}, warn: function () {}, snap: function () {} };
 
@@ -622,6 +722,9 @@
       var img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = function () {
+        // Computed once per photo and cached on the Image itself - see
+        // detectContentBox() above for why this exists (PSA auto-centering).
+        img.__vgvContentBox = detectContentBox(img);
         guardImageCache[product.id] = img;
         resolve(img);
       };
@@ -635,11 +738,8 @@
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, W, H);
 
-    var win = GUARD_WINDOW[state.brand] || GUARD_WINDOW.tag;
-    var winX = (win.left / 100) * W;
-    var winY = (win.top / 100) * H;
-    var winW = W - winX - (win.right / 100) * W;
-    var winH = H - winY - (win.bottom / 100) * H;
+    var winRect = getGuardWindowRect(state.brand, guardImg, W, H);
+    var winX = winRect.x, winY = winRect.y, winW = winRect.w, winH = winRect.h;
     var r = Math.max(2, Math.round(W * 0.0125));
 
     if (state.slabImage) {

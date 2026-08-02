@@ -607,6 +607,107 @@ Both were root-caused and fixed for real this time, with actual proof:
 
 ---
 
+## 6c. PSA guard "auto-center" fix — runtime bounding-box detection
+
+**Symptom reported:** "a lot of the colors and guards aren't centered" on the
+PSA guards specifically (TAG was explicitly excluded — it was already fixed,
+see 6b). Request: auto-center each color option to the real perforated edges
+of the PSA slab whenever a customer uploads their photo.
+
+**Root cause (found via pixel measurement, not guesswork):** `vg-vault.liquid`
+used one hardcoded `GUARD_WINDOW.psa` rectangle, defined as a fixed
+percentage of the *whole canvas*, applied identically to every PSA guard
+color's product photo in `drawGuardComposite()`. Real PSA guard product
+photos are NOT shot on a fixed rig — each of the 14 colors' photos has its
+own zoom/crop. Downloaded all 14 real front photos from
+`cdn.shopify.com` (via the `shimmer-series` `products.json` — see Section 2
+for the Cloudflare-rate-limit workaround) and measured them:
+
+- The guard+slab object's own visible (non-white) bounding box ranges from
+  ~62% to ~66% of the photo's width depending on the color, and isn't always
+  centered in the frame (2 of 14 colors were shifted ~4pp left of the rest).
+- So *any* single fixed-percentage window is only ever correct for whichever
+  one photo happened to match the guess — every other color is off by
+  however much that photo's real crop differs.
+
+**Measurement method (important caveat found this session):** an initial
+pass asked `understand_images` to verify the current window against each
+photo with the current red-box overlay already drawn on it — this produced
+an **anchoring-bias artifact**: across 14 different photos, sometimes with
+completely different graded cards inside, it echoed back near-identical
+numbers to the box every time, even when explicitly told not to trust the
+box. **Do not verify a measurement with a vision model shown the reference
+value in the same image.** What actually worked:
+1. Direct pixel/numpy inspection (horizontal + vertical intensity scans) of
+   several real photos, to characterize the frame-color band vs. the
+   slab's own visible content.
+2. A plain white-background-threshold bounding-box scan (`max(|255-pixel|) >
+   12`) across all 14 photos — simple, unambiguous, no card-content
+   dependency, and it's exactly what confirmed the object position/size
+   really does vary photo to photo.
+3. Overlay images with the *newly computed* rectangle (not the old one)
+   drawn on the real photos, viewed directly (not asked to a vision model to
+   "confirm a number") across 11 of the 14 products, including different
+   frame colors, different demo cards (confirmed at least 3 different real
+   graded cards appear across the 14 photos: Mega Gengar ex, Dark
+   Charmeleon, Blaine's Charizard) and the two known outlier photos — all
+   showed a clean, consistent margin around the label+card with no clipping.
+
+**Fix — auto-detect at runtime instead of one hardcoded value:** rather than
+trying to hand-tune a better single percentage (which would still be wrong
+for whichever photos don't match it), `vg-vault.liquid` now detects each
+PSA guard photo's own visible bounding box in the browser when it loads,
+then derives that photo's window as a fixed proportional inset *from that
+photo's own box* — so it "auto-centers" against whatever the real photo
+actually shows instead of assuming one universal position:
+- `detectContentBox(img)` — draws the loaded guard image onto a small
+  (≤240px wide) offscreen canvas purely for speed, reads back pixel data,
+  and returns the non-white bounding box as fractions of width/height.
+  Returns `null` if the canvas can't be read (falls back to the old fixed
+  percentage) — this only matters if a future host ever serves guard photos
+  without CORS; `cdn.shopify.com` sends `access-control-allow-origin: *` so
+  in production this always succeeds (confirmed both via `curl -I` and via a
+  real Playwright browser test loading real product photos with
+  `crossOrigin="anonymous"` and calling `getImageData()` — no
+  `SecurityError`, and the computed boxes matched a Python simulation of the
+  same algorithm run against the same photos, to the pixel).
+- `GUARD_WINDOW_AUTO_MARGIN.psa = { left: 0.13, right: 0.13, top: 0.03,
+  bottom: 0.03 }` — measured proportions of that box's own width/height that
+  the colored guard border eats up. Left/right margin is much bigger than
+  top/bottom because these guards have a real physical design with almost
+  no visible border above/below the slab but a thicker gripping rail on the
+  sides — confirmed consistent (~13-15%) across every photo checked once the
+  box itself is used as the reference frame, even though the box's absolute
+  position in the canvas is not consistent.
+- `getGuardWindowRect(brand, guardImg, W, H)` picks the auto-detected path
+  when both a margin config and a successfully-detected box exist for that
+  brand, otherwise falls back to the old fixed `GUARD_WINDOW[brand]`
+  percentages untouched — this is exactly how **TAG stays on the old,
+  already-verified-correct fixed-percentage path**: it's simply not present
+  in `GUARD_WINDOW_AUTO_MARGIN`, so it always takes the fallback branch.
+- The box is computed once per photo (inside `loadGuardImage()`, cached as
+  `img.__vgvContentBox` alongside the existing `guardImageCache`), not
+  recomputed on every redraw.
+- `GUARD_WINDOW.psa`'s fixed percentage still exists but now only feeds the
+  generic *align-step* guide overlay (shown before any specific color is
+  picked, so there's no real per-photo box to detect yet) — updated to a
+  representative median across all 14 photos' own auto-detected windows
+  (`{ top: 11.0, left: 27.7, right: 25.6, bottom: 12.2 }`) so the guide the
+  customer aligns against during upload is a better approximation than the
+  old blind visual estimate. The align step's relative positioning math
+  (`relX`/`relY`/`baseHRatio` in `drawGuardComposite()`) is unaffected by
+  this change — it already worked by mapping the user's position *relative*
+  to the align-step guide into whatever the final window turns out to be, so
+  it stays correct even though the guide and the real per-photo window are
+  now two different rectangles.
+
+**Deployed:** pushed via `shopify theme push --only
+sections/vg-vault.liquid --allow-live --nodelete --force`, verified
+byte-for-byte via `theme pull` into a fresh tmp dir (banner-stripped diff),
+committed and pushed to GitHub.
+
+---
+
 ## 7. Open items / known pending decisions
 
 - **Footer wordmark color** (see Section 4) — unresolved, needs the user's
